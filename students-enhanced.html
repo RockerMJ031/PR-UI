@@ -460,32 +460,32 @@
             
             <div class="nav-menu">
                 <div class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="mentor-dashboard.html" class="nav-link">
                         <i class="fas fa-tachometer-alt"></i>
                         Dashboard
                     </a>
                 </div>
                 <div class="nav-item">
-                    <a href="#" class="nav-link active">
+                    <a href="students-enhanced.html" class="nav-link active">
                         <i class="fas fa-users"></i>
                         Students
                     </a>
                 </div>
                 <div class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="sessions-enhanced.html" class="nav-link">
                         <i class="fas fa-calendar-alt"></i>
                         Sessions
                     </a>
                 </div>
                 <div class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="reports-enhanced.html" class="nav-link">
                         <i class="fas fa-chart-bar"></i>
                         Reports
                     </a>
                 </div>
                 <div class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-credit-card"></i>
+                    <a href="finance.html" class="nav-link">
+                        <i class="fas fa-pound-sign"></i>
                         Finance
                     </a>
                 </div>
@@ -785,20 +785,21 @@
             alert(`Viewing leave request for student: ${studentId}`);
         }
 
+        // 删除第790-799行的整个代码块
         // Navigation links
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                // Remove active class from all links
-                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-                
-                // Add active class to clicked link
-                this.classList.add('active');
-                
-                console.log('Navigation clicked:', this.textContent.trim());
-            });
-        });
+        // document.querySelectorAll('.nav-link').forEach(link => {
+        //     link.addEventListener('click', function(e) {
+        //         e.preventDefault();
+        //         
+        //         // Remove active class from all links
+        //         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        //         
+        //         // Add active class to clicked link
+        //         this.classList.add('active');
+        //         
+        //         console.log('Navigation clicked:', this.textContent.trim());
+        //     });
+        // });
     </script>
 </body>
 </html>
