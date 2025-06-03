@@ -27,6 +27,7 @@
             --attendance-color: #3498db;
             --safeguarding-color: #f39c12;
             --termly-color: #27ae60;
+            --behavior-color: #9b59b6;
         }
 
         * {
@@ -151,87 +152,95 @@
         /* Report Cards Grid */
         .reports-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
             margin-bottom: 30px;
+            align-items: start;
         }
 
+        /* 精确对齐版本 */
+        /* 修复报告卡片对齐问题 */
         .report-card {
             background: white;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
             overflow: hidden;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: grid;
+            grid-template-rows: auto 1fr;
+            /* 修复报告卡片高度问题 */
+            .report-card {
+                background: white;
+                border-radius: var(--border-radius);
+                box-shadow: var(--shadow);
+                overflow: hidden;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                display: grid;
+                grid-template-rows: auto 1fr;
+                min-height: 450px; /* 增加最小高度 */
+                height: auto; /* 改为自动高度 */
+            }
+            
+            .report-card-header {
+                padding: 25px 20px; /* 增加上下内边距 */
+                color: white;
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                min-height: 200px; /* 增加最小高度 */
+            }
+            
+            .report-card-body {
+                padding: 25px 20px; /* 增加内边距 */
+                display: grid;
+                grid-template-rows: 1fr auto auto;
+                gap: 20px; /* 增加间距 */
+                align-content: space-between;
+                min-height: 180px; /* 确保底部内容有足够空间 */
+            }
+        height: 400px; /* 固定高度确保完全对齐 */
         }
-
-        .report-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-        }
-
-        .report-card.session .report-card-header {
-            background: linear-gradient(135deg, var(--session-color), #c0392b);
-        }
-
-        .report-card.attendance .report-card-header {
-            background: linear-gradient(135deg, var(--attendance-color), #2980b9);
-        }
-
-        .report-card.safeguarding .report-card-header {
-            background: linear-gradient(135deg, var(--safeguarding-color), #e67e22);
-        }
-
-        .report-card.termly .report-card-header {
-            background: linear-gradient(135deg, var(--termly-color), #229954);
-        }
-
+        
         .report-card-header {
             padding: 20px;
             color: white;
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 180px;
         }
-
-        .report-card-header .icon {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-
-        .report-card-header h3 {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .report-card-header p {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-
+        
         .report-card-body {
             padding: 20px;
+            display: grid;
+            grid-template-rows: 1fr auto auto;
+            gap: 15px;
+            align-content: space-between;
         }
-
+        
         .report-info {
-            text-align: center;
-            margin-bottom: 20px;
+            display: contents;
         }
-
+        
         .report-link {
-            display: block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             background: var(--primary-color);
             color: white;
             padding: 12px 20px;
             border-radius: var(--border-radius);
             text-decoration: none;
-            margin-bottom: 10px;
             transition: all 0.3s ease;
+            font-weight: 600;
+            height: 48px;
         }
-
-        .report-link:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-        }
-
+        
         .password-display {
             background: #f8f9fa;
             border: 1px solid var(--border-color);
@@ -241,34 +250,97 @@
             font-size: 0.9rem;
             color: var(--text-color);
             text-align: center;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+        /* 报告卡片类型样式 */
+.report-card.session .report-card-header {
+    background: var(--session-color);
+}
+.report-card.attendance .report-card-header {
+    background: var(--attendance-color);
+}
+.report-card.safeguarding .report-card-header {
+    background: var(--safeguarding-color);
+}
+.report-card.termly .report-card-header {
+    background: var(--termly-color);
+}
+.report-card.behavior .report-card-header {
+    background: var(--behavior-color);
+}
+/* 图标样式 */
+.report-card-header .icon {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    opacity: 0.9;
+}
+.report-card-header h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+.report-card-header p {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    line-height: 1.4;
+}
+/* 悬停效果 */
+.report-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+.report-link:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+}
+/* 确保网格布局统一 */
+.reports-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+    align-items: stretch;
+}
 
-        /* Statistics Overview */
+        /* Statistics Overview 优化 */
         .stats-overview {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
         }
 
         .stat-item {
             background: white;
-            padding: 15px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
             text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-top: 4px solid var(--primary-color);
+        }
+
+        .stat-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
         }
 
         .stat-item .number {
-            font-size: 1.8rem;
-            font-weight: 700;
+            font-size: 2.2rem;
+            font-weight: 800;
             color: var(--primary-color);
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            line-height: 1;
         }
 
         .stat-item .label {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: var(--text-light);
+            font-weight: 500;
+            line-height: 1.3;
         }
 
         /* Responsive */
@@ -299,6 +371,87 @@
             .stats-overview {
                 grid-template-columns: repeat(2, 1fr);
             }
+        }
+        /* 响应式设计 - 合并后的媒体查询 */
+        @media (max-width: 1200px) {
+            .reports-grid {
+                grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+                gap: 20px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .reports-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-overview {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .report-card {
+                min-height: 420px; /* 增加移动端最小高度 */
+                height: auto;
+            }
+            
+            .report-card-header {
+                min-height: 180px; /* 保持足够的头部高度 */
+                padding: 20px 15px;
+            }
+            
+            .report-card-body {
+                padding: 20px 15px;
+                gap: 18px;
+                min-height: 160px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .reports-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .report-card {
+                min-height: 400px; /* 小屏幕也保持合理高度 */
+            }
+            
+            .report-card-header {
+                min-height: 160px;
+                padding: 18px 15px;
+            }
+            
+            .report-card-body {
+                padding: 18px 15px;
+                min-height: 150px;
+            }
+        }
+        
+        /* 确保网格布局统一 */
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+            align-items: stretch;
         }
     </style>
 </head>
@@ -474,6 +627,27 @@
                         </div>
                     </div>
                 </div>
+                <!-- Behavior Report -->
+                <div class="report-card behavior">
+                    <div class="report-card-header">
+                        <div class="icon">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <h3>Behavior Report</h3>
+                        <p>Student behavior tracking and analysis</p>
+                    </div>
+                    <div class="report-card-body">
+                        <div class="report-info">
+                            <a href="https://example-lark-document-link.com/behavior" class="report-link" target="_blank">
+                                <i class="fas fa-external-link-alt"></i>
+                                View Report
+                            </a>
+                            <div class="password-display">
+                                Password: Behavior2024
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
@@ -497,3 +671,4 @@
     </script>
 </body>
 </html>
+
