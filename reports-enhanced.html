@@ -28,6 +28,7 @@
             --safeguarding-color: #f39c12;
             --termly-color: #27ae60;
             --behavior-color: #9b59b6;
+            --teacher-scr-color: #e67e22; /* 新增Teacher SCR Report颜色 */
         }
 
         * {
@@ -158,8 +159,6 @@
             align-items: start;
         }
 
-        /* 精确对齐版本 */
-        /* 修复报告卡片对齐问题 */
         .report-card {
             background: white;
             border-radius: var(--border-radius);
@@ -168,58 +167,28 @@
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             display: grid;
             grid-template-rows: auto 1fr;
-            /* 修复报告卡片高度问题 */
-            .report-card {
-                background: white;
-                border-radius: var(--border-radius);
-                box-shadow: var(--shadow);
-                overflow: hidden;
-                transition: transform 0.3s ease, box-shadow 0.3s ease;
-                display: grid;
-                grid-template-rows: auto 1fr;
-                min-height: 450px; /* 增加最小高度 */
-                height: auto; /* 改为自动高度 */
-            }
-            
-            .report-card-header {
-                padding: 25px 20px; /* 增加上下内边距 */
-                color: white;
-                text-align: center;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                min-height: 200px; /* 增加最小高度 */
-            }
-            
-            .report-card-body {
-                padding: 25px 20px; /* 增加内边距 */
-                display: grid;
-                grid-template-rows: 1fr auto auto;
-                gap: 20px; /* 增加间距 */
-                align-content: space-between;
-                min-height: 180px; /* 确保底部内容有足够空间 */
-            }
-        height: 400px; /* 固定高度确保完全对齐 */
+            min-height: 450px;
+            height: auto;
         }
         
         .report-card-header {
-            padding: 20px;
+            padding: 25px 20px;
             color: white;
             text-align: center;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 180px;
+            min-height: 200px;
         }
         
         .report-card-body {
-            padding: 20px;
+            padding: 25px 20px;
             display: grid;
             grid-template-rows: 1fr auto auto;
-            gap: 15px;
+            gap: 20px;
             align-content: space-between;
+            min-height: 180px;
         }
         
         .report-info {
@@ -255,55 +224,62 @@
             align-items: center;
             justify-content: center;
         }
+
         /* 报告卡片类型样式 */
-.report-card.session .report-card-header {
-    background: var(--session-color);
-}
-.report-card.attendance .report-card-header {
-    background: var(--attendance-color);
-}
-.report-card.safeguarding .report-card-header {
-    background: var(--safeguarding-color);
-}
-.report-card.termly .report-card-header {
-    background: var(--termly-color);
-}
-.report-card.behavior .report-card-header {
-    background: var(--behavior-color);
-}
-/* 图标样式 */
-.report-card-header .icon {
-    font-size: 2.5rem;
-    margin-bottom: 15px;
-    opacity: 0.9;
-}
-.report-card-header h3 {
-    font-size: 1.3rem;
-    font-weight: 600;
-    margin-bottom: 8px;
-}
-.report-card-header p {
-    font-size: 0.9rem;
-    opacity: 0.9;
-    line-height: 1.4;
-}
-/* 悬停效果 */
-.report-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-}
-.report-link:hover {
-    background: var(--primary-dark);
-    transform: translateY(-2px);
-}
-/* 确保网格布局统一 */
-.reports-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-    margin-bottom: 30px;
-    align-items: stretch;
-}
+        .report-card.session .report-card-header {
+            background: var(--session-color);
+        }
+        .report-card.attendance .report-card-header {
+            background: var(--attendance-color);
+        }
+        .report-card.safeguarding .report-card-header {
+            background: var(--safeguarding-color);
+        }
+        .report-card.termly .report-card-header {
+            background: var(--termly-color);
+        }
+        .report-card.behavior .report-card-header {
+            background: var(--behavior-color);
+        }
+        .report-card.teacher-scr .report-card-header {
+            background: var(--teacher-scr-color);
+        }
+
+        /* 图标样式 */
+        .report-card-header .icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+        .report-card-header h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .report-card-header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+
+        /* 悬停效果 */
+        .report-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .report-link:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* 确保网格布局统一 */
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+            align-items: stretch;
+        }
 
         /* Statistics Overview 优化 */
         .stats-overview {
@@ -343,36 +319,7 @@
             line-height: 1.3;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                transition: transform 0.3s ease;
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-
-            .main-content {
-                margin-left: 0;
-            }
-
-            .header {
-                flex-direction: column;
-                gap: 15px;
-                align-items: flex-start;
-            }
-
-            .reports-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .stats-overview {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        /* 响应式设计 - 合并后的媒体查询 */
+        /* 响应式设计 */
         @media (max-width: 1200px) {
             .reports-grid {
                 grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -409,12 +356,12 @@
             }
             
             .report-card {
-                min-height: 420px; /* 增加移动端最小高度 */
+                min-height: 420px;
                 height: auto;
             }
             
             .report-card-header {
-                min-height: 180px; /* 保持足够的头部高度 */
+                min-height: 180px;
                 padding: 20px 15px;
             }
             
@@ -431,7 +378,7 @@
             }
             
             .report-card {
-                min-height: 400px; /* 小屏幕也保持合理高度 */
+                min-height: 400px;
             }
             
             .report-card-header {
@@ -443,15 +390,6 @@
                 padding: 18px 15px;
                 min-height: 150px;
             }
-        }
-        
-        /* 确保网格布局统一 */
-        .reports-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-            align-items: stretch;
         }
     </style>
 </head>
@@ -495,8 +433,6 @@
                     </a>
                 </div>
             </div>
-            <!-- 删除Settings项 -->
-    
             
             <div class="user-profile">
                 <div class="user-info">
@@ -627,6 +563,7 @@
                         </div>
                     </div>
                 </div>
+
                 <!-- Behavior Report -->
                 <div class="report-card behavior">
                     <div class="report-card-header">
@@ -648,26 +585,30 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Teacher SCR Report (新增) -->
+                <div class="report-card teacher-scr">
+                    <div class="report-card-header">
+                        <div class="icon">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <h3>Teacher SCR Report</h3>
+                        <p>DBS checks, safer recruitment & compliance</p>
+                    </div>
+                    <div class="report-card-body">
+                        <div class="report-info">
+                            <a href="https://example-lark-document-link.com/teacher-scr" class="report-link" target="_blank">
+                                <i class="fas fa-external-link-alt"></i>
+                                View Report
+                            </a>
+                            <div class="password-display">
+                                Password: TeacherSCR2024
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
-
-    <script>
-        // Mobile sidebar toggle
-        function toggleSidebar() {
-            const sidebar = document.querySelector('.sidebar');
-            sidebar.classList.toggle('open');
-        }
-
-        // Add mobile menu button if needed
-        if (window.innerWidth <= 768) {
-            const header = document.querySelector('.header');
-            const menuButton = document.createElement('button');
-            menuButton.innerHTML = '<i class="fas fa-bars"></i>';
-            menuButton.className = 'btn btn-secondary';
-            menuButton.onclick = toggleSidebar;
-            header.insertBefore(menuButton, header.firstChild);
-        }
-    </script>
 </body>
 </html>
