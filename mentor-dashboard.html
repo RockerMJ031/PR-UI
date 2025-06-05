@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mentor Dashboard - Purple Ruler Academy</title>
+    <title>Sessions - Mentor Portal</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -41,7 +41,7 @@
             min-height: 100vh;
         }
 
-        /* Sidebar - Using sessions.html style */
+        /* Sidebar - Using mentor-dashboard.html style */
         .sidebar {
             width: 250px;
             background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
@@ -147,408 +147,292 @@
             gap: 10px;
         }
 
-        .notification-icon {
-            position: relative;
-            cursor: pointer;
-            padding: 10px;
-            color: var(--primary-color);
-            font-size: 1.2rem;
-        }
-
-        .notification-badge {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background-color: var(--danger-color);
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-        }
-
-        /* Action Sections */
-        .action-sections {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .action-section {
-            background: white;
-            border-radius: var(--border-radius);
-            padding: 25px;
-            box-shadow: var(--shadow);
-            border-top: 4px solid var(--primary-color);
-            text-align: center;
-        }
-
-        .section-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--primary-color);
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .section-description {
-            color: var(--text-light);
-            margin-bottom: 20px;
-            line-height: 1.5;
-            font-size: 0.9rem;
-        }
-
-        /* 改进的按钮样式 */
-        .action-buttons {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 20px;
-        }
-        
-        .btn {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            min-width: 140px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
-        }
-        
-        .btn:hover::before {
-            left: 100%;
-        }
-        
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        
-        .btn:active {
-            transform: translateY(-1px);
-            transition: all 0.1s ease;
-        }
-        
-        /* 改进的颜色方案 */
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary-color), #6f42c1);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: linear-gradient(135deg, var(--primary-dark), #5a2d91);
-        }
-        
-        .btn-success {
-            background: linear-gradient(135deg, var(--success-color), #20c997);
-            color: white;
-        }
-        
-        .btn-success:hover {
-            background: linear-gradient(135deg, #218838, #1aa179);
-        }
-        
-        .btn-warning {
-            background: linear-gradient(135deg, var(--warning-color), #fd7e14);
-            color: #333;
-        }
-        
-        .btn-warning:hover {
-            background: linear-gradient(135deg, #e0a800, #e8650e);
-        }
-        
-        .btn-info {
-            background: linear-gradient(135deg, var(--info-color), #6f42c1);
-            color: white;
-        }
-        
-        .btn-info:hover {
-            background: linear-gradient(135deg, #138496, #5a2d91);
-        }
-        
-        .btn-secondary {
-            background: linear-gradient(135deg, #6c757d, #495057);
-            color: white;
-        }
-        
-        .btn-secondary:hover {
-            background: linear-gradient(135deg, #5a6268, #343a40);
-        }
-        
-        /* 改进的action-section样式 */
-        .action-section {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
-            border-top: 4px solid var(--primary-color);
-            text-align: center;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .action-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary-color), #6f42c1, var(--info-color));
-            transition: all 0.3s ease;
-        }
-        
-        .action-section:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-        
-        .section-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-        }
-        
-        .section-title i {
-            font-size: 1.4rem;
-            opacity: 0.8;
-        }
-        
-        .section-description {
-            color: var(--text-light);
-            margin-bottom: 25px;
-            line-height: 1.6;
-            font-size: 0.95rem;
-        }
-
-        /* Statistics Cards */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
+        /* View Toggle */
+        .view-toggle {
             background: white;
             padding: 20px;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
-            text-align: center;
-            border-left: 5px solid var(--primary-color);
+            margin-bottom: 20px;
         }
 
-        .stat-card.total-students {
-            border-left-color: var(--info-color);
+        .toggle-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
         }
 
-        .stat-card.active-students {
-            border-left-color: var(--success-color);
+        .toggle-btn {
+            padding: 12px 24px;
+            border: 2px solid var(--primary-color);
+            background: white;
+            color: var(--primary-color);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-family: inherit;
         }
 
-        .stat-card.safeguarding {
-            border-left-color: var(--danger-color);
+        .toggle-btn.active {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
         }
 
-        .stat-card.invoices {
-            border-left-color: var(--warning-color);
+        .filter-section {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
         }
 
-        .stat-title {
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-group label {
             font-size: 0.9rem;
             color: var(--text-light);
-            margin-bottom: 10px;
-            font-weight: 500;
-        }
-
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--text-color);
-            margin-bottom: 5px;
-        }
-
-        .stat-description {
-            font-size: 0.8rem;
-            color: var(--text-light);
-        }
-
-        /* Pricing Section - From finance.html */
-        .pricing-section {
-            background: white;
-            padding: 30px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            margin-bottom: 30px;
-        }
-
-        .pricing-section-title {
-            color: var(--primary-color);
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
             font-weight: 600;
         }
 
-        .pricing-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .pricing-card {
+        .filter-group select,
+        .filter-group input {
+            padding: 10px 12px;
             border: 2px solid var(--border-color);
             border-radius: var(--border-radius);
-            padding: 25px;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .pricing-card:hover {
-            border-color: var(--primary-color);
-            transform: translateY(-5px);
-            box-shadow: var(--shadow);
-        }
-
-        .pricing-card.featured {
-            border-color: var(--primary-color);
-            background: linear-gradient(135deg, #f8f9ff, #fff);
-        }
-
-        .pricing-title {
-            font-size: 1.3rem;
-            color: var(--primary-color);
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
-
-        .pricing-amount {
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: var(--text-color);
-            margin-bottom: 10px;
-        }
-
-        .pricing-period {
-            color: var(--text-light);
-            margin-bottom: 20px;
             font-size: 0.9rem;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
         }
 
-        .pricing-features {
-            list-style: none;
+        .filter-group select:focus,
+        .filter-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        /* Calendar View */
+        .calendar-view {
+            background: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 25px;
         }
 
-        .pricing-features li {
-            padding: 8px 0;
-            border-bottom: 1px solid #f0f0f0;
-            font-size: 0.9rem;
-        }
-
-        .pricing-features li:last-child {
-            border-bottom: none;
-        }
-
-        /* Buttons */
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
+        .calendar-nav {
+            display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 15px;
         }
 
-        .btn-primary {
+        .calendar-nav button {
             background: var(--primary-color);
             color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
         }
 
-        .btn-primary:hover {
+        .calendar-nav button:hover {
             background: var(--primary-dark);
             transform: translateY(-2px);
         }
 
-        .btn-success {
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            background: var(--border-color);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .calendar-day-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .calendar-day {
+            background: white;
+            min-height: 100px;
+            padding: 10px;
+            position: relative;
+        }
+
+        .calendar-day.other-month {
+            background: #f8f9fa;
+            color: #ccc;
+        }
+
+        .calendar-day.today {
+            background: #e3f2fd;
+        }
+
+        .day-number {
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .session-item {
+            background: var(--primary-color);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-bottom: 3px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .session-item:hover {
+            background: var(--primary-dark);
+            transform: scale(1.02);
+        }
+
+        .session-item.attended {
             background: var(--success-color);
+        }
+
+        .session-item.missed {
+            background: var(--danger-color);
+        }
+
+        /* List View */
+        .list-view {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .list-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
             color: white;
+            padding: 20px;
+            font-weight: 600;
+            font-size: 1.2rem;
         }
 
-        .btn-success:hover {
-            background: #218838;
+        .session-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .session-row {
+            display: grid;
+            grid-template-columns: 1fr 150px 120px 100px 120px;
+            gap: 15px;
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border-color);
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .session-row:hover {
+            background: rgba(102, 51, 153, 0.05);
+            transform: translateX(5px);
+        }
+
+        .session-info h4 {
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .session-info p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .status-badge {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge.scheduled {
+            background: rgba(23, 162, 184, 0.15);
+            color: var(--info-color);
+        }
+
+        .status-badge.attended {
+            background: rgba(40, 167, 69, 0.15);
+            color: var(--success-color);
+        }
+
+        .status-badge.missed {
+            background: rgba(220, 53, 69, 0.15);
+            color: var(--danger-color);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: inherit;
+        }
+
+        .btn:hover {
             transform: translateY(-2px);
+            box-shadow: var(--shadow);
         }
 
-        .btn-warning {
-            background: var(--warning-color);
-            color: #333;
-        }
-
-        .btn-warning:hover {
-            background: #e0a800;
-            transform: translateY(-2px);
-        }
-
-        .btn-info {
-            background: var(--info-color);
+        .btn-primary {
+            background-color: var(--primary-color);
             color: white;
-        }
-
-        .btn-info:hover {
-            background: #138496;
-            transform: translateY(-2px);
         }
 
         .btn-secondary {
-            background: #6c757d;
+            background-color: #6c757d;
             color: white;
         }
 
-        .btn-secondary:hover {
-            background: #5a6268;
-            transform: translateY(-2px);
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        .hidden {
+            display: none;
         }
 
         /* Responsive Design */
@@ -566,24 +450,32 @@
             .header {
                 flex-direction: column;
                 gap: 15px;
+                text-align: center;
             }
 
-            .action-sections {
-                grid-template-columns: repeat(2, 1fr);
+            .toggle-buttons {
+                flex-wrap: wrap;
+                justify-content: center;
             }
 
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .filter-section {
+                flex-direction: column;
+                align-items: stretch;
             }
 
-            .pricing-grid {
+            .session-row {
                 grid-template-columns: 1fr;
+                gap: 10px;
+                text-align: center;
             }
-        }
-        
-        @media (max-width: 480px) {
-            .action-sections {
-                grid-template-columns: 1fr;
+
+            .calendar-grid {
+                font-size: 0.8rem;
+            }
+
+            .calendar-day {
+                min-height: 80px;
+                padding: 5px;
             }
         }
     </style>
@@ -598,7 +490,7 @@
             
             <div class="nav-menu">
                 <div class="nav-item">
-                    <a href="mentor-dashboard.html" class="nav-link active">
+                    <a href="mentor-dashboard.html" class="nav-link">
                         <i class="fas fa-tachometer-alt"></i>
                         Dashboard
                     </a>
@@ -610,7 +502,7 @@
                     </a>
                 </div>
                 <div class="nav-item">
-                    <a href="sessions-enhanced.html" class="nav-link">
+                    <a href="sessions-enhanced.html" class="nav-link active">
                         <i class="fas fa-calendar-alt"></i>
                         Sessions
                     </a>
@@ -635,188 +527,541 @@
                         <i class="fas fa-user"></i>
                     </div>
                     <div>
-                        <div style="font-weight: 600;">Mentor</div>
-                        <div style="font-size: 0.8rem; opacity: 0.8;">Admin User</div>
+                        <div style="font-weight: 600;">John Mentor</div>
+                        <div style="font-size: 0.8rem; opacity: 0.8;">Mentor</div>
                     </div>
                 </div>
             </div>
         </nav>
-
+        
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Header -->
             <div class="header">
-                <h1>Mentor Dashboard</h1>
+                <h1>Session Management</h1>
                 <div class="header-actions">
-                    <div class="notification-icon">
-                        <i class="fas fa-bell"></i>
-                        <div class="notification-badge">3</div>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        New Session
+                    </button>
+                </div>
+            </div>
+
+            <!-- View Toggle -->
+            <div class="view-toggle">
+                <div class="toggle-buttons">
+                    <button class="toggle-btn active" data-view="calendar">
+                        <i class="fas fa-calendar"></i>
+                        Calendar View
+                    </button>
+                    <button class="toggle-btn" data-view="list">
+                        <i class="fas fa-list"></i>
+                        All Sessions
+                    </button>
+                    <button class="toggle-btn" data-view="attended">
+                        <i class="fas fa-check-circle"></i>
+                        Attended
+                    </button>
+                    <button class="toggle-btn" data-view="missed">
+                        <i class="fas fa-times-circle"></i>
+                        Missed
+                    </button>
+                </div>
+                
+                <div class="filter-section">
+                    <div class="filter-group">
+                        <label for="studentFilter">Student</label>
+                        <select id="studentFilter">
+                            <option value="">All Students</option>
+                            <option value="john-doe">John Doe</option>
+                            <option value="jane-smith">Jane Smith</option>
+                            <option value="mike-johnson">Mike Johnson</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="subjectFilter">Subject</label>
+                        <select id="subjectFilter">
+                            <option value="">All Subjects</option>
+                            <option value="mathematics">Mathematics</option>
+                            <option value="english">English</option>
+                            <option value="science">Science</option>
+                            <option value="history">History</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="startDate">Start Date</label>
+                        <input type="date" id="startDate">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="endDate">End Date</label>
+                        <input type="date" id="endDate">
                     </div>
                 </div>
             </div>
 
-            <!-- Action Sections -->
-            <div class="action-sections">
-                <!-- Student Management Section -->
-                <div class="action-section">
-                    <h2 class="section-title">
-                        <i class="fas fa-users"></i>
-                        Student Management
-                    </h2>
-                    <p class="section-description">
-                        Manage student enrollment and withdrawal
-                    </p>
-                    <div class="action-buttons">
-                        <button class="btn btn-success">
-                            <i class="fas fa-user-plus"></i>
-                            Add Student
+            <!-- Calendar View -->
+            <div id="calendarView" class="calendar-view">
+                <div class="calendar-header">
+                    <h2 id="currentMonth">December 2024</h2>
+                    <div class="calendar-nav">
+                        <button id="prevMonth">
+                            <i class="fas fa-chevron-left"></i>
                         </button>
-                        <button class="btn btn-warning">
-                            <i class="fas fa-user-minus"></i>
-                            Remove Student
+                        <button id="todayBtn">Today</button>
+                        <button id="nextMonth">
+                            <i class="fas fa-chevron-right"></i>
                         </button>
                     </div>
                 </div>
                 
-                <!-- Course Management Section -->
-                <div class="action-section">
-                    <h2 class="section-title">
-                        <i class="fas fa-graduation-cap"></i>
-                        Course Management
-                    </h2>
-                    <p class="section-description">
-                        Manage course extensions and cancellations
-                    </p>
-                    <div class="action-buttons">
-                        <button class="btn btn-primary">
-                            <i class="fas fa-plus"></i>
-                            Extend Course
-                        </button>
-                        <button class="btn btn-secondary">
-                            <i class="fas fa-times"></i>
-                            Cancel Course
-                        </button>
+                <div class="calendar-grid">
+                    <div class="calendar-day-header">Sun</div>
+                    <div class="calendar-day-header">Mon</div>
+                    <div class="calendar-day-header">Tue</div>
+                    <div class="calendar-day-header">Wed</div>
+                    <div class="calendar-day-header">Thu</div>
+                    <div class="calendar-day-header">Fri</div>
+                    <div class="calendar-day-header">Sat</div>
+                    
+                    <div class="calendar-day">
+                        <div class="day-number">1</div>
+                        <div class="session-item">Math - John D.</div>
                     </div>
-                </div>
-                
-                <!-- Session Management Section -->
-                <div class="action-section">
-                    <h2 class="section-title">
-                        <i class="fas fa-calendar-alt"></i>
-                        Session Management
-                    </h2>
-                    <p class="section-description">
-                        Schedule and manage teaching sessions
-                    </p>
-                    <div class="action-buttons">
-                        <button class="btn btn-info">
-                            <i class="fas fa-calendar-plus"></i>
-                            Schedule Session
-                        </button>
-                        <button class="btn btn-secondary">
-                            <i class="fas fa-calendar-times"></i>
-                            Cancel Session
-                        </button>
+                    <div class="calendar-day">
+                        <div class="day-number">2</div>
+                        <div class="session-item attended">English - Jane S.</div>
                     </div>
-                </div>
-                
-                <!-- Ticket Management Section -->
-                <div class="action-section">
-                    <h2 class="section-title">
-                        <i class="fas fa-ticket-alt"></i>
-                        Ticket Management
-                    </h2>
-                    <p class="section-description">
-                        Submit support tickets and check status
-                    </p>
-                    <div class="action-buttons">
-                        <button class="btn btn-primary">
-                            <i class="fas fa-plus"></i>
-                            Submit Ticket
-                        </button>
-                        <button class="btn btn-info">
-                            <i class="fas fa-search"></i>
-                            Check Status
-                        </button>
+                    <div class="calendar-day">
+                        <div class="day-number">3</div>
+                        <div class="session-item missed">Science - Mike J.</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">4</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">5</div>
+                        <div class="session-item attended">History - John D.</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">6</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">7</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">8</div>
+                        <div class="session-item">Math Adv - Jane S.</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">9</div>
+                        <div class="session-item">English - Mike J.</div>
+                    </div>
+                    <div class="calendar-day today">
+                        <div class="day-number">10</div>
+                        <div class="session-item">Science - John D.</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">11</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">12</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">13</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">14</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">15</div>
+                        <div class="session-item">History - Jane S.</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">16</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">17</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">18</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">19</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">20</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">21</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">22</div>
+                        <div class="session-item">Science - Jane S.</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">23</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">24</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">25</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">26</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">27</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">28</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">29</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">30</div>
+                    </div>
+                    <div class="calendar-day">
+                        <div class="day-number">31</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">1</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">2</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">3</div>
+                    </div>
+                    <div class="calendar-day other-month">
+                        <div class="day-number">4</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Statistics Cards -->
-            <div class="stats-grid">
-                <div class="stat-card total-students">
-                    <div class="stat-title">Total Students</div>
-                    <div class="stat-value">127</div>
-                    <div class="stat-description">Enrolled this term</div>
+            <!-- List View -->
+            <div id="listView" class="list-view hidden">
+                <div class="list-header">
+                    All Sessions
                 </div>
-                <div class="stat-card active-students">
-                    <div class="stat-title">Active Students</div>
-                    <div class="stat-value">98</div>
-                    <div class="stat-description">Currently attending</div>
-                </div>
-                <div class="stat-card safeguarding">
-                    <div class="stat-title">Safeguarding Alerts</div>
-                    <div class="stat-value">3</div>
-                    <div class="stat-description">Require attention</div>
-                </div>
-                <div class="stat-card invoices">
-                    <div class="stat-title">Pending Invoices</div>
-                    <div class="stat-value">12</div>
-                    <div class="stat-description">Awaiting payment</div>
+                <div class="session-list">
+                    <div class="session-row">
+                        <div class="session-info">
+                            <h4>Mathematics Session</h4>
+                            <p>Student: John Doe | Tutor: Sarah Wilson</p>
+                        </div>
+                        <div>Dec 2, 2024</div>
+                        <div>10:00 AM</div>
+                        <div><span class="status-badge attended">Attended</span></div>
+                        <div>
+                            <button class="btn btn-sm btn-secondary">
+                                <i class="fas fa-eye"></i>
+                                View
+                            </button>
+                        </div>
+                    </div>
+                    <div class="session-row">
+                        <div class="session-info">
+                            <h4>English Literature</h4>
+                            <p>Student: Jane Smith | Tutor: Mark Thompson</p>
+                        </div>
+                        <div>Dec 3, 2024</div>
+                        <div>2:00 PM</div>
+                        <div><span class="status-badge scheduled">Scheduled</span></div>
+                        <div>
+                            <button class="btn btn-sm btn-secondary">
+                                <i class="fas fa-eye"></i>
+                                View
+                            </button>
+                        </div>
+                    </div>
+                    <div class="session-row">
+                        <div class="session-info">
+                            <h4>Science Lab</h4>
+                            <p>Student: Mike Johnson | Tutor: Dr. Emily Brown</p>
+                        </div>
+                        <div>Dec 3, 2024</div>
+                        <div>3:30 PM</div>
+                        <div><span class="status-badge missed">Missed</span></div>
+                        <div>
+                            <button class="btn btn-sm btn-secondary">
+                                <i class="fas fa-eye"></i>
+                                View
+                            </button>
+                        </div>
+                    </div>
+                    <div class="session-row">
+                        <div class="session-info">
+                            <h4>History Discussion</h4>
+                            <p>Student: John Doe | Tutor: Prof. David Lee</p>
+                        </div>
+                        <div>Dec 5, 2024</div>
+                        <div>11:00 AM</div>
+                        <div><span class="status-badge attended">Attended</span></div>
+                        <div>
+                            <button class="btn btn-sm btn-secondary">
+                                <i class="fas fa-eye"></i>
+                                View
+                            </button>
+                        </div>
+                    </div>
+                    <div class="session-row">
+                        <div class="session-info">
+                            <h4>Mathematics Advanced</h4>
+                            <p>Student: Jane Smith | Tutor: Sarah Wilson</p>
+                        </div>
+                        <div>Dec 8, 2024</div>
+                        <div>9:00 AM</div>
+                        <div><span class="status-badge scheduled">Scheduled</span></div>
+                        <div>
+                            <button class="btn btn-sm btn-secondary">
+                                <i class="fas fa-eye"></i>
+                                View
+                            </button>
+                        </div>
+                    </div>
+                    <div class="session-row">
+                        <div class="session-info">
+                            <h4>English Writing</h4>
+                            <p>Student: Mike Johnson | Tutor: Mark Thompson</p>
+                        </div>
+                        <div>Dec 9, 2024</div>
+                        <div>1:00 PM</div>
+                        <div><span class="status-badge scheduled">Scheduled</span></div>
+                        <div>
+                            <button class="btn btn-sm btn-secondary">
+                                <i class="fas fa-eye"></i>
+                                View
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Pricing Plans Section -->
-            <div class="pricing-section">
-                <h2 class="pricing-section-title">Pricing Plans</h2>
-                
-                <div class="pricing-grid">
-                    <!-- Full Time -->
-                    <div class="pricing-card featured">
-                        <h3 class="pricing-title">Full Time</h3>
-                        <div class="pricing-amount">£1,200</div>
-                        <div class="pricing-period">per half term per student (5% discount per term)</div>
-                        <ul class="pricing-features">
-                            <li>5 days per week</li>
-                            <li>6 hours per day</li>
-                            <li>All subjects included</li>
-                            <li>Progress tracking</li>
-                        </ul>
-                        <button class="btn btn-primary">Add Student</button>
+            <!-- Attended Sessions View (Report buttons removed) -->
+            <div id="attendedView" class="list-view hidden">
+                <div class="list-header">
+                    Attended Sessions
+                </div>
+                <div class="session-list">
+                    <div class="session-row">
+                        <div class="session-info">
+                            <h4>Mathematics Session</h4>
+                            <p>Student: John Doe | Tutor: Sarah Wilson</p>
+                        </div>
+                        <div>Dec 2, 2024</div>
+                        <div>10:00 AM</div>
+                        <div><span class="status-badge attended">Attended</span></div>
+                        <div>
+                            <button class="btn btn-sm btn-secondary">
+                                <i class="fas fa-eye"></i>
+                                View
+                            </button>
+                        </div>
                     </div>
-                
-                    <!-- Part Time -->
-                    <div class="pricing-card">
-                        <h3 class="pricing-title">Part Time</h3>
-                        <div class="pricing-amount">£35</div>
-                        <div class="pricing-period">per lesson - per hour</div>
-                        <ul class="pricing-features">
-                            <li>Flexible scheduling</li>
-                            <li>2-3 hours per session</li>
-                            <li>Subject-specific support</li>
-                            <li>Individual attention</li>
-                            <li>Progress monitoring</li>
-                        </ul>
-                        <button class="btn btn-primary">Add Student</button>
+                    <div class="session-row">
+                        <div class="session-info">
+                            <h4>History Discussion</h4>
+                            <p>Student: John Doe | Tutor: Prof. David Lee</p>
+                        </div>
+                        <div>Dec 5, 2024</div>
+                        <div>11:00 AM</div>
+                        <div><span class="status-badge attended">Attended</span></div>
+                        <div>
+                            <button class="btn btn-sm btn-secondary">
+                                <i class="fas fa-eye"></i>
+                                View
+                            </button>
+                        </div>
                     </div>
-                
-                    <!-- Mental Health Program -->
-                    <div class="pricing-card">
-                        <h3 class="pricing-title">Mental Health Program</h3>
-                        <div class="pricing-amount">£149</div>
-                        <div class="pricing-period">per month (Reading Subscription)</div>
-                        <ul class="pricing-features">
-                            <li>Therapeutic reading materials</li>
-                            <li>Monthly book selection</li>
-                            <li>Guided reading sessions</li>
-                            <li>Mental health resources</li>
-                            <li>Progress tracking</li>
-                        </ul>
-                        <button class="btn btn-info">Subscribe</button>
+                    <div class="session-row">
+                        <div class="session-info">
+                            <h4>Science Experiment</h4>
+                            <p>Student: Jane Smith | Tutor: Dr. Emily Brown</p>
+                        </div>
+                        <div>Nov 28, 2024</div>
+                        <div>2:30 PM</div>
+                        <div><span class="status-badge attended">Attended</span></div>
+                        <div>
+                            <button class="btn btn-sm btn-secondary">
+                                <i class="fas fa-eye"></i>
+                                View
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Missed Sessions View (Reschedule buttons removed) -->
+            <div id="missedView" class="list-view hidden">
+                <div class="list-header">
+                    Missed Sessions
+                </div>
+                <div class="session-list">
+                    <div class="session-row">
+                        <div class="session-info">
+                            <h4>Science Lab</h4>
+                            <p>Student: Mike Johnson | Tutor: Dr. Emily Brown</p>
+                        </div>
+                        <div>Dec 3, 2024</div>
+                        <div>3:30 PM</div>
+                        <div><span class="status-badge missed">Missed</span></div>
+                        <div>
+                            <button class="btn btn-sm btn-secondary">
+                                <i class="fas fa-eye"></i>
+                                View
+                            </button>
+                        </div>
+                    </div>
+                    <div class="session-row">
+                        <div class="session-info">
+                            <h4>History Essay Review</h4>
+                            <p>Student: Mike Johnson | Tutor: Prof. David Lee</p>
+                        </div>
+                        <div>Nov 30, 2024</div>
+                        <div>4:00 PM</div>
+                        <div><span class="status-badge missed">Missed</span></div>
+                        <div>
+                            <button class="btn btn-sm btn-secondary">
+                                <i class="fas fa-eye"></i>
+                                View
+                            </button>
+                        </div>
+                    </div>
+                    <div class="session-row">
+                        <div class="session-info">
+                            <h4>English Grammar</h4>
+                            <p>Student: Jane Smith | Tutor: Mark Thompson</p>
+                        </div>
+                        <div>Nov 25, 2024</div>
+                        <div>10:30 AM</div>
+                        <div><span class="status-badge missed">Missed</span></div>
+                        <div>
+                            <button class="btn btn-sm btn-secondary">
+                                <i class="fas fa-eye"></i>
+                                View
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </main>
     </div>
+
+    <script>
+        // View Toggle Functionality
+        const toggleButtons = document.querySelectorAll('.toggle-btn');
+        const views = {
+            calendar: document.getElementById('calendarView'),
+            list: document.getElementById('listView'),
+            attended: document.getElementById('attendedView'),
+            missed: document.getElementById('missedView')
+        };
+
+        toggleButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                toggleButtons.forEach(btn => btn.classList.remove('active'));
+                // Add active class to clicked button
+                button.classList.add('active');
+
+                // Hide all views
+                Object.values(views).forEach(view => view.classList.add('hidden'));
+                
+                // Show selected view
+                const selectedView = button.getAttribute('data-view');
+                if (views[selectedView]) {
+                    views[selectedView].classList.remove('hidden');
+                }
+            });
+        });
+
+        // Calendar Navigation
+        const currentMonthElement = document.getElementById('currentMonth');
+        const prevMonthBtn = document.getElementById('prevMonth');
+        const nextMonthBtn = document.getElementById('nextMonth');
+        const todayBtn = document.getElementById('todayBtn');
+
+        let currentDate = new Date();
+        const months = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+
+        function updateCalendarHeader() {
+            currentMonthElement.textContent = `${months[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+        }
+
+        prevMonthBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            updateCalendarHeader();
+        });
+
+        nextMonthBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            updateCalendarHeader();
+        });
+
+        todayBtn.addEventListener('click', () => {
+            currentDate = new Date();
+            updateCalendarHeader();
+        });
+
+        // Session item click handlers
+        document.querySelectorAll('.session-item').forEach(item => {
+            item.addEventListener('click', () => {
+                alert('Session details would open here');
+            });
+        });
+
+        // Filter functionality
+        const studentFilter = document.getElementById('studentFilter');
+        const subjectFilter = document.getElementById('subjectFilter');
+        const startDate = document.getElementById('startDate');
+        const endDate = document.getElementById('endDate');
+
+        function applyFilters() {
+            console.log('Applying filters:', {
+                student: studentFilter.value,
+                subject: subjectFilter.value,
+                startDate: startDate.value,
+                endDate: endDate.value
+            });
+        }
+
+        // Action button handlers
+        document.querySelectorAll('.btn').forEach(button => {
+            if (button.textContent.includes('View')) {
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    alert('View session details functionality would be implemented here');
+                });
+            }
+        });
+
+
+
+        // Initialize calendar
+        updateCalendarHeader();
+
+        // Mobile sidebar toggle (if needed)
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        // Add mobile menu button if needed
+        if (window.innerWidth <= 768) {
+            const header = document.querySelector('.header');
+            const menuButton = document.createElement('button');
+            menuButton.innerHTML = '<i class="fas fa-bars"></i>';
+            menuButton.className = 'btn btn-secondary';
+            menuButton.onclick = toggleSidebar;
+            header.insertBefore(menuButton, header.firstChild);
+        }
+    </script>
 </body>
 </html>
