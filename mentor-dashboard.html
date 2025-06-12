@@ -551,33 +551,16 @@
             transform: translateY(-2px);
         }
 
-        /* Responsive Design */
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .action-sections {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+        }
+        
         @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-            }
-
-            .main-content {
-                margin-left: 0;
-            }
-
-            .header {
-                flex-direction: column;
-                gap: 15px;
-            }
-
             .action-sections {
                 grid-template-columns: repeat(2, 1fr);
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .pricing-grid {
-                grid-template-columns: 1fr;
             }
         }
         
@@ -685,9 +668,13 @@
                         Course Management
                     </h2>
                     <p class="section-description">
-                        Manage course extensions and cancellations
+                        Manage course extensions, cancellations and new courses
                     </p>
                     <div class="action-buttons">
+                        <button class="btn btn-success">
+                            <i class="fas fa-plus-circle"></i>
+                            Add New Course
+                        </button>
                         <button class="btn btn-primary">
                             <i class="fas fa-plus"></i>
                             Extend Course
