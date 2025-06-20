@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safeguarding - Student Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #663399;
+            --primary-dark: #4a2570;
+            --primary-light: #8a5bb8;
+            --secondary-color: #f8f9fa;
+            --text-color: #333;
+            --text-light: #666;
+            --border-color: #e0e0e0;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+            --white: #ffffff;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+            --border-radius: 8px;
+            --safeguarding-red: #e74c3c;
+            --safeguarding-orange: #f39c12;
+            --safeguarding-blue: #3498db;
+            --safeguarding-green: #27ae60;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar - Aligned with student-dashboard.html */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .logo {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .nav-menu {
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            margin: 5px 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            transition: all 0.3s ease;
+            min-height: 44px;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            border-right: 3px solid white;
+        }
+
+        .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            font-weight: 600;
+        }
+
+        .nav-link i {
+            margin-right: 10px;
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .user-profile {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .emergency-btn {
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .emergency-btn:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        /* Important Notice Banner */
+        .important-notice {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border: 2px solid #ffc107;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .important-notice h2 {
+            color: #856404;
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+
+        .important-notice p {
+            color: #856404;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        /* SAFE Guidelines */
+        .safe-guidelines {
+            background: linear-gradient(135deg, #e8d5f2, #f0e6ff);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .safe-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .safe-header h2 {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .safe-items {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .safe-item {
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .safe-letter {
+            width: 40px;
+            height: 40px;
+            background: #ff6b35;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .safe-text {
+            color: var(--text-color);
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+
+        /* Quick Report Section */
+        .quick-report {
+            background: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .quick-report h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .report-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .report-card {
+            background: var(--secondary-color);
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .report-card:hover {
+            border-color: var(--primary-color);
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .report-card.urgent {
+            border-color: var(--safeguarding-red);
+            background: #ffeaea;
+        }
+
+        .report-card.urgent:hover {
+            background: white;
+            border-color: var(--safeguarding-red);
+        }
+
+        .report-card .icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .report-card.urgent .icon {
+            color: var(--safeguarding-red);
+        }
+
+        .report-card.general .icon {
+            color: var(--safeguarding-blue);
+        }
+
+        .report-card.anonymous .icon {
+            color: var(--safeguarding-green);
+        }
+
+        .report-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+
+        .report-card p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* Safeguarding Information */
+        .safeguarding-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .info-card {
+            background: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .info-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .info-list {
+            list-style: none;
+        }
+
+        .info-list li {
+            margin-bottom: 10px;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .info-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--success-color);
+            font-weight: bold;
+        }
+
+        /* Contact Information */
+        .contact-section {
+            background: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .contact-section h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .contact-card {
+            background: var(--secondary-color);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+
+        .contact-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .contact-card h4 {
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+
+        .contact-card .contact-info {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .contact-card .availability {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-top: 5px;
+        }
+
+        /* Resources Section */
+        .resources-section {
+            background: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .resources-section h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .resource-link {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: var(--secondary-color);
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .resource-link:hover {
+            background: white;
+            box-shadow: var(--shadow);
+            transform: translateY(-2px);
+        }
+
+        .resource-link i {
+            font-size: 1.5rem;
+            margin-right: 15px;
+            color: var(--primary-color);
+            min-width: 30px;
+        }
+
+        .resource-text {
+            flex: 1;
+        }
+
+        .resource-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .resource-description {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .report-options {
+                grid-template-columns: 1fr;
+            }
+
+            .safeguarding-info {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .resources-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .safe-guidelines {
+                padding: 20px;
+            }
+
+            .safe-item {
+                padding: 12px 15px;
+            }
+
+            .safe-letter {
+                width: 35px;
+                height: 35px;
+                font-size: 1.1rem;
+                margin-right: 12px;
+            }
+
+            .safe-text {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: black;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .submit-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .urgent-submit-btn {
+            background: var(--safeguarding-red);
+        }
+
+        .urgent-submit-btn:hover {
+            background: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="logo">
+                <h2>Student Portal</h2>
+            </div>
+            
+            <div class="nav-menu">
+                <div class="nav-item">
+                    <a href="student-dashboard.html" class="nav-link">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Dashboard
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="student-courses.html" class="nav-link">
+                        <i class="fas fa-book"></i>
+                        My Courses
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="student-schedule.html" class="nav-link">
+                        <i class="fas fa-calendar-alt"></i>
+                        Schedule
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="student-progress.html" class="nav-link">
+                        <i class="fas fa-chart-line"></i>
+                        Progress
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="student-wellbeing.html" class="nav-link">
+                        <i class="fas fa-heart"></i>
+                        Wellbeing
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="student-safeguarding.html" class="nav-link active">
+                        <i class="fas fa-shield-alt"></i>
+                        Safeguarding
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="student-support.html" class="nav-link">
+                        <i class="fas fa-hands-helping"></i>
+                        Get Support
+                    </a>
+                </div>
+            </div>
+            
+            <div class="user-profile">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight: 600;">Alex Johnson</div>
+                        <div style="font-size: 0.8rem; opacity: 0.8;">Year 10 Student</div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div>
+                    <h1>Safeguarding & Protection</h1>
+                    <p style="color: var(--text-light); margin: 5px 0 0 0;">Your safety and wellbeing are our top priority</p>
+                </div>
+                <div class="header-actions">
+                    <button class="emergency-btn" onclick="showEmergencyContacts()">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Emergency Help
+                    </button>
+                </div>
+            </div>
+
+            <!-- Important Notice -->
+            <div class="important-notice">
+                <h2><i class="fas fa-shield-alt"></i> Your Safety Matters</h2>
+                <p>If you are in immediate danger, call 999. All reports are taken seriously and handled confidentially by trained professionals.</p>
+            </div>
+
+            <!-- SAFE Guidelines -->
+            <div class="safe-guidelines">
+                <div class="safe-header">
+                    <h2>Remember</h2>
+                </div>
+                <div class="safe-items">
+                    <div class="safe-item">
+                        <div class="safe-letter">S</div>
+                        <div class="safe-text">Speak up: If something doesn't feel right, talk to someone you trust</div>
+                    </div>
+                    <div class="safe-item">
+                        <div class="safe-letter">A</div>
+                        <div class="safe-text">Ask for help: You'll never get in trouble for asking</div>
+                    </div>
+                    <div class="safe-item">
+                        <div class="safe-letter">F</div>
+                        <div class="safe-text">Feelings matter: Even small worries are important</div>
+                    </div>
+                    <div class="safe-item">
+                        <div class="safe-letter">E</div>
+                        <div class="safe-text">Everyone needs support: You are never alone — there are people who care</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Report Section -->
+            <div class="quick-report">
+                <h2>Report a Concern</h2>
+                <p style="margin-bottom: 20px; color: var(--text-light);">Choose the most appropriate option below. All reports are confidential and will be handled by qualified safeguarding professionals.</p>
+                
+                <div class="report-options">
+                    <div class="report-card urgent" onclick="openReportModal('urgent')">
+                        <div class="icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <h3>Urgent Concern</h3>
+                        <p>Immediate safety risk or serious harm to yourself or others</p>
+                    </div>
+                    
+                    <div class="report-card general" onclick="openReportModal('general')">
+                        <div class="icon">
+                            <i class="fas fa-flag"></i>
+                        </div>
+                        <h3>General Concern</h3>
+                        <p>Non-urgent safeguarding issues or welfare concerns</p>
+                    </div>
+                    
+                    <div class="report-card anonymous" onclick="openReportModal('anonymous')">
+                        <div class="icon">
+                            <i class="fas fa-user-secret"></i>
+                        </div>
+                        <h3>Anonymous Report</h3>
+                        <p>Report concerns without revealing your identity</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Safeguarding Information -->
+            <div class="safeguarding-info">
+                <div class="info-card">
+                    <h3>What is Safeguarding?</h3>
+                    <ul class="info-list">
+                        <li>Protecting you from abuse, neglect, and harm</li>
+                        <li>Ensuring your physical and emotional safety</li>
+                        <li>Supporting your wellbeing and development</li>
+                        <li>Preventing exploitation and discrimination</li>
+                        <li>Promoting your rights and dignity</li>
+                    </ul>
+                </div>
+                
+                <div class="info-card">
+                    <h3>When to Report</h3>
+                    <ul class="info-list">
+                        <li>Physical, emotional, or sexual abuse</li>
+                        <li>Neglect or abandonment</li>
+                        <li>Bullying or harassment</li>
+                        <li>Discrimination or hate incidents</li>
+                        <li>Online safety concerns</li>
+                        <li>Substance abuse issues</li>
+                        <li>Mental health crises</li>
+                        <li>Domestic violence</li>
+                    </ul>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Your Rights</h3>
+                    <ul class="info-list">
+                        <li>To be safe and protected from harm</li>
+                        <li>To be listened to and taken seriously</li>
+                        <li>To receive appropriate support</li>
+                        <li>To confidentiality and privacy</li>
+                        <li>To be involved in decisions about you</li>
+                        <li>To access independent advocacy</li>
+                        <li>To make complaints if needed</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="contact-section">
+                <h2>Safeguarding Contacts</h2>
+                <div class="contact-grid">
+                    <div class="contact-card">
+                        <div class="icon">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <h4>Designated Safeguarding Lead</h4>
+                        <div class="contact-info">Sarah Mitchell</div>
+                        <div class="contact-info">s.mitchell@school.ac.uk</div>
+                        <div class="contact-info">01234 567890</div>
+                        <div class="availability">Mon-Fri, 8:00-17:00</div>
+                    </div>
+                    
+                    <div class="contact-card">
+                        <div class="icon">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <h4>Deputy Safeguarding Lead</h4>
+                        <div class="contact-info">James Thompson</div>
+                        <div class="contact-info">j.thompson@school.ac.uk</div>
+                        <div class="contact-info">01234 567891</div>
+                        <div class="availability">Mon-Fri, 8:00-17:00</div>
+                    </div>
+                    
+                    <div class="contact-card">
+                        <div class="icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <h4>24/7 Helpline</h4>
+                        <div class="contact-info">0800 1111 (Childline)</div>
+                        <div class="contact-info">116 123 (Samaritans)</div>
+                        <div class="contact-info">0808 2000 247 (NSPCC)</div>
+                        <div class="availability">Available 24/7</div>
+                    </div>
+                    
+                    <div class="contact-card">
+                        <div class="icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <h4>Local Authority</h4>
+                        <div class="contact-info">Children's Services</div>
+                        <div class="contact-info">01234 567892</div>
+                        <div class="contact-info">Out of hours: 01234 567893</div>
+                        <div class="availability">Emergency: 24/7</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resources Section -->
+            <div class="resources-section">
+                <h2>Support Resources</h2>
+                <div class="resources-grid">
+                    <a href="#" class="resource-link">
+                        <i class="fas fa-book-open"></i>
+                        <div class="resource-text">
+                            <div class="resource-title">Safeguarding Handbook</div>
+                            <div class="resource-description">Complete guide to staying safe</div>
+                        </div>
+                    </a>
+                    
+                    <a href="#" class="resource-link">
+                        <i class="fas fa-laptop"></i>
+                        <div class="resource-text">
+                            <div class="resource-title">Online Safety Guide</div>
+                            <div class="resource-description">Protecting yourself online</div>
+                        </div>
+                    </a>
+                    
+                    <a href="#" class="resource-link">
+                        <i class="fas fa-users"></i>
+                        <div class="resource-text">
+                            <div class="resource-title">Peer Support Network</div>
+                            <div class="resource-description">Connect with trained peer supporters</div>
+                        </div>
+                    </a>
+                    
+                    <a href="#" class="resource-link">
+                        <i class="fas fa-heart"></i>
+                        <div class="resource-text">
+                            <div class="resource-title">Mental Health Resources</div>
+                            <div class="resource-description">Support for emotional wellbeing</div>
+                        </div>
+                    </a>
+                    
+                    <a href="#" class="resource-link">
+                        <i class="fas fa-gavel"></i>
+                        <div class="resource-text">
+                            <div class="resource-title">Legal Rights Information</div>
+                            <div class="resource-description">Know your rights and protections</div>
+                        </div>
+                    </a>
+                    
+                    <a href="#" class="resource-link">
+                        <i class="fas fa-home"></i>
+                        <div class="resource-text">
+                            <div class="resource-title">Housing Support</div>
+                            <div class="resource-description">Safe accommodation assistance</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Modal -->
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeReportModal()">&times;</span>
+            <h2 id="modalTitle">Report a Concern</h2>
+            <form id="reportForm">
+                <div class="form-group">
+                    <label for="reportType">Type of Concern:</label>
+                    <select id="reportType" name="reportType" required>
+                        <option value="">Select concern type...</option>
+                        <option value="abuse">Physical/Emotional/Sexual Abuse</option>
+                        <option value="neglect">Neglect or Abandonment</option>
+                        <option value="bullying">Bullying or Harassment</option>
+                        <option value="discrimination">Discrimination</option>
+                        <option value="online">Online Safety</option>
+                        <option value="substance">Substance Abuse</option>
+                        <option value="mental-health">Mental Health Crisis</option>
+                        <option value="domestic">Domestic Violence</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="nameGroup">
+                    <label for="reporterName">Your Name (optional for anonymous reports):</label>
+                    <input type="text" id="reporterName" name="reporterName">
+                </div>
+                
+                <div class="form-group" id="contactGroup">
+                    <label for="contactInfo">Contact Information (optional):</label>
+                    <input type="text" id="contactInfo" name="contactInfo" placeholder="Phone number or email">
+                </div>
+                
+                <div class="form-group">
+                    <label for="concernDetails">Details of Concern:</label>
+                    <textarea id="concernDetails" name="concernDetails" required placeholder="Please provide as much detail as possible about the concern. Include when, where, who was involved, and what happened."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="immediateRisk">Is there immediate risk of harm?</label>
+                    <select id="immediateRisk" name="immediateRisk" required>
+                        <option value="">Select...</option>
+                        <option value="yes">Yes - immediate danger</option>
+                        <option value="no">No - not immediate</option>
+                        <option value="unsure">Unsure</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="previousReports">Has this been reported before?</label>
+                    <select id="previousReports" name="previousReports">
+                        <option value="no">No</option>
+                        <option value="yes">Yes</option>
+                        <option value="unsure">Unsure</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="submit-btn" id="submitBtn">Submit Report</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Mobile sidebar toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Emergency contacts function
+        function showEmergencyContacts() {
+            alert('EMERGENCY CONTACTS\n\n🚨 IMMEDIATE DANGER: Call 999\n\n📞 24/7 Helplines:\n• Childline: 0800 1111\n• Samaritans: 116 123\n• NSPCC: 0808 2000 247\n\n🏫 School Safeguarding:\n• Sarah Mitchell: 01234 567890\n• James Thompson: 01234 567891\n\n🏛️ Local Authority:\n• Children\'s Services: 01234 567892\n• Out of hours: 01234 567893\n\nYou are not alone. Help is available.');
+        }
+
+        // Report modal functions
+        function openReportModal(type) {
+            const modal = document.getElementById('reportModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const submitBtn = document.getElementById('submitBtn');
+            const nameGroup = document.getElementById('nameGroup');
+            const contactGroup = document.getElementById('contactGroup');
+            
+            modal.style.display = 'block';
+            
+            if (type === 'urgent') {
+                modalTitle.textContent = 'Report Urgent Concern';
+                submitBtn.textContent = 'Submit Urgent Report';
+                submitBtn.className = 'submit-btn urgent-submit-btn';
+            } else if (type === 'anonymous') {
+                modalTitle.textContent = 'Anonymous Report';
+                submitBtn.textContent = 'Submit Anonymous Report';
+                submitBtn.className = 'submit-btn';
+                nameGroup.style.display = 'none';
+                contactGroup.style.display = 'none';
+            } else {
+                modalTitle.textContent = 'Report General Concern';
+                submitBtn.textContent = 'Submit Report';
+                submitBtn.className = 'submit-btn';
+                nameGroup.style.display = 'block';
+                contactGroup.style.display = 'block';
+            }
+        }
+
+        function closeReportModal() {
+            const modal = document.getElementById('reportModal');
+            modal.style.display = 'none';
+            document.getElementById('reportForm').reset();
+        }
+
+        // Form submission
+        document.getElementById('reportForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const immediateRisk = formData.get('immediateRisk');
+            
+            if (immediateRisk === 'yes') {
+                alert('IMMEDIATE RISK IDENTIFIED\n\nYour report has been flagged as urgent and will be reviewed immediately.\n\nIf you are in immediate danger, please call 999 or contact emergency services.\n\nA safeguarding professional will contact you within 1 hour.');
+            } else {
+                alert('REPORT SUBMITTED SUCCESSFULLY\n\nThank you for reporting this concern. Your report has been received and will be reviewed by our safeguarding team.\n\nReference Number: SG' + Date.now().toString().slice(-6) + '\n\nYou will receive a response within 24 hours.\n\nIf the situation becomes urgent, please contact emergency services or our 24/7 helpline.');
+            }
+            
+            closeReportModal();
+        });
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('reportModal');
+            if (event.target === modal) {
+                closeReportModal();
+            }
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.querySelector('.mobile-menu-toggle');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(event.target) && 
+                !toggle.contains(event.target) && 
+                sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
