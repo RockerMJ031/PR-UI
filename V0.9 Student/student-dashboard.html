@@ -558,6 +558,12 @@
                         Schedule
                     </a>
                 </div>
+                <div class="nav-item">
+                    <a href="./student-progress.html" class="nav-link">
+                        <i class="fas fa-chart-line"></i>
+                        Progress
+                    </a>
+                </div>
 
                 <div class="nav-item">
                     <a href="./student-wellbeing.html" class="nav-link">
@@ -637,23 +643,34 @@
                 
                 <!-- 第三个：健康检查 -->
                 <div class="action-card">
-                    <i class="fas fa-heart"></i>
-                    <h3>Wellbeing Check-in</h3>
-                    <p>How are you feeling today? Track your mood and access wellbeing support.</p>
-                    <button class="btn btn-success" onclick="showWellbeingModal()">
-                        <i class="fas fa-smile"></i>
-                        Check-in
+                    <i class="fas fa-heart-pulse"></i>
+                    <h3>Wellbeing Check</h3>
+                    <p>Complete your daily wellbeing check-in and access mental health resources.</p>
+                    <button class="btn btn-success">
+                        <i class="fas fa-check-circle"></i>
+                        Check In
                     </button>
                 </div>
                 
-                <!-- 第四个：安全举报 -->
+                <!-- 第四个：获取支持 -->
                 <div class="action-card">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <h3>Report Safeguarding Issue</h3>
-                    <p>Concerned about something? Report it confidentially and safely here.</p>
-                    <button class="btn btn-warning" onclick="window.open('https://purpleruler.larksuite.com/share/base/form/shrusjBn7gcOaLf7QotIustHGPc', '_blank')">
+                    <i class="fas fa-hands-helping"></i>
+                    <h3>Get Support</h3>
+                    <p>Access academic support, counseling services, and peer mentoring.</p>
+                    <button class="btn btn-info">
+                        <i class="fas fa-comments"></i>
+                        Get Help
+                    </button>
+                </div>
+                
+                <!-- 第五个：安全保障 -->
+                <div class="action-card">
+                    <i class="fas fa-shield-alt"></i>
+                    <h3>Safeguarding</h3>
+                    <p>Report concerns, access safety resources, and learn about your rights.</p>
+                    <button class="btn btn-warning">
                         <i class="fas fa-shield-alt"></i>
-                        Report Concern
+                        Safety Info
                     </button>
                 </div>
             </div>
@@ -665,87 +682,84 @@
                     <div class="stat-value">6</div>
                     <div class="stat-description">Currently enrolled</div>
                 </div>
-                
-
-                
+                <div class="stat-card progress">
+                    <div class="stat-title">Overall Progress</div>
+                    <div class="stat-value">78%</div>
+                    <div class="stat-description">This semester</div>
+                </div>
                 <div class="stat-card assignments">
                     <div class="stat-title">Pending Tasks</div>
                     <div class="stat-value">4</div>
                     <div class="stat-description">Due this week</div>
                 </div>
-                
                 <div class="stat-card attendance">
                     <div class="stat-title">Attendance Rate</div>
                     <div class="stat-value">95%</div>
-                    <div class="stat-description">This term</div>
+                    <div class="stat-description">This month</div>
                 </div>
             </div>
 
             <!-- Content Grid -->
             <div class="content-grid">
-                <!-- Main Section -->
+                <!-- Recent Courses -->
                 <div class="section">
-                    <h2>Upcoming Lessons</h2>
+                    <h2><i class="fas fa-book"></i> Recent Courses</h2>
                     <div class="course-list">
                         <div class="course-item">
                             <div class="course-info">
-                                <h4>Mathematics</h4>
-                                <p>Today 10:00 AM - Ms. Sarah Johnson</p>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 75%;"></div>
-                                </div>
-                            </div>
-                            <button class="btn btn-primary">Join Lesson</button>
-                        </div>
-                        
-                        <div class="course-item">
-                            <div class="course-info">
-                                <h4>English Literature</h4>
-                                <p>Tomorrow 2:00 PM - Mr. David Wilson</p>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 60%;"></div>
-                                </div>
-                            </div>
-                            <button class="btn btn-primary">View Details</button>
-                        </div>
-                        
-                        <div class="course-item">
-                            <div class="course-info">
-                                <h4>Science</h4>
-                                <p>Friday 11:00 AM - Dr. Emily Chen</p>
+                                <h4>Mathematics - Algebra II</h4>
+                                <p>Next class: Tomorrow at 9:00 AM</p>
                                 <div class="progress-bar">
                                     <div class="progress-fill" style="width: 85%;"></div>
                                 </div>
+                                <small>85% complete</small>
                             </div>
-                            <button class="btn btn-primary">View Details</button>
+                        </div>
+                        <div class="course-item">
+                            <div class="course-info">
+                                <h4>English Literature</h4>
+                                <p>Next class: Wednesday at 11:00 AM</p>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 72%;"></div>
+                                </div>
+                                <small>72% complete</small>
+                            </div>
+                        </div>
+                        <div class="course-item">
+                            <div class="course-info">
+                                <h4>Science - Physics</h4>
+                                <p>Next class: Friday at 2:00 PM</p>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 68%;"></div>
+                                </div>
+                                <small>68% complete</small>
+                            </div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Sidebar Section -->
+
+                <!-- Notifications -->
                 <div class="section">
-                    <h2>Important Notifications</h2>
-                    
+                    <h2><i class="fas fa-bell"></i> Recent Notifications</h2>
                     <div class="notification">
                         <strong>Assignment Reminder</strong>
-                        <p>Mathematics homework due tomorrow at 9:00 AM</p>
+                        <p>Mathematics homework due tomorrow at 11:59 PM</p>
                     </div>
-                    
+                    <div class="notification">
+                        <strong>New Message</strong>
+                        <p>Your English teacher has posted feedback on your essay</p>
+                    </div>
                     <div class="notification">
                         <strong>Schedule Update</strong>
-                        <p>Science class moved to Room 204 this Friday</p>
+                        <p>Physics lab session moved to Friday 3:00 PM</p>
                     </div>
                     
-                    <div class="notification">
-                        <strong>Wellbeing Check</strong>
-                        <p>Remember to complete your weekly wellbeing check-in</p>
-                    </div>
-                    
+                    <!-- Safeguarding Alert -->
                     <div class="safeguarding-alert">
                         <i class="fas fa-shield-alt"></i>
                         <div>
                             <strong>Need Help?</strong>
-                            <p style="margin: 5px 0 0 0; font-size: 0.9rem;">If you're concerned about anything, our safeguarding team is here to help. Click the report button above.</p>
+                            <p style="margin: 5px 0 0 0; font-size: 0.9rem;">If you're experiencing any concerns about your safety or wellbeing, click here to access immediate support.</p>
                         </div>
                     </div>
                 </div>
@@ -754,22 +768,33 @@
     </div>
 
     <script>
-        // Wellbeing modal functionality
-        function showWellbeingModal() {
-            alert('Wellbeing check-in feature coming soon! For now, please speak to your mentor or use the support resources.');
-        }
-
-        // Add click handlers for navigation
+        // Add some interactivity
         document.addEventListener('DOMContentLoaded', function() {
-            // Add active state management for navigation
-            const navLinks = document.querySelectorAll('.nav-link');
-            navLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    // Remove active class from all links
-                    navLinks.forEach(l => l.classList.remove('active'));
-                    // Add active class to clicked link
-                    this.classList.add('active');
+            // Emergency button functionality
+            const emergencyBtn = document.querySelector('.emergency-btn');
+            emergencyBtn.addEventListener('click', function() {
+                alert('Emergency support contacted. Help is on the way.');
+            });
+
+            // Notification icon functionality
+            const notificationIcon = document.querySelector('.notification-icon');
+            notificationIcon.addEventListener('click', function() {
+                alert('Notifications panel would open here.');
+            });
+
+            // Action card buttons
+            const actionButtons = document.querySelectorAll('.action-card .btn');
+            actionButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const cardTitle = this.closest('.action-card').querySelector('h3').textContent;
+                    alert(`${cardTitle} feature would be accessed here.`);
                 });
+            });
+
+            // Safeguarding alert
+            const safeguardingAlert = document.querySelector('.safeguarding-alert');
+            safeguardingAlert.addEventListener('click', function() {
+                alert('Redirecting to safeguarding support resources...');
             });
         });
     </script>
