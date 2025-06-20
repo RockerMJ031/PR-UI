@@ -116,6 +116,17 @@
             align-items: center;
             justify-content: center;
             margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .user-details h4 {
+            font-size: 0.9rem;
+            margin-bottom: 2px;
+        }
+
+        .user-details p {
+            font-size: 0.8rem;
+            opacity: 0.8;
         }
 
         /* Main Content */
@@ -123,17 +134,18 @@
             flex: 1;
             margin-left: 250px;
             padding: 20px;
+            background-color: var(--secondary-color);
         }
 
         .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
             background: white;
             padding: 20px;
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
 
         .header h1 {
@@ -151,29 +163,14 @@
             padding: 10px 20px;
             border: none;
             border-radius: var(--border-radius);
-            font-weight: 600;
             cursor: pointer;
-            display: flex;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
             align-items: center;
             gap: 8px;
-            font-size: 14px;
             transition: all 0.3s ease;
-            text-decoration: none;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow);
-        }
-
-        .btn-success {
-            background-color: var(--success-color);
-            color: white;
-        }
-
-        .btn-danger {
-            background-color: var(--danger-color);
-            color: white;
         }
 
         .btn-primary {
@@ -181,12 +178,38 @@
             color: white;
         }
 
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
         .btn-secondary {
-            background-color: #6c757d;
+            background-color: var(--text-light);
             color: white;
         }
 
-        /* Stats Cards */
+        .btn-secondary:hover {
+            background-color: #555;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        /* Stats Overview */
         .stats-overview {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -196,38 +219,31 @@
 
         .stat-card {
             background: white;
-            border-radius: var(--border-radius);
             padding: 25px;
+            border-radius: var(--border-radius);
             box-shadow: var(--shadow);
             text-align: center;
-            border-left: 5px solid var(--primary-color);
-            transition: transform 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
         }
 
         .stat-number {
             font-size: 2.5rem;
-            font-weight: 700;
+            font-weight: bold;
             color: var(--primary-color);
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
 
         .stat-label {
             color: var(--text-light);
             font-size: 0.9rem;
-            font-weight: 500;
         }
 
         /* Filter Section */
         .filter-section {
             background: white;
+            padding: 20px;
             border-radius: var(--border-radius);
-            padding: 25px;
-            margin-bottom: 20px;
             box-shadow: var(--shadow);
+            margin-bottom: 20px;
         }
 
         .filter-row {
@@ -238,14 +254,11 @@
         }
 
         .filter-select {
-            padding: 12px 15px;
-            border: 2px solid var(--border-color);
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
             border-radius: var(--border-radius);
-            background-color: white;
             font-size: 14px;
             min-width: 150px;
-            font-family: inherit;
-            transition: border-color 0.3s ease;
         }
 
         .filter-select:focus {
@@ -253,7 +266,7 @@
             border-color: var(--primary-color);
         }
 
-        /* Student Table */
+        /* Students Table */
         .students-table-container {
             background: white;
             border-radius: var(--border-radius);
@@ -262,19 +275,17 @@
         }
 
         .table-header {
-            padding: 25px;
-            border-bottom: 2px solid var(--border-color);
+            background: var(--primary-color);
+            color: white;
+            padding: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
-            color: white;
         }
 
         .table-title {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: 600;
-            margin: 0;
         }
 
         .students-table {
@@ -283,134 +294,129 @@
         }
 
         .students-table th {
-            text-align: left;
-            padding: 18px 20px;
             background-color: #f8f9fa;
-            border-bottom: 2px solid var(--border-color);
-            color: var(--text-color);
+            padding: 15px;
+            text-align: left;
             font-weight: 600;
-            font-size: 14px;
+            color: var(--text-color);
+            border-bottom: 1px solid var(--border-color);
         }
 
         .students-table td {
-            padding: 18px 20px;
+            padding: 15px;
             border-bottom: 1px solid var(--border-color);
             vertical-align: middle;
         }
 
         .students-table tr:hover {
-            background-color: rgba(102, 51, 153, 0.05);
+            background-color: #f8f9fa;
         }
 
         .student-info {
             display: flex;
             align-items: center;
-            gap: 15px;
         }
 
         .student-avatar {
-            width: 45px;
-            height: 45px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            background-color: var(--primary-color);
+            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 16px;
+            font-weight: bold;
+            margin-right: 12px;
         }
 
         .student-details h4 {
-            margin: 0;
-            font-size: 15px;
-            color: var(--text-color);
-            font-weight: 600;
+            margin-bottom: 2px;
+            font-size: 0.95rem;
         }
 
         .student-details p {
-            margin: 4px 0 0 0;
-            font-size: 13px;
             color: var(--text-light);
+            font-size: 0.85rem;
         }
 
         .status-badge {
-            padding: 8px 16px;
+            padding: 4px 12px;
             border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            display: inline-block;
+            font-size: 0.8rem;
+            font-weight: 500;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
         .status-active {
-            background-color: rgba(40, 167, 69, 0.15);
-            color: var(--success-color);
+            background-color: #d4edda;
+            color: #155724;
         }
 
         .status-pending {
-            background-color: rgba(255, 193, 7, 0.15);
-            color: var(--warning-color);
+            background-color: #fff3cd;
+            color: #856404;
         }
 
         .status-concern {
-            background-color: rgba(220, 53, 69, 0.15);
-            color: var(--danger-color);
+            background-color: #f8d7da;
+            color: #721c24;
         }
 
         .status-inactive {
-            background-color: rgba(108, 117, 125, 0.15);
-            color: #6c757d;
+            background-color: #e2e3e5;
+            color: #383d41;
         }
 
         .action-buttons {
             display: flex;
-            gap: 8px;
+            gap: 5px;
         }
 
         .action-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: var(--border-radius);
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: none;
-            cursor: pointer;
-            color: white;
-            font-size: 14px;
             transition: all 0.3s ease;
-        }
-
-        .action-btn:hover {
-            transform: scale(1.1);
         }
 
         .leave-request-btn {
             background-color: var(--info-color);
+            color: white;
+        }
+
+        .leave-request-btn:hover {
+            background-color: #138496;
         }
 
         /* Pagination */
         .pagination {
             display: flex;
             justify-content: center;
-            align-items: center;
-            padding: 25px;
-            gap: 10px;
+            padding: 20px;
+            gap: 5px;
         }
 
         .pagination button {
-            padding: 10px 15px;
-            border: 2px solid var(--border-color);
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
             background: white;
-            color: var(--text-color);
-            border-radius: var(--border-radius);
             cursor: pointer;
+            border-radius: 4px;
             transition: all 0.3s ease;
         }
 
-        .pagination button:hover,
+        .pagination button:hover {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
         .pagination button.active {
             background-color: var(--primary-color);
             color: white;
@@ -420,9 +426,8 @@
         /* Responsive Design */
         @media (max-width: 768px) {
             .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
             }
 
             .main-content {
@@ -435,69 +440,160 @@
                 text-align: center;
             }
 
-            .stats-overview {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
             .filter-row {
                 flex-direction: column;
                 align-items: stretch;
             }
 
-            .students-table-container {
-                overflow-x: auto;
+            .filter-select {
+                min-width: auto;
             }
+
+            .students-table {
+                font-size: 0.9rem;
+            }
+
+            .students-table th,
+            .students-table td {
+                padding: 10px 8px;
+            }
+
+            .student-info {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .student-avatar {
+                margin-right: 0;
+                margin-bottom: 8px;
+            }
+        }
+
+        /* Top Navigation */
+        .top-nav {
+            background: white;
+            padding: 15px 20px;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-radius: var(--border-radius);
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .breadcrumb {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .notification-icon {
+            position: relative;
+            color: var(--text-light);
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <!-- Sidebar -->
-        <nav class="sidebar">
+        <div class="sidebar">
             <div class="logo">
                 <h2>Mentor Portal</h2>
             </div>
             
-            <div class="nav-menu">
+            <nav class="nav-menu">
                 <div class="nav-item">
-                    <a href="mentor-dashboard.html" class="nav-link">
+                    <a href="#" class="nav-link">
                         <i class="fas fa-tachometer-alt"></i>
                         Dashboard
                     </a>
                 </div>
                 <div class="nav-item">
-                    <a href="students-enhanced.html" class="nav-link active">
+                    <a href="#" class="nav-link active">
                         <i class="fas fa-users"></i>
                         Students
                     </a>
                 </div>
                 <div class="nav-item">
-                    <a href="sessions-enhanced.html" class="nav-link">
+                    <a href="#" class="nav-link">
                         <i class="fas fa-calendar-alt"></i>
                         Sessions
                     </a>
                 </div>
                 <div class="nav-item">
-                    <a href="reports-enhanced.html" class="nav-link">
+                    <a href="#" class="nav-link">
                         <i class="fas fa-chart-bar"></i>
                         Reports
                     </a>
                 </div>
                 <div class="nav-item">
-                    <a href="finance.html" class="nav-link">
-                        <i class="fas fa-pound-sign"></i>
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-dollar-sign"></i>
                         Finance
                     </a>
                 </div>
-            </div>
+            </nav>
             
             <div class="user-profile">
                 <div class="user-info">
-                    <div class="user-avatar">
-                        <i class="fas fa-user"></i>
+                    <div class="user-avatar">JM</div>
+                    <div class="user-details">
+                        <h4>John Mentor</h4>
+                        <div style="font-size: 0.8rem; opacity: 0.8;">Mentor</div>
                     </div>
-                    <div>
-                        <div style="font-weight: 600;">John Mentor</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Top Navigation -->
+        <nav class="top-nav" style="margin-left: 250px;">
+            <div class="nav-left">
+                <div class="breadcrumb">
+                    <a href="#">Dashboard</a> / <span>Students</span>
+                </div>
+            </div>
+            <div class="nav-right">
+                <div class="notification-icon">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar" style="width: 35px; height: 35px; background-color: var(--primary-color);">JM</div>
+                    <div class="user-details" style="margin-left: 10px;">
+                        <h4 style="font-size: 0.9rem; color: var(--text-color);">John Mentor</h4>
                         <div style="font-size: 0.8rem; opacity: 0.8;">Mentor</div>
                     </div>
                 </div>
@@ -598,12 +694,13 @@
                     <thead>
                         <tr>
                             <th>Student</th>
-                            <th>Student ID</th>
                             <th>Year Group</th>
                             <th>Provision Type</th>
                             <th>Start Date</th>
                             <th>Status</th>
-                            <th>Last Updated</th>
+                            <th>Attendance Ratio</th>
+                            <th>Qty of Leave Request</th>
+                            <th>Outstanding information Required</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -618,12 +715,13 @@
                                     </div>
                                 </div>
                             </td>
-                            <td>STU001</td>
                             <td>Year 10</td>
                             <td>Full-time</td>
                             <td>15 Sep 2023</td>
                             <td><span class="status-badge status-active">Active</span></td>
-                            <td>2 days ago</td>
+                            <td>95%</td>
+                            <td>2</td>
+                            <td>Medical Certificate</td>
                             <td>
                                 <div class="action-buttons">
                                     <button class="action-btn leave-request-btn" title="View Leave Request" onclick="viewLeaveRequest('STU001')">
@@ -642,12 +740,13 @@
                                     </div>
                                 </div>
                             </td>
-                            <td>STU002</td>
                             <td>Year 9</td>
                             <td>Tutoring</td>
                             <td>03 Oct 2023</td>
                             <td><span class="status-badge status-active">Active</span></td>
-                            <td>1 day ago</td>
+                            <td>88%</td>
+                            <td>1</td>
+                            <td>None</td>
                             <td>
                                 <div class="action-buttons">
                                     <button class="action-btn leave-request-btn" title="View Leave Request" onclick="viewLeaveRequest('STU002')">
@@ -666,12 +765,13 @@
                                     </div>
                                 </div>
                             </td>
-                            <td>STU003</td>
                             <td>Year 6</td>
                             <td>Mentoring</td>
                             <td>22 Nov 2023</td>
                             <td><span class="status-badge status-concern">Needs Help</span></td>
-                            <td>3 hours ago</td>
+                            <td>72%</td>
+                            <td>5</td>
+                            <td>Parent Meeting Required</td>
                             <td>
                                 <div class="action-buttons">
                                     <button class="action-btn leave-request-btn" title="View Leave Request" onclick="viewLeaveRequest('STU003')">
@@ -690,12 +790,13 @@
                                     </div>
                                 </div>
                             </td>
-                            <td>STU004</td>
                             <td>Year 11</td>
                             <td>Counseling</td>
                             <td>05 Jan 2024</td>
                             <td><span class="status-badge status-pending">Pending</span></td>
-                            <td>5 days ago</td>
+                            <td>92%</td>
+                            <td>0</td>
+                            <td>Enrollment Documents</td>
                             <td>
                                 <div class="action-buttons">
                                     <button class="action-btn leave-request-btn" title="View Leave Request" onclick="viewLeaveRequest('STU004')">
@@ -714,12 +815,13 @@
                                     </div>
                                 </div>
                             </td>
-                            <td>STU005</td>
                             <td>Year 8</td>
                             <td>Part-time</td>
                             <td>12 Dec 2023</td>
                             <td><span class="status-badge status-active">Active</span></td>
-                            <td>1 week ago</td>
+                            <td>85%</td>
+                            <td>3</td>
+                            <td>None</td>
                             <td>
                                 <div class="action-buttons">
                                     <button class="action-btn leave-request-btn" title="View Leave Request" onclick="viewLeaveRequest('STU005')">
