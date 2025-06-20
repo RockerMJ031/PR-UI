@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Students - Mentor Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #663399;
+            --primary-dark: #4a2570;
+            --primary-light: #8a5bb8;
+            --secondary-color: #f8f9fa;
+            --text-color: #333;
+            --text-light: #666;
+            --border-color: #e0e0e0;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+            --white: #ffffff;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+            --border-radius: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar - Using mentor-dashboard.html style */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .logo {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .nav-menu {
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            margin: 5px 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            border-left-color: white;
+        }
+
+        .nav-link.active {
+            background-color: rgba(255,255,255,0.15);
+            color: white;
+            border-left-color: white;
+        }
+
+        .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .user-profile {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .user-info i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .user-details h4 {
+            font-size: 0.9rem;
+            margin-bottom: 2px;
+        }
+
+        .user-details p {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.7);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #545b62;
+            transform: translateY(-2px);
+        }
+
+        /* Stats Overview */
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 0.9rem;
+            min-width: 150px;
+        }
+
+        /* Students Table */
+        .students-table-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .students-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .students-table th {
+            background-color: var(--secondary-color);
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .students-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .students-table tr:hover {
+            background-color: rgba(102, 51, 153, 0.05);
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+        }
+
+        .btn-info {
+            background-color: var(--info-color);
+            color: white;
+        }
+
+        .btn-info:hover {
+            background-color: #138496;
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .close {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+        .close:hover {
+            opacity: 0.7;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        .student-list-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+        }
+
+        /* Enhanced Modal Styles for Student Management */
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .form-section h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 0.9rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(102, 51, 153, 0.2);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .note {
+            background-color: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: var(--border-radius);
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            color: #0066cc;
+        }
+
+        .remove-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .remove-option {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .remove-option:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(102, 51, 153, 0.05);
+        }
+
+        .remove-option.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(102, 51, 153, 0.1);
+        }
+
+        .student-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.2s ease;
+        }
+
+        .student-item:hover {
+            background-color: rgba(102, 51, 153, 0.05);
+        }
+
+        .student-item:last-child {
+            border-bottom: none;
+        }
+
+        .student-info {
+            flex: 1;
+        }
+
+        .student-name {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .student-details {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-top: 2px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .header-actions {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .stats-overview {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-select {
+                min-width: auto;
+            }
+
+            .students-table {
+                font-size: 0.8rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 2% auto;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .remove-options {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <h2>Mentor Portal</h2>
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="nav-item">
+                    <a href="mentor-dashboard.html" class="nav-link">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Dashboard
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="students-enhanced.html" class="nav-link active">
+                        <i class="fas fa-users"></i>
+                        Students
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="sessions-enhanced.html" class="nav-link">
+                        <i class="fas fa-calendar-alt"></i>
+                        Sessions
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="reports-enhanced.html" class="nav-link">
+                        <i class="fas fa-chart-bar"></i>
+                        Reports
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="finance.html" class="nav-link">
+                        <i class="fas fa-pound-sign"></i>
+                        Finance
+                    </a>
+                </div>
+            </nav>
+            
+            <div class="user-profile">
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <div class="user-details">
+                        <h4>Mentor</h4>
+                        <p>Admin User</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1>Student Management</h1>
+                <div class="header-actions">
+                    <button class="btn btn-success" onclick="openStudentModal('add')">
+                        <i class="fas fa-user-plus"></i>
+                        Add Students
+                    </button>
+                    <button class="btn btn-danger" onclick="openStudentModal('remove')">
+                        <i class="fas fa-user-minus"></i>
+                        Remove Students
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Overview -->
+            <div class="stats-overview">
+                <div class="stat-card">
+                    <h3>127</h3>
+                    <p>Total Students</p>
+                </div>
+                <div class="stat-card">
+                    <h3>98</h3>
+                    <p>Active Students</p>
+                </div>
+                <div class="stat-card">
+                    <h3>3</h3>
+                    <p>Safeguarding Alerts</p>
+                </div>
+                <div class="stat-card">
+                    <h3>12</h3>
+                    <p>Pending Invoices</p>
+                </div>
+            </div>
+
+            <!-- Filter Section -->
+            <div class="filter-section">
+                <div class="filter-row">
+                    <select class="filter-select">
+                        <option>All Year Groups</option>
+                        <option>Year 7</option>
+                        <option>Year 8</option>
+                        <option>Year 9</option>
+                        <option>Year 10</option>
+                        <option>Year 11</option>
+                        <option>Year 12</option>
+                        <option>Year 13</option>
+                    </select>
+                    <select class="filter-select">
+                        <option>All Subjects</option>
+                        <option>Mathematics</option>
+                        <option>English</option>
+                        <option>Science</option>
+                        <option>History</option>
+                        <option>Geography</option>
+                    </select>
+                    <select class="filter-select">
+                        <option>All Status</option>
+                        <option>Active</option>
+                        <option>Inactive</option>
+                        <option>Pending</option>
+                    </select>
+                    <button class="btn btn-primary">Apply Filters</button>
+                </div>
+            </div>
+
+            <!-- Students Table -->
+            <div class="students-table-container">
+                <div class="table-header">
+                    <div class="table-title">Student List</div>
+                    <div class="header-actions">
+                        <button class="btn btn-secondary btn-sm">
+                            <i class="fas fa-download"></i>
+                            Export
+                        </button>
+                    </div>
+                </div>
+                <table class="students-table">
+                    <thead>
+                        <tr>
+                            <th>Student Name</th>
+                            <th>Year Group</th>
+                            <th>Subjects</th>
+                            <th>Status</th>
+                            <th>Last Session</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div>
+                                    <strong>Emma Thompson</strong><br>
+                                    <small>emma.thompson@email.com</small>
+                                </div>
+                            </td>
+                            <td>Year 11</td>
+                            <td>Mathematics, Physics</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>2024-01-15</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-info btn-sm">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-warning btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-primary btn-sm" onclick="viewLeaveRequest()">
+                                        <i class="fas fa-calendar-times"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div>
+                                    <strong>James Wilson</strong><br>
+                                    <small>james.wilson@email.com</small>
+                                </div>
+                            </td>
+                            <td>Year 10</td>
+                            <td>English, History</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>2024-01-14</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-info btn-sm">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-warning btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-primary btn-sm" onclick="viewLeaveRequest()">
+                                        <i class="fas fa-calendar-times"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div>
+                                    <strong>Sophie Davis</strong><br>
+                                    <small>sophie.davis@email.com</small>
+                                </div>
+                            </td>
+                            <td>Year 12</td>
+                            <td>Chemistry, Biology</td>
+                            <td><span class="status-badge status-pending">Pending</span></td>
+                            <td>2024-01-12</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-info btn-sm">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-warning btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-primary btn-sm" onclick="viewLeaveRequest()">
+                                        <i class="fas fa-calendar-times"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div>
+                                    <strong>Michael Brown</strong><br>
+                                    <small>michael.brown@email.com</small>
+                                </div>
+                            </td>
+                            <td>Year 9</td>
+                            <td>Mathematics</td>
+                            <td><span class="status-badge status-inactive">Inactive</span></td>
+                            <td>2024-01-10</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-info btn-sm">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-warning btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-primary btn-sm" onclick="viewLeaveRequest()">
+                                        <i class="fas fa-calendar-times"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div>
+                                    <strong>Olivia Johnson</strong><br>
+                                    <small>olivia.johnson@email.com</small>
+                                </div>
+                            </td>
+                            <td>Year 13</td>
+                            <td>English Literature, Psychology</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>2024-01-16</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-info btn-sm">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-warning btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-primary btn-sm" onclick="viewLeaveRequest()">
+                                        <i class="fas fa-calendar-times"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Student Management Modal -->
+    <div id="studentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Student Management</h2>
+                <button class="close" onclick="closeStudentModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Add Student Form -->
+                <div id="addStudentForm" style="display: none;">
+                    <div class="note">
+                        <strong>Note:</strong> This function is for adding students to existing groups. For new groups, please use the Course Enrolment function.
+                    </div>
+                    
+                    <form onsubmit="submitAddStudent(event)">
+                        <div class="form-section">
+                            <h3>Basic Information</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="studentName">Student Name *</label>
+                                    <input type="text" id="studentName" name="studentName" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="studentEmail">Email Address *</label>
+                                    <input type="email" id="studentEmail" name="studentEmail" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="studentPhone">Phone Number</label>
+                                    <input type="tel" id="studentPhone" name="studentPhone">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-section">
+                            <h3>Academic Information</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="yearGroup">Year Group *</label>
+                                    <select id="yearGroup" name="yearGroup" required>
+                                        <option value="">Select Year Group</option>
+                                        <option value="7">Year 7</option>
+                                        <option value="8">Year 8</option>
+                                        <option value="9">Year 9</option>
+                                        <option value="10">Year 10</option>
+                                        <option value="11">Year 11</option>
+                                        <option value="12">Year 12</option>
+                                        <option value="13">Year 13</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="currentGrade">Current Grade</label>
+                                    <input type="text" id="currentGrade" name="currentGrade" placeholder="e.g., B+, 7, etc.">
+                                </div>
+                                <div class="form-group">
+                                    <label for="sendCode">SEND CODE</label>
+                                    <input type="text" id="sendCode" name="sendCode">
+                                </div>
+                                <div class="form-group">
+                                    <label for="examBoard">Exam Board</label>
+                                    <select id="examBoard" name="examBoard">
+                                        <option value="">Select Exam Board</option>
+                                        <option value="AQA">AQA</option>
+                                        <option value="Edexcel">Edexcel</option>
+                                        <option value="OCR">OCR</option>
+                                        <option value="WJEC">WJEC</option>
+                                        <option value="CIE">CIE</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="existingGroup">Existing Group *</label>
+                                    <select id="existingGroup" name="existingGroup" required>
+                                        <option value="">Select Group</option>
+                                        <option value="MATH-Y11-A">Mathematics Year 11 Group A</option>
+                                        <option value="ENG-Y10-B">English Year 10 Group B</option>
+                                        <option value="SCI-Y9-C">Science Year 9 Group C</option>
+                                        <option value="HIST-Y12-A">History Year 12 Group A</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="closeStudentModal()">Cancel</button>
+                            <button type="submit" class="btn btn-success">Add Student</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Remove Student Form -->
+                <div id="removeStudentForm" style="display: none;">
+                    <div class="remove-options">
+                        <div class="remove-option" onclick="showRemoveAllCourses()">
+                            <h4>Remove All Courses</h4>
+                            <p>Completely remove student from all courses</p>
+                        </div>
+                        <div class="remove-option" onclick="showRemoveSpecificCourses()">
+                            <h4>Remove Specific Courses</h4>
+                            <p>Remove student from selected courses only</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Remove All Courses Section -->
+                    <div id="removeAllSection" style="display: none;">
+                        <h3>Remove All Courses</h3>
+                        <input type="text" class="search-bar" placeholder="Search students..." onkeyup="filterStudents(this.value, 'removeAllStudentList')">
+                        <div id="removeAllStudentList" class="student-list-container"></div>
+                    </div>
+                    
+                    <!-- Remove Specific Courses Section -->
+                    <div id="removeSpecificSection" style="display: none;">
+                        <h3>Remove Specific Courses</h3>
+                        <input type="text" class="search-bar" placeholder="Search students..." onkeyup="filterSpecificCourses(this.value)">
+                        <div id="specificCourseList" class="student-list-container"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Filter functionality
+        function filterStudents(searchTerm) {
+            // Implementation for filtering students
+            console.log('Filtering students:', searchTerm);
+        }
+
+        // Sample student data
+        const studentData = [
+            {
+                id: 1,
+                name: "Emma Thompson",
+                email: "emma.thompson@email.com",
+                yearGroup: "Year 11",
+                subjects: ["Mathematics", "Physics"],
+                status: "Active"
+            },
+            {
+                id: 2,
+                name: "James Wilson",
+                email: "james.wilson@email.com",
+                yearGroup: "Year 10",
+                subjects: ["English", "History"],
+                status: "Active"
+            },
+            {
+                id: 3,
+                name: "Sophie Davis",
+                email: "sophie.davis@email.com",
+                yearGroup: "Year 12",
+                subjects: ["Chemistry", "Biology"],
+                status: "Pending"
+            },
+            {
+                id: 4,
+                name: "Michael Brown",
+                email: "michael.brown@email.com",
+                yearGroup: "Year 9",
+                subjects: ["Mathematics"],
+                status: "Inactive"
+            },
+            {
+                id: 5,
+                name: "Olivia Johnson",
+                email: "olivia.johnson@email.com",
+                yearGroup: "Year 13",
+                subjects: ["English Literature", "Psychology"],
+                status: "Active"
+            }
+        ];
+
+        let currentStudentAction = '';
+
+        function openStudentModal(action) {
+            currentStudentAction = action;
+            const modal = document.getElementById('studentModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const addForm = document.getElementById('addStudentForm');
+            const removeForm = document.getElementById('removeStudentForm');
+            
+            // Hide all forms initially
+            addForm.style.display = 'none';
+            removeForm.style.display = 'none';
+            
+            // Hide remove subsections
+            document.getElementById('removeAllSection').style.display = 'none';
+            document.getElementById('removeSpecificSection').style.display = 'none';
+            
+            if (action === 'add') {
+                modalTitle.textContent = 'Add Student to Existing Group';
+                addForm.style.display = 'block';
+            } else if (action === 'remove') {
+                modalTitle.textContent = 'Remove Student';
+                removeForm.style.display = 'block';
+            }
+            
+            modal.style.display = 'block';
+        }
+
+        function closeStudentModal() {
+            document.getElementById('studentModal').style.display = 'none';
+        }
+
+        function submitAddStudent(event) {
+            event.preventDefault();
+            
+            // Get form data
+            const formData = new FormData(event.target);
+            const studentData = {
+                name: formData.get('studentName'),
+                email: formData.get('studentEmail'),
+                phone: formData.get('studentPhone'),
+                yearGroup: formData.get('yearGroup'),
+                currentGrade: formData.get('currentGrade'),
+                sendCode: formData.get('sendCode'),
+                examBoard: formData.get('examBoard'),
+                existingGroup: formData.get('existingGroup')
+            };
+            
+            // Validate required fields
+            if (!studentData.name || !studentData.email || !studentData.yearGroup || !studentData.existingGroup) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            // Here you would integrate with Wix to add the student
+            console.log('Adding student:', studentData);
+            alert('Student added successfully! (This would integrate with Wix in production)');
+            
+            closeStudentModal();
+        }
+
+        function showRemoveAllCourses() {
+            document.getElementById('removeAllSection').style.display = 'block';
+            document.getElementById('removeSpecificSection').style.display = 'none';
+            populateRemoveAllStudentList();
+        }
+
+        function showRemoveSpecificCourses() {
+            document.getElementById('removeAllSection').style.display = 'none';
+            document.getElementById('removeSpecificSection').style.display = 'block';
+            populateRemoveSpecificStudentList();
+        }
+
+        function populateRemoveAllStudentList() {
+            const container = document.getElementById('removeAllStudentList');
+            container.innerHTML = '';
+            
+            // Sample student data for removal
+            const students = [
+                { id: 1, name: "Emma Thompson", email: "emma.thompson@email.com", courses: 2 },
+                { id: 2, name: "James Wilson", email: "james.wilson@email.com", courses: 2 },
+                { id: 3, name: "Sophie Davis", email: "sophie.davis@email.com", courses: 2 },
+                { id: 4, name: "Michael Brown", email: "michael.brown@email.com", courses: 1 },
+                { id: 5, name: "Olivia Johnson", email: "olivia.johnson@email.com", courses: 2 }
+            ];
+            
+            students.forEach(student => {
+                const studentItem = createRemoveAllStudentItem(student);
+                container.appendChild(studentItem);
+            });
+        }
+
+        function createRemoveAllStudentItem(student) {
+            const div = document.createElement('div');
+            div.className = 'student-item';
+            div.innerHTML = `
+                <div class="student-info">
+                    <div class="student-name">${student.name}</div>
+                    <div class="student-details">${student.email} • ${student.courses} course(s)</div>
+                </div>
+                <button class="btn btn-danger btn-sm" onclick="handleRemoveAllCourses(${student.id}, '${student.name}')">
+                    Remove All
+                </button>
+            `;
+            return div;
+        }
+
+        function populateRemoveSpecificStudentList() {
+            const container = document.getElementById('specificCourseList');
+            container.innerHTML = '';
+            
+            // Sample course data for specific removal
+            const courses = [
+                { id: 1, studentName: "Emma Thompson", classId: "MATH-Y11-A", subject: "Mathematics", futureLessons: 8 },
+                { id: 2, studentName: "Emma Thompson", classId: "PHYS-Y11-A", subject: "Physics", futureLessons: 6 },
+                { id: 3, studentName: "James Wilson", classId: "ENG-Y10-B", subject: "English", futureLessons: 10 },
+                { id: 4, studentName: "James Wilson", classId: "HIST-Y10-A", subject: "History", futureLessons: 7 },
+                { id: 5, studentName: "Sophie Davis", classId: "CHEM-Y12-A", subject: "Chemistry", futureLessons: 12 }
+            ];
+            
+            courses.forEach(course => {
+                const courseItem = createSpecificCourseItem(course);
+                container.appendChild(courseItem);
+            });
+        }
+
+        function createSpecificCourseItem(course) {
+            const div = document.createElement('div');
+            div.className = 'student-item';
+            div.innerHTML = `
+                <div class="student-info">
+                    <div class="student-name">${course.studentName}</div>
+                    <div class="student-details">Class ID: ${course.classId} • Subject: ${course.subject} • Future Lessons: ${course.futureLessons}</div>
+                </div>
+                <button class="btn btn-danger btn-sm" onclick="handleRemoveSpecificCourse(${course.id}, '${course.studentName}', '${course.subject}')">
+                    Remove
+                </button>
+            `;
+            return div;
+        }
+
+        function handleRemoveAllCourses(studentId, studentName) {
+            if (confirm(`Are you sure you want to remove ${studentName} from ALL courses? This action cannot be undone.`)) {
+                // Here you would integrate with Wix to remove the student from all courses
+                console.log('Removing student from all courses:', studentId);
+                alert(`${studentName} has been removed from all courses. (This would integrate with Wix in production)`);
+                populateRemoveAllStudentList(); // Refresh the list
+            }
+        }
+
+        function handleRemoveSpecificCourse(courseId, studentName, subject) {
+            if (confirm(`Are you sure you want to remove ${studentName} from ${subject}? This action cannot be undone.`)) {
+                // Here you would integrate with Wix to remove the student from the specific course
+                console.log('Removing student from specific course:', courseId);
+                alert(`${studentName} has been removed from ${subject}. (This would integrate with Wix in production)`);
+                populateRemoveSpecificStudentList(); // Refresh the list
+            }
+        }
+
+        function filterStudents(searchTerm, containerId) {
+            const container = document.getElementById(containerId);
+            const items = container.querySelectorAll('.student-item');
+            
+            items.forEach(item => {
+                const studentName = item.querySelector('.student-name').textContent.toLowerCase();
+                const studentDetails = item.querySelector('.student-details').textContent.toLowerCase();
+                
+                if (studentName.includes(searchTerm.toLowerCase()) || studentDetails.includes(searchTerm.toLowerCase())) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function filterSpecificCourses(searchTerm) {
+            const container = document.getElementById('specificCourseList');
+            const items = container.querySelectorAll('.student-item');
+            
+            items.forEach(item => {
+                const studentName = item.querySelector('.student-name').textContent.toLowerCase();
+                const studentDetails = item.querySelector('.student-details').textContent.toLowerCase();
+                
+                if (studentName.includes(searchTerm.toLowerCase()) || studentDetails.includes(searchTerm.toLowerCase())) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners for Add Students and Remove Students buttons
+            const addStudentsBtn = document.querySelector('.btn-success');
+            const removeStudentsBtn = document.querySelector('.btn-danger');
+            
+            if (addStudentsBtn) {
+                addStudentsBtn.addEventListener('click', () => openStudentModal('add'));
+            }
+            
+            if (removeStudentsBtn) {
+                removeStudentsBtn.addEventListener('click', () => openStudentModal('remove'));
+            }
+        });
+
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            const studentModal = document.getElementById('studentModal');
+            if (event.target === studentModal) {
+                closeStudentModal();
+            }
+        }
+
+        function viewLeaveRequest() {
+            alert('Leave request functionality would be implemented here.');
+        }
+
+        // Navigation links functionality (commented out for now)
+        /*
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Remove active class from all links
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                
+                // Add active class to clicked link
+                this.classList.add('active');
+                
+                // Here you would typically load the corresponding page content
+                console.log('Navigating to:', this.textContent.trim());
+            });
+        });
+        */
+    </script>
+</body>
+</html>
