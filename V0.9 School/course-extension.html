@@ -35,23 +35,11 @@
             min-height: 100vh;
         }
 
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal-content {
+        /* Modal Styles */
+        .modal {
             background-color: white;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
             width: 600px;
             max-width: 90%;
             max-height: 90vh;
@@ -62,7 +50,7 @@
         .modal-header {
             background-color: var(--primary-color);
             color: white;
-            padding: 15px 20px;
+            padding: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -73,6 +61,7 @@
         .modal-header h2 {
             font-weight: 500;
             font-size: 1.5rem;
+            margin: 0;
         }
 
         .modal-close {
@@ -88,30 +77,40 @@
             padding: 20px;
         }
 
-        .search-bar {
+        /* Search Bar Styles */
+        .search-container {
             margin-bottom: 20px;
             position: relative;
         }
 
-        .search-bar input {
+        .search-container input {
             width: 100%;
-            padding: 12px 15px 12px 40px;
+            padding: 12px 40px 12px 15px;
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 14px;
+            transition: border-color 0.3s;
         }
 
-        .search-bar i {
+        .search-container input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(106, 61, 232, 0.2);
+        }
+
+        .search-icon {
             position: absolute;
-            left: 15px;
+            right: 15px;
             top: 50%;
             transform: translateY(-50%);
-            color: #999;
+            color: #777;
         }
 
+        /* Course Item Styles */
         .course-list {
-            max-height: 400px;
-            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
         .course-item {
@@ -119,79 +118,88 @@
             border: 1px solid #eee;
             border-radius: 8px;
             padding: 15px;
-            margin-bottom: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .course-info {
-            flex: 1;
+        .course-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .course-id {
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 5px;
-            font-size: 1.1rem;
-        }
-
-        .course-meta {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .meta-item {
+        .course-header {
             display: flex;
-            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: 500;
         }
 
-        .meta-item i {
-            margin-right: 5px;
+        .class-id {
             color: var(--primary-color);
-            width: 20px;
-            text-align: center;
+        }
+
+        .qty-lessons {
+            color: var(--info-color);
+            font-size: 0.9rem;
+        }
+
+        .course-details {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .detail-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .label {
+            color: #777;
+            min-width: 80px;
+        }
+
+        .value {
+            font-weight: 500;
         }
 
         .course-actions {
-            margin-left: 15px;
+            display: flex;
+            gap: 10px;
         }
 
-        .btn {
+        .action-btn {
             padding: 8px 15px;
             border-radius: 4px;
             border: none;
             cursor: pointer;
             font-size: 14px;
-            transition: all 0.3s;
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 5px;
+            transition: background-color 0.3s;
         }
 
-        .btn i {
-            margin-right: 5px;
-        }
-
-        .btn-primary {
+        .extend-btn {
             background-color: var(--primary-color);
             color: white;
         }
 
-        .btn-primary:hover {
+        .extend-btn:hover {
             background-color: var(--accent-color);
         }
 
+        /* Extension Form Styles */
         .extension-form {
             display: none;
             background-color: #f9f9f9;
-            border: 1px solid #eee;
             border-radius: 8px;
-            padding: 15px;
+            padding: 20px;
             margin-top: 20px;
+            border: 1px solid #eee;
         }
 
         .form-group {
@@ -201,8 +209,8 @@
         .form-group label {
             display: block;
             margin-bottom: 5px;
-            font-weight: 500;
             color: #555;
+            font-weight: 500;
         }
 
         .form-control {
@@ -211,6 +219,11 @@
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 14px;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
         }
 
         .form-row {
@@ -229,6 +242,35 @@
             margin-top: 20px;
         }
 
+        .btn {
+            padding: 10px 15px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-color);
+        }
+
+        .btn-secondary {
+            background-color: #f5f5f5;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        .btn-secondary:hover {
+            background-color: #e9e9e9;
+        }
+
+        /* Success Message Styles */
         .success-message {
             display: none;
             background-color: #d4edda;
@@ -240,260 +282,313 @@
             text-align: center;
         }
 
-        .success-message i {
+        .success-icon {
             font-size: 48px;
-            margin-bottom: 15px;
             color: var(--success-color);
+            margin-bottom: 15px;
         }
 
-        .success-message h3 {
-            margin-bottom: 10px;
+        .success-title {
+            font-size: 18px;
             font-weight: 500;
+            margin-bottom: 10px;
         }
 
-        .lessons-remaining {
-            display: inline-block;
-            background-color: var(--primary-color);
-            color: white;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            margin-left: 10px;
+        .success-text {
+            margin-bottom: 15px;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .modal {
+                width: 95%;
+                max-height: 95vh;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .course-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .course-actions {
+                margin-top: 15px;
+                align-self: flex-end;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Course Extension</h2>
-                <button class="modal-close" onclick="window.location.href='mentor-dashboard.html'">&times;</button>
+    <div class="modal">
+        <div class="modal-header">
+            <h2>Course Extension</h2>
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search by Student Name, Subject, or Class ID..." onkeyup="filterCourses()">
+                <i class="fas fa-search search-icon"></i>
             </div>
-            <div class="modal-body">
-                <div class="search-bar">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="courseSearch" placeholder="Search by Student Name, Subject, or Class ID..." onkeyup="filterCourses()">
-                </div>
-                
-                <div id="courseList" class="course-list">
-                    <!-- Course items will be populated here -->
-                </div>
-                
-                <div id="extensionForm" class="extension-form">
-                    <h3>Extend Course</h3>
+            <div id="courseList" class="course-list">
+                <!-- Course items will be populated here -->
+            </div>
+
+            <!-- Extension Form -->
+            <div id="extensionForm" class="extension-form">
+                <h3 id="formTitle" style="margin-bottom: 15px;">Extend Course</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="studentName">Student Name</label>
+                        <input type="text" id="studentName" class="form-control" readonly>
+                    </div>
                     <div class="form-group">
                         <label for="courseId">Course ID</label>
                         <input type="text" id="courseId" class="form-control" readonly>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="studentName">Student</label>
-                            <input type="text" id="studentName" class="form-control" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label for="subject">Subject</label>
-                            <input type="text" id="subject" class="form-control" readonly>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="currentEndDate">Current End Date</label>
-                            <input type="date" id="currentEndDate" class="form-control" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label for="extensionPeriod">Extension Period</label>
-                            <select id="extensionPeriod" class="form-control">
-                                <option value="1">1 Month</option>
-                                <option value="3">3 Months</option>
-                                <option value="6">6 Months</option>
-                                <option value="12">12 Months</option>
-                            </select>
-                        </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="subject">Subject</label>
+                        <input type="text" id="subject" class="form-control" readonly>
                     </div>
                     <div class="form-group">
-                        <label for="reason">Reason for Extension</label>
-                        <textarea id="reason" class="form-control" rows="3"></textarea>
-                    </div>
-                    <div class="form-actions">
-                        <button class="btn btn-primary" onclick="cancelExtension()">Cancel</button>
-                        <button class="btn btn-primary" onclick="submitExtension()"><i class="fas fa-check"></i> Submit</button>
+                        <label for="currentLessons">Current Lessons Remaining</label>
+                        <input type="text" id="currentLessons" class="form-control" readonly>
                     </div>
                 </div>
-                
-                <div id="successMessage" class="success-message">
+                <div class="form-group">
+                    <label for="extensionReason">Reason for Extension</label>
+                    <select id="extensionReason" class="form-control">
+                        <option value="">-- Select Reason --</option>
+                        <option value="medical">Medical Leave</option>
+                        <option value="academic">Academic Performance</option>
+                        <option value="personal">Personal Circumstances</option>
+                        <option value="holiday">Holiday Extension</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="extensionDetails">Additional Details</label>
+                    <textarea id="extensionDetails" class="form-control" rows="3" placeholder="Provide additional details about the extension request..."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="extensionDuration">Extension Duration (weeks)</label>
+                        <input type="number" id="extensionDuration" class="form-control" min="1" max="52" value="4">
+                    </div>
+                    <div class="form-group">
+                        <label for="additionalLessons">Additional Lessons</label>
+                        <input type="number" id="additionalLessons" class="form-control" min="1" max="100" value="10">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-secondary" onclick="cancelExtension()">Cancel</button>
+                    <button class="btn btn-primary" onclick="submitExtension()">Submit Extension</button>
+                </div>
+            </div>
+
+            <!-- Success Message -->
+            <div id="successMessage" class="success-message">
+                <div class="success-icon">
                     <i class="fas fa-check-circle"></i>
-                    <h3>Course Extended Successfully!</h3>
-                    <p>The course has been extended according to your request.</p>
-                    <div class="form-actions" style="justify-content: center;">
-                        <button class="btn btn-primary" onclick="resetForm()">Done</button>
-                    </div>
                 </div>
+                <div class="success-title">Course Extended Successfully!</div>
+                <div class="success-text">The course has been extended according to your request.</div>
+                <button class="btn btn-primary" onclick="closeSuccessMessage()">Done</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Sample data for courses
-        const courses = [
+        // Course Data
+        const courseData = [
             { 
-                id: 'AS-JPY-Y9-EL-BIOLOGY', 
-                title: 'Biology', 
-                student: 'Emma Johnson', 
-                studentId: 'BD-001',
-                subject: 'Biology',
-                lessonsRemaining: 34,
-                currentEndDate: '2023-09-15'
+                classId: 'AS-APY-Y9-EL-BIOLOGY', 
+                studentName: 'Emma Johnson', 
+                subject: 'Biology', 
+                courseId: 'BD-001',
+                qtyLessons: 34
             },
             { 
-                id: 'AS-JPY-Y9-EL-ENGLISH', 
-                title: 'English', 
-                student: 'James Smith', 
-                studentId: 'EN2-002',
-                subject: 'English',
-                lessonsRemaining: 47,
-                currentEndDate: '2023-10-20'
+                classId: 'AS-APY-Y9-EL-ENGLISH', 
+                studentName: 'James Smith', 
+                subject: 'English', 
+                courseId: 'EN2-002',
+                qtyLessons: 47
             },
             { 
-                id: 'AS-JPY-Y9-EL-MATH', 
-                title: 'Mathematics', 
-                student: 'Michael Brown', 
-                studentId: 'MT-003',
-                subject: 'Mathematics',
-                lessonsRemaining: 22,
-                currentEndDate: '2023-08-30'
+                classId: 'AS-APY-Y9-EL-MATH', 
+                studentName: 'Michael Brown', 
+                subject: 'Mathematics', 
+                courseId: 'MT-003',
+                qtyLessons: 22
             },
             { 
-                id: 'AS-JPY-Y9-EL-PHYSICS', 
-                title: 'Physics', 
-                student: 'Sarah Davis', 
-                studentId: 'PH-004',
-                subject: 'Physics',
-                lessonsRemaining: 15,
-                currentEndDate: '2023-08-05'
+                classId: 'AS-APY-Y9-EL-PHYSICS', 
+                studentName: 'Sarah Davis', 
+                subject: 'Physics', 
+                courseId: 'PH-004',
+                qtyLessons: 15
             },
             { 
-                id: 'AS-JPY-Y9-EL-CHEMISTRY', 
-                title: 'Chemistry', 
-                student: 'David Wilson', 
-                studentId: 'CH-005',
-                subject: 'Chemistry',
-                lessonsRemaining: 28,
-                currentEndDate: '2023-09-25'
+                classId: 'AS-APY-Y9-EL-CHEMISTRY', 
+                studentName: 'David Wilson', 
+                subject: 'Chemistry', 
+                courseId: 'CH-005',
+                qtyLessons: 28
             }
         ];
 
-        // Load courses when the page loads
+        let selectedCourse = null;
+
+        // Initialize the page
         document.addEventListener('DOMContentLoaded', function() {
-            loadCourses();
+            populateCourseList();
         });
 
-        // Function to load courses
-        function loadCourses() {
+        function populateCourseList() {
             const courseList = document.getElementById('courseList');
             courseList.innerHTML = '';
-
-            courses.forEach(course => {
-                courseList.appendChild(createCourseItem(course));
+            
+            courseData.forEach(course => {
+                const courseItem = createCourseItem(course);
+                courseList.appendChild(courseItem);
             });
         }
 
-        // Function to create course item
         function createCourseItem(course) {
-            const courseItem = document.createElement('div');
-            courseItem.className = 'course-item';
-            courseItem.innerHTML = `
+            const item = document.createElement('div');
+            item.className = 'course-item';
+            item.innerHTML = `
                 <div class="course-info">
-                    <div class="course-id">${course.id} <span class="lessons-remaining">${course.lessonsRemaining} lessons remaining</span></div>
-                    <div class="course-meta">
-                        <div class="meta-item">
-                            <i class="fas fa-user"></i>
-                            <span>Student: ${course.student}</span>
+                    <div class="course-header">
+                        <span class="class-id">${course.classId}</span>
+                        <span class="qty-lessons">${course.qtyLessons} lessons remaining</span>
+                    </div>
+                    <div class="course-details">
+                        <div class="detail-row">
+                            <span class="label">Student:</span>
+                            <span class="value">${course.studentName}</span>
                         </div>
-                        <div class="meta-item">
-                            <i class="fas fa-book"></i>
-                            <span>Subject: ${course.subject}</span>
+                        <div class="detail-row">
+                            <span class="label">Subject:</span>
+                            <span class="value">${course.subject}</span>
                         </div>
-                        <div class="meta-item">
-                            <i class="fas fa-id-card"></i>
-                            <span>Course ID: ${course.studentId}</span>
-                        </div>
-                        <div class="meta-item">
-                            <i class="fas fa-calendar-alt"></i>
-                            <span>End Date: ${formatDate(course.currentEndDate)}</span>
+                        <div class="detail-row">
+                            <span class="label">Course ID:</span>
+                            <span class="value">${course.courseId}</span>
                         </div>
                     </div>
                 </div>
                 <div class="course-actions">
-                    <button class="btn btn-primary" onclick="extendCourse('${course.id}')"><i class="fas fa-calendar-plus"></i> Extend</button>
+                    <button class="action-btn extend-btn" 
+                            onclick="showExtensionForm('${course.classId}')">
+                        <i class="fas fa-plus"></i>
+                        Extend
+                    </button>
                 </div>
             `;
-            return courseItem;
+            return item;
         }
 
-        // Function to filter courses
         function filterCourses() {
-            const searchTerm = document.getElementById('courseSearch').value.toLowerCase();
-            const courseList = document.getElementById('courseList');
-            courseList.innerHTML = '';
-
-            const filteredCourses = courses.filter(course => 
-                course.student.toLowerCase().includes(searchTerm) ||
-                course.id.toLowerCase().includes(searchTerm) ||
-                course.subject.toLowerCase().includes(searchTerm) ||
-                course.studentId.toLowerCase().includes(searchTerm)
-            );
-
-            filteredCourses.forEach(course => {
-                courseList.appendChild(createCourseItem(course));
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const courseItems = document.querySelectorAll('.course-item');
+            
+            courseItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
             });
         }
 
-        // Function to extend course
-        function extendCourse(courseId) {
-            const course = courses.find(c => c.id === courseId);
-            if (!course) return;
-
-            // Populate the extension form
-            document.getElementById('courseId').value = course.id;
-            document.getElementById('studentName').value = course.student;
-            document.getElementById('subject').value = course.subject;
-            document.getElementById('currentEndDate').value = course.currentEndDate;
-            document.getElementById('reason').value = '';
-
-            // Show the extension form and hide success message
-            document.getElementById('extensionForm').style.display = 'block';
-            document.getElementById('successMessage').style.display = 'none';
-
-            // Scroll to the form
-            document.getElementById('extensionForm').scrollIntoView({ behavior: 'smooth' });
+        function showExtensionForm(classId) {
+            // Find the selected course
+            selectedCourse = courseData.find(course => course.classId === classId);
+            
+            if (selectedCourse) {
+                // Populate form fields
+                document.getElementById('studentName').value = selectedCourse.studentName;
+                document.getElementById('courseId').value = selectedCourse.courseId;
+                document.getElementById('subject').value = selectedCourse.subject;
+                document.getElementById('currentLessons').value = selectedCourse.qtyLessons;
+                
+                // Show the form and hide the success message
+                document.getElementById('extensionForm').style.display = 'block';
+                document.getElementById('successMessage').style.display = 'none';
+                
+                // Scroll to the form
+                document.getElementById('extensionForm').scrollIntoView({ behavior: 'smooth' });
+            }
         }
 
-        // Function to cancel extension
         function cancelExtension() {
             document.getElementById('extensionForm').style.display = 'none';
+            selectedCourse = null;
         }
 
-        // Function to submit extension
         function submitExtension() {
-            // Here you would typically send the data to the server
-            // For this demo, we'll just show the success message
+            // Get form values
+            const reason = document.getElementById('extensionReason').value;
+            const details = document.getElementById('extensionDetails').value;
+            const duration = document.getElementById('extensionDuration').value;
+            const additionalLessons = document.getElementById('additionalLessons').value;
+            
+            // Validate form
+            if (!reason) {
+                alert('Please select a reason for extension.');
+                return;
+            }
+            
+            if (!duration || duration < 1) {
+                alert('Please enter a valid extension duration.');
+                return;
+            }
+            
+            if (!additionalLessons || additionalLessons < 1) {
+                alert('Please enter a valid number of additional lessons.');
+                return;
+            }
+            
+            // Hide the form and show success message
             document.getElementById('extensionForm').style.display = 'none';
             document.getElementById('successMessage').style.display = 'block';
+            
+            // Scroll to the success message
             document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
+            
+            // In a real application, you would send this data to the server
+            console.log('Extension submitted:', {
+                course: selectedCourse,
+                reason,
+                details,
+                duration,
+                additionalLessons
+            });
         }
 
-        // Function to reset the form
-        function resetForm() {
-            document.getElementById('extensionForm').style.display = 'none';
+        function closeSuccessMessage() {
             document.getElementById('successMessage').style.display = 'none';
-            document.getElementById('courseSearch').value = '';
-            loadCourses();
+            selectedCourse = null;
+            
+            // Reset form fields
+            document.getElementById('extensionReason').value = '';
+            document.getElementById('extensionDetails').value = '';
+            document.getElementById('extensionDuration').value = '4';
+            document.getElementById('additionalLessons').value = '10';
         }
 
-        // Helper function to format date
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+        function closeModal() {
+            // In a real application, this would close the modal
+            // For this standalone page, we'll redirect back to the dashboard
+            window.location.href = 'mentor-dashboard.html';
         }
     </script>
 </body>
