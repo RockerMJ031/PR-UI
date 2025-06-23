@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentor Dashboard - Purple Ruler</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #663399;
+            --primary-dark: #4a2570;
+            --primary-light: #8a5bb8;
+            --secondary-color: #f8f9fa;
+            --text-color: #333;
+            --text-light: #666;
+            --border-color: #e0e0e0;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+            --white: #ffffff;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+            --border-radius: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .logo {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .nav-menu {
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            margin: 5px 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            border-right: 3px solid white;
+        }
+
+        .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .user-profile {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .notification-icon {
+            position: relative;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .action-area {
+            display: flex;
+            align-items: center;
+        }
+
+        .section-description {
+            color: var(--text-light);
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        /* Improved Button Styles */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            gap: 8px;
+        }
+
+        .btn i {
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background-color: #e0a800;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-info {
+            background-color: var(--info-color);
+            color: white;
+        }
+
+        .btn-info:hover {
+            background-color: #138496;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Improved Action Section */
+        .action-section {
+            background: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            border-left: 5px solid var(--primary-color);
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            border-left: 5px solid var(--primary-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-card.students {
+            border-left-color: var(--primary-color);
+        }
+
+        .stat-card.sessions {
+            border-left-color: var(--success-color);
+        }
+
+        .stat-card.attendance {
+            border-left-color: var(--info-color);
+        }
+
+        .stat-card.performance {
+            border-left-color: var(--warning-color);
+        }
+
+        .stat-title {
+            color: var(--text-light);
+            font-size: 1rem;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .stat-card.students .stat-value {
+            color: var(--primary-color);
+        }
+
+        .stat-card.sessions .stat-value {
+            color: var(--success-color);
+        }
+
+        .stat-card.attendance .stat-value {
+            color: var(--info-color);
+        }
+
+        .stat-card.performance .stat-value {
+            color: var(--warning-color);
+        }
+
+        .stat-change {
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .stat-change.positive {
+            color: var(--success-color);
+        }
+
+        .stat-change.negative {
+            color: var(--danger-color);
+        }
+
+        /* Recent Activity */
+        .activity-list {
+            list-style: none;
+        }
+
+        .activity-item {
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(102, 51, 153, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            flex-shrink: 0;
+        }
+
+        .activity-icon.student {
+            background-color: rgba(102, 51, 153, 0.1);
+            color: var(--primary-color);
+        }
+
+        .activity-icon.session {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: var(--success-color);
+        }
+
+        .activity-icon.report {
+            background-color: rgba(23, 162, 184, 0.1);
+            color: var(--info-color);
+        }
+
+        .activity-icon.alert {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: var(--danger-color);
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .activity-time {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        /* Upcoming Sessions */
+        .session-list {
+            list-style: none;
+        }
+
+        .session-item {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: background-color 0.3s ease;
+        }
+
+        .session-item:hover {
+            background-color: rgba(102, 51, 153, 0.05);
+        }
+
+        .session-item:last-child {
+            border-bottom: none;
+        }
+
+        .session-time {
+            width: 80px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--primary-color);
+            flex-shrink: 0;
+        }
+
+        .session-details {
+            flex: 1;
+        }
+
+        .session-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .session-students {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .session-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Student Progress */
+        .progress-list {
+            list-style: none;
+        }
+
+        .progress-item {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .progress-item:last-child {
+            border-bottom: none;
+        }
+
+        .student-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(102, 51, 153, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .progress-details {
+            flex: 1;
+        }
+
+        .student-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .progress-bar-container {
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-bar.excellent {
+            background-color: var(--success-color);
+        }
+
+        .progress-bar.good {
+            background-color: var(--info-color);
+        }
+
+        .progress-bar.average {
+            background-color: var(--warning-color);
+        }
+
+        .progress-bar.poor {
+            background-color: var(--danger-color);
+        }
+
+        .progress-percentage {
+            text-align: right;
+            font-weight: 600;
+            width: 50px;
+            flex-shrink: 0;
+        }
+
+        .progress-percentage.excellent {
+            color: var(--success-color);
+        }
+
+        .progress-percentage.good {
+            color: var(--info-color);
+        }
+
+        .progress-percentage.average {
+            color: var(--warning-color);
+        }
+
+        .progress-percentage.poor {
+            color: var(--danger-color);
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .quick-action-btn {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quick-action-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+            border-color: var(--primary-color);
+        }
+
+        .quick-action-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: rgba(102, 51, 153, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .quick-action-text {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-actions {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="logo">
+                <h2>Purple Ruler</h2>
+            </div>
+            
+            <div class="nav-menu">
+                <div class="nav-item">
+                    <a href="index.html" class="nav-link">
+                        <i class="fas fa-home"></i>
+                        Home
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="mentor-dashboard.html" class="nav-link active">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Dashboard
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="students-enhanced.html" class="nav-link">
+                        <i class="fas fa-users"></i>
+                        Students
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="sessions-enhanced.html" class="nav-link">
+                        <i class="fas fa-calendar-alt"></i>
+                        Sessions
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="reports-enhanced.html" class="nav-link">
+                        <i class="fas fa-chart-bar"></i>
+                        Reports
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="finance.html" class="nav-link">
+                        <i class="fas fa-pound-sign"></i>
+                        Finance
+                    </a>
+                </div>
+            </div>
+            
+            <div class="user-profile">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight: 600;">Mentor</div>
+                        <div style="font-size: 0.8rem; opacity: 0.8;">Admin User</div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <h1>Mentor Dashboard</h1>
+                <div class="action-area">
+                    <div class="notification-icon">
+                        <i class="fas fa-bell fa-lg"></i>
+                        <span class="notification-badge">3</span>
+                    </div>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        New Session
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="action-section">
+                <h2 class="section-title">
+                    <i class="fas fa-bolt"></i>
+                    Quick Actions
+                </h2>
+                <div class="quick-actions">
+                    <div class="quick-action-btn">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <span class="quick-action-text">Add Student</span>
+                    </div>
+                    <div class="quick-action-btn">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-calendar-plus"></i>
+                        </div>
+                        <span class="quick-action-text">Schedule Session</span>
+                    </div>
+                    <div class="quick-action-btn">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <span class="quick-action-text">Create Report</span>
+                    </div>
+                    <div class="quick-action-btn">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <span class="quick-action-text">Send Message</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Overview -->
+            <div class="stats-grid">
+                <div class="stat-card students">
+                    <div class="stat-title">Total Students</div>
+                    <div class="stat-value">45</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>12% from last month</span>
+                    </div>
+                </div>
+                <div class="stat-card sessions">
+                    <div class="stat-title">Sessions This Week</div>
+                    <div class="stat-value">28</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>5% from last week</span>
+                    </div>
+                </div>
+                <div class="stat-card attendance">
+                    <div class="stat-title">Attendance Rate</div>
+                    <div class="stat-value">92%</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>3% from last month</span>
+                    </div>
+                </div>
+                <div class="stat-card performance">
+                    <div class="stat-title">Average Performance</div>
+                    <div class="stat-value">B+</div>
+                    <div class="stat-change negative">
+                        <i class="fas fa-arrow-down"></i>
+                        <span>Slight decrease</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Two Column Layout for Activities and Sessions -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                <!-- Recent Activity -->
+                <div class="action-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-history"></i>
+                        Recent Activity
+                    </h2>
+                    <ul class="activity-list">
+                        <li class="activity-item">
+                            <div class="activity-icon student">
+                                <i class="fas fa-user-graduate"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">New student Emma Thompson enrolled</div>
+                                <div class="activity-time">Today, 10:30 AM</div>
+                            </div>
+                        </li>
+                        <li class="activity-item">
+                            <div class="activity-icon session">
+                                <i class="fas fa-calendar-check"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">Math session with Group B completed</div>
+                                <div class="activity-time">Yesterday, 2:15 PM</div>
+                            </div>
+                        </li>
+                        <li class="activity-item">
+                            <div class="activity-icon report">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">Monthly progress report generated</div>
+                                <div class="activity-time">Yesterday, 9:00 AM</div>
+                            </div>
+                        </li>
+                        <li class="activity-item">
+                            <div class="activity-icon alert">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">James Wilson missed Science session</div>
+                                <div class="activity-time">2 days ago, 11:30 AM</div>
+                            </div>
+                        </li>
+                    </ul>
+                    <div style="text-align: center; margin-top: 15px;">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-list"></i>
+                            View All Activities
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Upcoming Sessions -->
+                <div class="action-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-calendar-day"></i>
+                        Today's Sessions
+                    </h2>
+                    <ul class="session-list">
+                        <li class="session-item">
+                            <div class="session-time">09:00 AM</div>
+                            <div class="session-details">
+                                <div class="session-title">English Literature</div>
+                                <div class="session-students">Group A - 8 students</div>
+                            </div>
+                            <div class="session-actions">
+                                <button class="btn btn-info" style="padding: 5px 10px; font-size: 0.8rem;">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </li>
+                        <li class="session-item">
+                            <div class="session-time">11:30 AM</div>
+                            <div class="session-details">
+                                <div class="session-title">Mathematics</div>
+                                <div class="session-students">Group B - 6 students</div>
+                            </div>
+                            <div class="session-actions">
+                                <button class="btn btn-info" style="padding: 5px 10px; font-size: 0.8rem;">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </li>
+                        <li class="session-item">
+                            <div class="session-time">02:00 PM</div>
+                            <div class="session-details">
+                                <div class="session-title">Science</div>
+                                <div class="session-students">Group C - 7 students</div>
+                            </div>
+                            <div class="session-actions">
+                                <button class="btn btn-info" style="padding: 5px 10px; font-size: 0.8rem;">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </li>
+                        <li class="session-item">
+                            <div class="session-time">04:30 PM</div>
+                            <div class="session-details">
+                                <div class="session-title">History</div>
+                                <div class="session-students">Group A - 8 students</div>
+                            </div>
+                            <div class="session-actions">
+                                <button class="btn btn-info" style="padding: 5px 10px; font-size: 0.8rem;">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </li>
+                    </ul>
+                    <div style="text-align: center; margin-top: 15px;">
+                        <button class="btn btn-primary">
+                            <i class="fas fa-calendar-alt"></i>
+                            View Full Schedule
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Student Progress -->
+            <div class="action-section">
+                <h2 class="section-title">
+                    <i class="fas fa-chart-line"></i>
+                    Student Progress
+                </h2>
+                <ul class="progress-list">
+                    <li class="progress-item">
+                        <div class="student-avatar">ET</div>
+                        <div class="progress-details">
+                            <div class="student-name">Emma Thompson</div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar excellent" style="width: 92%;"></div>
+                            </div>
+                        </div>
+                        <div class="progress-percentage excellent">92%</div>
+                    </li>
+                    <li class="progress-item">
+                        <div class="student-avatar">JW</div>
+                        <div class="progress-details">
+                            <div class="student-name">James Wilson</div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar good" style="width: 78%;"></div>
+                            </div>
+                        </div>
+                        <div class="progress-percentage good">78%</div>
+                    </li>
+                    <li class="progress-item">
+                        <div class="student-avatar">SD</div>
+                        <div class="progress-details">
+                            <div class="student-name">Sophie Davis</div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar average" style="width: 65%;"></div>
+                            </div>
+                        </div>
+                        <div class="progress-percentage average">65%</div>
+                    </li>
+                    <li class="progress-item">
+                        <div class="student-avatar">MB</div>
+                        <div class="progress-details">
+                            <div class="student-name">Michael Brown</div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar poor" style="width: 45%;"></div>
+                            </div>
+                        </div>
+                        <div class="progress-percentage poor">45%</div>
+                    </li>
+                </ul>
+                <div style="text-align: center; margin-top: 15px;">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-users"></i>
+                        View All Students
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Enhanced JavaScript for interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click handlers for navigation links
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // Remove active class from all links
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    // Add active class to clicked link
+                    this.classList.add('active');
+                });
+            });
+
+            // Add click handlers for buttons
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const buttonText = this.textContent.trim();
+                    
+                    if (buttonText.includes('New Session')) {
+                        alert('New session creation feature coming soon!');
+                    } else if (buttonText.includes('View All Activities')) {
+                        alert('Activity log feature coming soon!');
+                    } else if (buttonText.includes('View Full Schedule')) {
+                        alert('Full schedule view coming soon!');
+                    } else if (buttonText.includes('View All Students')) {
+                        alert('Redirecting to students page...');
+                        window.location.href = 'students-enhanced.html';
+                    }
+                });
+            });
+
+            // Add click handlers for quick action buttons
+            const quickActions = document.querySelectorAll('.quick-action-btn');
+            quickActions.forEach(action => {
+                action.addEventListener('click', function() {
+                    const actionText = this.querySelector('.quick-action-text').textContent;
+                    
+                    if (actionText === 'Add Student') {
+                        alert('Add student feature coming soon!');
+                    } else if (actionText === 'Schedule Session') {
+                        alert('Session scheduling feature coming soon!');
+                    } else if (actionText === 'Create Report') {
+                        alert('Report creation feature coming soon!');
+                    } else if (actionText === 'Send Message') {
+                        alert('Messaging feature coming soon!');
+                    }
+                });
+            });
+
+            // Add click handler for notification icon
+            const notificationIcon = document.querySelector('.notification-icon');
+            notificationIcon.addEventListener('click', function() {
+                alert('Notifications feature coming soon!');
+            });
+
+            // Add animation to stat cards
+            const statCards = document.querySelectorAll('.stat-card');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            });
+
+            statCards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(card);
+            });
+
+            // Add hover effects for session items
+            const sessionItems = document.querySelectorAll('.session-item');
+            sessionItems.forEach(item => {
+                item.addEventListener('mouseenter', function() {
+                    this.style.backgroundColor = 'rgba(102, 51, 153, 0.05)';
+                });
+                
+                item.addEventListener('mouseleave', function() {
+                    this.style.backgroundColor = '';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
