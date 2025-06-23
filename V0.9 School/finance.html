@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance - Mentor Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #663399;
+            --primary-dark: #4a2570;
+            --primary-light: #8a5bb8;
+            --secondary-color: #f8f9fa;
+            --text-color: #333;
+            --text-light: #666;
+            --border-color: #e0e0e0;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+            --white: #ffffff;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+            --border-radius: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar - Using mentor-dashboard.html style */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .logo {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .nav-menu {
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            margin: 5px 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            border-right: 3px solid white;
+        }
+
+        .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .user-profile {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-info {
+            background-color: var(--info-color);
+            color: white;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            border-left: 5px solid var(--primary-color);
+        }
+
+        .stat-card.paid {
+            border-left-color: var(--success-color);
+        }
+
+        .stat-card.outstanding {
+            border-left-color: var(--warning-color);
+        }
+
+        .stat-card.overdue {
+            border-left-color: var(--danger-color);
+        }
+
+        .stat-card.students {
+            border-left-color: var(--info-color);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .stat-card.paid .stat-number {
+            color: var(--success-color);
+        }
+
+        .stat-card.outstanding .stat-number {
+            color: var(--warning-color);
+        }
+
+        .stat-card.overdue .stat-number {
+            color: var(--danger-color);
+        }
+
+        .stat-card.students .stat-number {
+            color: var(--info-color);
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        /* Pricing Section */
+        .pricing-section {
+            background: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .pricing-card {
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .pricing-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .pricing-card.featured {
+            border-color: var(--primary-color);
+            background: linear-gradient(135deg, #f8f9ff, #fff);
+            position: relative;
+        }
+
+        .pricing-card.featured::before {
+            content: 'Most Popular';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary-color);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .pricing-title {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .pricing-amount {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+
+        .pricing-period {
+            color: var(--text-light);
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .pricing-features li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .pricing-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--success-color);
+            font-weight: bold;
+        }
+
+        .pricing-features li:last-child {
+            border-bottom: none;
+        }
+
+        /* Table Styles */
+        .table-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table tr:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-paid {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-overdue {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="logo">
+                <h2>Mentor Portal</h2>
+            </div>
+            
+            <div class="nav-menu">
+                <div class="nav-item">
+                    <a href="mentor-dashboard.html" class="nav-link">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Dashboard
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="students-enhanced.html" class="nav-link">
+                        <i class="fas fa-users"></i>
+                        Students
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="sessions-enhanced.html" class="nav-link">
+                        <i class="fas fa-calendar-alt"></i>
+                        Sessions
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="reports-enhanced.html" class="nav-link">
+                        <i class="fas fa-chart-bar"></i>
+                        Reports
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="finance.html" class="nav-link active">
+                        <i class="fas fa-pound-sign"></i>
+                        Finance
+                    </a>
+                </div>
+            </div>
+            
+            <div class="user-profile">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight: 600;">Mentor</div>
+                        <div style="font-size: 0.8rem; opacity: 0.8;">Admin User</div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <h1>Finance Management</h1>
+                <div class="header-actions">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-file-invoice"></i>
+                        Generate Invoice
+                    </button>
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-download"></i>
+                        Export Report
+                    </button>
+                </div>
+            </div>
+
+            <!-- Financial Overview -->
+            <div class="stats-grid">
+                <div class="stat-card paid">
+                    <div class="stat-number">£12,450</div>
+                    <div class="stat-label">Paid</div>
+                </div>
+                <div class="stat-card outstanding">
+                    <div class="stat-number">£2,340</div>
+                    <div class="stat-label">Outstanding Payment</div>
+                </div>
+                <div class="stat-card overdue">
+                    <div class="stat-number">£890</div>
+                    <div class="stat-label">Overdue Payment</div>
+                </div>
+                <div class="stat-card students">
+                    <div class="stat-number">45</div>
+                    <div class="stat-label">Active Students</div>
+                </div>
+            </div>
+
+            <!-- Pricing Plans -->
+            <div class="pricing-section">
+                <h2 class="section-title">
+                    <i class="fas fa-tags"></i>
+                    Pricing Plans
+                </h2>
+                
+                <div class="pricing-grid">
+                    <!-- Full Time -->
+                    <div class="pricing-card featured">
+                        <h3 class="pricing-title">Full Time</h3>
+                        <div class="pricing-amount">£1,200</div>
+                        <div class="pricing-period">per half term per student (5% discount per term)</div>
+                        <ul class="pricing-features">
+                            <li>5 days per week</li>
+                            <li>6 hours per day</li>
+                            <li>All subjects included</li>
+                            <li>Progress tracking</li>
+                        </ul>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-user-plus"></i>
+                            Add Student
+                        </button>
+                    </div>
+                
+                    <!-- Part Time -->
+                    <div class="pricing-card">
+                        <h3 class="pricing-title">Part Time</h3>
+                        <div class="pricing-amount">£35</div>
+                        <div class="pricing-period">per lesson - per hour</div>
+                        <ul class="pricing-features">
+                            <li>Fixed schedule per week</li>
+                            <li>2-3 hours per session</li>
+                            <li>Subject-specific support</li>
+                            <li>Individual attention</li>
+                            <li>Progress monitoring</li>
+                        </ul>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-user-plus"></i>
+                            Add Student
+                        </button>
+                    </div>
+                
+                    <!-- Mental Health Program -->
+                    <div class="pricing-card">
+                        <h3 class="pricing-title">Mental Health Program</h3>
+                        <div class="pricing-amount">£149</div>
+                        <div class="pricing-period">per month (Reading Subscription)</div>
+                        <ul class="pricing-features">
+                            <li>Therapeutic reading materials</li>
+                            <li>Monthly book selection</li>
+                            <li>Guided reading sessions</li>
+                            <li>Mental health resources</li>
+                            <li>Progress tracking</li>
+                        </ul>
+                        <button class="btn btn-info">
+                            <i class="fas fa-heart"></i>
+                            Subscribe
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Transactions -->
+            <div class="table-container">
+                <h2 class="section-title" style="padding: 20px 20px 0;">
+                    <i class="fas fa-history"></i>
+                    Recent Transactions
+                </h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Student Name</th>
+                            <th>Program</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Emma Thompson</td>
+                            <td>Full Time</td>
+                            <td>£1,200</td>
+                            <td>2024-01-15</td>
+                            <td><span class="status-badge status-paid">Paid</span></td>
+                            <td>
+                                <button class="btn btn-info" style="padding: 5px 10px; font-size: 0.8rem;">
+                                    <i class="fas fa-eye"></i>
+                                    View
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>James Wilson</td>
+                            <td>Part Time</td>
+                            <td>£35</td>
+                            <td>2024-01-14</td>
+                            <td><span class="status-badge status-paid">Paid</span></td>
+                            <td>
+                                <button class="btn btn-info" style="padding: 5px 10px; font-size: 0.8rem;">
+                                    <i class="fas fa-eye"></i>
+                                    View
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Sophie Davis</td>
+                            <td>Mental Health Program</td>
+                            <td>£149</td>
+                            <td>2024-01-13</td>
+                            <td><span class="status-badge status-pending">Pending</span></td>
+                            <td>
+                                <button class="btn btn-info" style="padding: 5px 10px; font-size: 0.8rem;">
+                                    <i class="fas fa-eye"></i>
+                                    View
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Michael Brown</td>
+                            <td>Foundation Program</td>
+                            <td>£850</td>
+                            <td>2024-01-12</td>
+                            <td><span class="status-badge status-overdue">Overdue</span></td>
+                            <td>
+                                <button class="btn btn-info" style="padding: 5px 10px; font-size: 0.8rem;">
+                                    <i class="fas fa-eye"></i>
+                                    View
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Olivia Johnson</td>
+                            <td>Academic Program</td>
+                            <td>£750</td>
+                            <td>2024-01-11</td>
+                            <td><span class="status-badge status-paid">Paid</span></td>
+                            <td>
+                                <button class="btn btn-info" style="padding: 5px 10px; font-size: 0.8rem;">
+                                    <i class="fas fa-eye"></i>
+                                    View
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Enhanced JavaScript for interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click handlers for navigation links
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // Remove active class from all links
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    // Add active class to clicked link
+                    this.classList.add('active');
+                    
+                    // 删除阻止导航的代码，允许正常跳转
+                });
+            });
+
+            // Add click handlers for buttons
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const buttonText = this.textContent.trim();
+                    
+                    if (buttonText.includes('Generate Invoice')) {
+                        alert('Invoice generation feature coming soon!');
+                    } else if (buttonText.includes('Export Report')) {
+                        alert('Report export feature coming soon!');
+                    } else if (buttonText.includes('Add Student')) {
+                        alert('Student enrollment process will be implemented soon!');
+                    } else if (buttonText.includes('Subscribe')) {
+                        alert('Subscription process will be implemented soon!');
+                    } else if (buttonText.includes('Enroll Now')) {
+                        alert('Enrollment process will be implemented soon!');
+                    } else if (buttonText.includes('View')) {
+                        alert('Transaction details view coming soon!');
+                    }
+                });
+            });
+
+            // Add hover effects for pricing cards
+            const pricingCards = document.querySelectorAll('.pricing-card');
+            pricingCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+
+            // Add animation to stat cards
+            const statCards = document.querySelectorAll('.stat-card');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            });
+
+            statCards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(card);
+            });
+        });
+    </script>
+</body>
+</html>
