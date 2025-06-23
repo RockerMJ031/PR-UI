@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Extension - Purple Ruler</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #6a3093;
+            --primary-light: #a044ff;
+            --primary-dark: #4d2377;
+            --secondary-color: #2b5876;
+            --text-color: #333;
+            --text-light: #666;
+            --border-color: #e0e0e0;
+            --background-color: #f8f9fa;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --border-radius: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 15px 0;
+            box-shadow: var(--shadow);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            margin-right: 10px;
+            font-size: 1.8rem;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-menu .notifications {
+            margin-right: 20px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .user-menu .notifications .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #ff4757;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        .close {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        /* Course Extension Styles */
+        .search-bar {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+        }
+
+        .search-bar i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+
+        .course-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .course-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background-color: white;
+        }
+
+        .course-info {
+            flex: 1;
+        }
+
+        .course-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .class-id {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .qty-lessons {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .course-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .detail-row {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .label {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-bottom: 3px;
+        }
+
+        .value {
+            font-weight: 500;
+        }
+
+        .course-actions {
+            margin-left: 15px;
+        }
+
+        .action-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn i {
+            margin-right: 5px;
+        }
+
+        .extend-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .extend-btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .cancel-btn {
+            background-color: #ff4757;
+            color: white;
+        }
+
+        .cancel-btn:hover {
+            background-color: #e03e4a;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #224a63;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .course-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .course-actions {
+                margin-left: 0;
+                margin-top: 15px;
+                width: 100%;
+            }
+
+            .action-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <i class="fas fa-crown"></i>
+                <span>Purple Ruler</span>
+            </div>
+            <div class="user-menu">
+                <div class="notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">3</span>
+                </div>
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Course Extension</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="Search by Student Name, Subject, or Class ID..." onkeyup="filterCourses()">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="course-list" id="courseList">
+                    <!-- Course items will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample course data
+        const courseData = [
+            {
+                classId: 'AS-APY-Y9-EL-BIOLOGY',
+                studentName: 'Emma Johnson',
+                subject: 'Biology',
+                courseId: 'BIO-001',
+                qtyLessons: 34
+            },
+            {
+                classId: 'AS-APY-Y9-EL-ENGLISH',
+                studentName: 'James Smith',
+                subject: 'English',
+                courseId: 'ENG-002',
+                qtyLessons: 67
+            }
+        ];
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            populateCourseList();
+        });
+
+        function populateCourseList() {
+            const courseList = document.getElementById('courseList');
+            courseList.innerHTML = '';
+            
+            courseData.forEach(course => {
+                const courseItem = createCourseItem(course);
+                courseList.appendChild(courseItem);
+            });
+        }
+
+        function createCourseItem(course) {
+            const item = document.createElement('div');
+            item.className = 'course-item';
+            item.innerHTML = `
+                <div class="course-info">
+                    <div class="course-header">
+                        <span class="class-id">${course.classId}</span>
+                        <span class="qty-lessons">${course.qtyLessons} lessons remaining</span>
+                    </div>
+                    <div class="course-details">
+                        <div class="detail-row">
+                            <span class="label">Student:</span>
+                            <span class="value">${course.studentName}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Subject:</span>
+                            <span class="value">${course.subject}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Course ID:</span>
+                            <span class="value">${course.courseId}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="course-actions">
+                    <button class="action-btn extend-btn" onclick="handleExtend('${course.classId}')">
+                        <i class="fas fa-plus"></i>
+                        Extend
+                    </button>
+                </div>
+            `;
+            return item;
+        }
+
+        function filterCourses() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const courseItems = document.querySelectorAll('.course-item');
+            
+            courseItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function handleExtend(classId) {
+            // In real implementation, this would handle the course extension process
+            // For now, redirect to the Lark Suite form
+            window.open('https://purpleruler.larksuite.com/share/base/form/shrusquF0kTZixa4bKNTqTUSPme', '_blank');
+        }
+
+        function closeModal() {
+            // In a real implementation, this would close the modal
+            // For this standalone page, we'll redirect back to the dashboard
+            window.location.href = 'mentor-dashboard.html';
+        }
+
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            const modal = document.querySelector('.modal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
