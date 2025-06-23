@@ -197,6 +197,7 @@
             justify-content: center;
             gap: 10px;
         }
+
         .section-description {
             color: var(--text-light);
             margin-bottom: 20px;
@@ -397,3 +398,1144 @@
 
         .stat-value {
             font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 5px;
+        }
+
+        .stat-description {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        /* Pricing Section - From finance.html */
+        .pricing-section {
+            background: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .pricing-section-title {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .pricing-card {
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .pricing-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .pricing-card.featured {
+            border-color: var(--primary-color);
+            background: linear-gradient(135deg, #f8f9ff, #fff);
+        }
+
+        .pricing-title {
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .pricing-amount {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+
+        .pricing-period {
+            color: var(--text-light);
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 25px;
+        }
+
+        .pricing-features li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.9rem;
+        }
+
+        .pricing-features li:last-child {
+            border-bottom: none;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: #333;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+            transform: translateY(-2px);
+        }
+
+        .btn-info {
+            background: var(--info-color);
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #138496;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .action-sections {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .action-sections {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .action-sections {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="logo">
+                <h2>Mentor Portal</h2>
+            </div>
+            
+            <div class="nav-menu">
+                <div class="nav-item">
+                    <a href="mentor-dashboard.html" class="nav-link active">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Dashboard
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="students-enhanced.html" class="nav-link">
+                        <i class="fas fa-users"></i>
+                        Students
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="sessions-enhanced.html" class="nav-link">
+                        <i class="fas fa-calendar-alt"></i>
+                        Sessions
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="reports-enhanced.html" class="nav-link">
+                        <i class="fas fa-chart-bar"></i>
+                        Reports
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="finance.html" class="nav-link">
+                        <i class="fas fa-pound-sign"></i>
+                        Finance
+                    </a>
+                </div>
+            </div>
+            
+            <div class="user-profile">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight: 600;">Mentor</div>
+                        <div style="font-size: 0.8rem; opacity: 0.8;">Admin User</div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <h1>Mentor Dashboard</h1>
+                <div class="header-actions">
+                    <div class="notification-icon">
+                        <i class="fas fa-bell"></i>
+                        <div class="notification-badge">3</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Sections -->
+            <div class="action-sections">
+                <!-- Student Management Section -->
+                <div class="action-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-users"></i>
+                        Student Management
+                    </h2>
+                    <p class="section-description">
+                        Manage student enrollment and withdrawal
+                    </p>
+                    <div class="action-buttons">
+                        <button class="btn btn-success" onclick="openStudentModal('add')">
+                            <i class="fas fa-user-plus"></i>
+                            Add Student
+                        </button>
+                        <button class="btn btn-warning" onclick="openStudentModal('remove')">
+                            <i class="fas fa-user-minus"></i>
+                            Remove Student
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Course Management Section -->
+                <div class="action-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-graduation-cap"></i>
+                        Course Management
+                    </h2>
+                    <p class="section-description">
+                        Manage course extensions, cancellations and new courses
+                    </p>
+                    <div class="action-buttons">
+                        <a href="https://purpleruler.larksuite.com/share/base/form/shrus1sQDc4LW4xpAQvpThPAO1c" target="_blank" class="btn btn-success">
+                            <i class="fas fa-plus-circle"></i>
+                            Course Enrolment
+                        </a>
+                        <button class="btn btn-primary" onclick="openCourseModal('extend')">
+                            <i class="fas fa-plus"></i>
+                            Course Extension
+                        </button>
+                        <button class="btn btn-secondary" onclick="openCourseModal('cancel')">
+                            <i class="fas fa-times"></i>
+                            Cancel Course
+                        </button>
+                    </div>
+                </div>
+                
+                
+                <!-- Ticket Management Section -->
+                <div class="action-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-ticket-alt"></i>
+                        Ticket Management
+                    </h2>
+                    <p class="section-description">
+                        Submit support tickets and check status
+                    </p>
+                    <div class="action-buttons">
+                        <a href="https://purpleruler.larksuite.com/share/base/form/shrusaHWmdONTi0eb0PSBxpo6Lh" target="_blank" class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            Submit Ticket
+                        </a>
+                        <a href="https://purpleruler.larksuite.com/share/base/query/shrusMF1CqK7ZD5PBP6uI7CUpwi" target="_blank" class="btn btn-info">
+                            <i class="fas fa-search"></i>
+                            Check Status
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="stats-grid">
+                <div class="stat-card total-students">
+                    <div class="stat-title">Total Students</div>
+                    <div class="stat-value">127</div>
+                    <div class="stat-description">Enrolled this term</div>
+                </div>
+                <div class="stat-card active-students">
+                    <div class="stat-title">Active Students</div>
+                    <div class="stat-value">98</div>
+                    <div class="stat-description">Currently attending</div>
+                </div>
+                <div class="stat-card safeguarding">
+                    <div class="stat-title">Safeguarding Alerts</div>
+                    <div class="stat-value">3</div>
+                    <div class="stat-description">Require attention</div>
+                </div>
+                <div class="stat-card invoices">
+                    <div class="stat-title">Pending Invoices</div>
+                    <div class="stat-value">12</div>
+                    <div class="stat-description">Awaiting payment</div>
+                </div>
+            </div>
+
+            <!-- Pricing Plans Section -->
+            <div class="pricing-section">
+                <h2 class="pricing-section-title">Pricing Plans</h2>
+                
+                <div class="pricing-grid">
+                    <!-- Full Time -->
+                    <div class="pricing-card featured">
+                        <h3 class="pricing-title">Full Time</h3>
+                        <div class="pricing-amount">£1,200</div>
+                        <div class="pricing-period">per half term per student (5% discount per term)</div>
+                        <ul class="pricing-features">
+                            <li>5 days per week</li>
+                            <li>6 hours per day</li>
+                            <li>All subjects included</li>
+                            <li>Progress tracking</li>
+                        </ul>
+                        <button class="btn btn-primary">Add Student</button>
+                    </div>
+                
+                    <!-- Part Time -->
+                    <div class="pricing-card">
+                        <h3 class="pricing-title">Part Time</h3>
+                        <div class="pricing-amount">£35</div>
+                        <div class="pricing-period">per lesson - per hour</div>
+                        <ul class="pricing-features">
+                            <li>Flexible scheduling</li>
+                            <li>2-3 hours per session</li>
+                            <li>Subject-specific support</li>
+                            <li>Individual attention</li>
+                            <li>Progress monitoring</li>
+                        </ul>
+                        <button class="btn btn-primary">Add Student</button>
+                    </div>
+                
+                    <!-- Mental Health Program -->
+                    <div class="pricing-card">
+                        <h3 class="pricing-title">Mental Health Program</h3>
+                        <div class="pricing-amount">£149</div>
+                        <div class="pricing-period">per month (Reading Subscription)</div>
+                        <ul class="pricing-features">
+                            <li>Therapeutic reading materials</li>
+                            <li>Monthly book selection</li>
+                            <li>Guided reading sessions</li>
+                            <li>Mental health resources</li>
+                            <li>Progress tracking</li>
+                        </ul>
+                        <button class="btn btn-info">Subscribe</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Course Management Modal -->
+    <div id="courseModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Course Management</h2>
+                <span class="close" onclick="closeCourseModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="Search by Student Name, Subject, or Class ID..." onkeyup="filterCourses()">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="course-list-container">
+                    <div class="course-list" id="courseList">
+                        <!-- Course items will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Management Modal -->
+    <div id="studentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="studentModalTitle">Student Management</h2>
+                <span class="close" onclick="closeStudentModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="addStudentForm" style="display: none;">
+                    <div class="form-section">
+                        <h3>添加学生到现有课程组</h3>
+                        <p class="form-description">如需创建新课程组，请使用 <a href="https://purpleruler.larksuite.com/share/base/form/shrus1sQDc4LW4xpAQvpThPAO1c" target="_blank">Course Enrolment</a></p>
+                        
+                        <div class="form-group">
+                            <label>学生基本信息</label>
+                            <input type="text" placeholder="学生姓名" class="form-input">
+                            <input type="email" placeholder="邮箱地址" class="form-input">
+                            <input type="tel" placeholder="联系电话" class="form-input">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>学术信息</label>
+                            <select class="form-select">
+                                <option value="">选择现有课程组</option>
+                                <option value="AS-APY-Y9-EL-BIOLOGY">AS-APY-Y9-EL-BIOLOGY</option>
+                                <option value="AS-APY-Y9-EL-ENGLISH">AS-APY-Y9-EL-ENGLISH</option>
+                                <option value="AS-APY-Y9-EL-FRENCH">AS-APY-Y9-EL-FRENCH</option>
+                                <option value="AS-STY-Y7-DG-MATHS">AS-STY-Y7-DG-MATHS</option>
+                            </select>
+                            <input type="text" placeholder="当前成绩/等级" class="form-input">
+                            <input type="text" placeholder="SEND Code" class="form-input">
+                            <select class="form-select">
+                                <option value="">选择 Exam Board</option>
+                                <option value="AQA">AQA</option>
+                                <option value="Edexcel">Edexcel</option>
+                                <option value="OCR">OCR</option>
+                                <option value="WJEC">WJEC</option>
+                                <option value="CIE">CIE</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button class="btn btn-success" onclick="submitAddStudent()">添加学生</button>
+                            <button class="btn btn-secondary" onclick="closeStudentModal()">取消</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="removeStudentForm" style="display: none;">
+                    <div class="form-section">
+                        <h3>移除学生选项</h3>
+                        <div class="removal-options">
+                            <button class="btn btn-danger removal-option" onclick="showRemoveAllCourses()">
+                                <i class="fas fa-user-times"></i>
+                                移除学生的所有课程
+                            </button>
+                            <button class="btn btn-warning removal-option" onclick="showRemoveSpecificCourses()">
+                                <i class="fas fa-minus-circle"></i>
+                                移除特定课程
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="removeAllSection" style="display: none;">
+                        <div class="search-bar">
+                            <input type="text" id="studentSearchInput" placeholder="搜索学生姓名..." onkeyup="filterStudents()">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="student-list-container">
+                            <div class="student-list" id="studentList">
+                                <!-- Student items will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="removeSpecificSection" style="display: none;">
+                        <div class="search-bar">
+                            <input type="text" id="courseSearchInput" placeholder="搜索课程、学生或Class ID..." onkeyup="filterSpecificCourses()">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="course-list-container">
+                            <div class="course-list" id="specificCourseList">
+                                <!-- Specific course items will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample course data (in real implementation, this would come from Wix CMS)
+        const courseData = [
+            {
+                classId: 'AS-APY-Y9-EL-BIOLOGY',
+                studentName: 'Emma Johnson',
+                subject: 'Biology',
+                courseId: 'BIO-001',
+                qtyLessons: 54
+            },
+            {
+                classId: 'AS-APY-Y9-EL-ENGLISH',
+                studentName: 'James Smith',
+                subject: 'English',
+                courseId: 'ENG-002',
+                qtyLessons: 67
+            },
+            {
+                classId: 'AS-APY-Y9-EL-FRENCH',
+                studentName: 'Sophie Chen',
+                subject: 'French',
+                courseId: 'FRE-003',
+                qtyLessons: 43
+            },
+            {
+                classId: 'AS-APY-Y9-EL-PHYSICS',
+                studentName: 'Michael Brown',
+                subject: 'Physics',
+                courseId: 'PHY-004',
+                qtyLessons: 59
+            },
+            {
+                classId: 'AS-STY-Y7-DG-ENGLISH',
+                studentName: 'Isabella Davis',
+                subject: 'English',
+                courseId: 'ENG-005',
+                qtyLessons: 35
+            },
+            {
+                classId: 'AS-STY-Y7-DG-HISTORY',
+                studentName: 'Oliver Wilson',
+                subject: 'History',
+                courseId: 'HIS-006',
+                qtyLessons: 17
+            },
+            {
+                classId: 'AS-STY-Y7-DG-MATHS',
+                studentName: 'Ava Martinez',
+                subject: 'Mathematics',
+                courseId: 'MAT-007',
+                qtyLessons: 39
+            },
+            {
+                classId: 'AS-STY-Y7-DG-SCIENCE',
+                studentName: 'Lucas Anderson',
+                subject: 'Science',
+                courseId: 'SCI-008',
+                qtyLessons: 13
+            },
+            {
+                classId: 'AS-STY-Y7-DG-GEOGRAPHY',
+                studentName: 'Mia Thompson',
+                subject: 'Geography',
+                courseId: 'GEO-009',
+                qtyLessons: 7
+            }
+        ];
+
+        let currentAction = '';
+
+        function openCourseModal(action) {
+            currentAction = action;
+            const modal = document.getElementById('courseModal');
+            const modalTitle = document.getElementById('modalTitle');
+            
+            if (action === 'extend') {
+                modalTitle.textContent = 'Course Extension';
+            } else if (action === 'cancel') {
+                modalTitle.textContent = 'Course Cancellation';
+            }
+            
+            populateCourseList();
+            modal.style.display = 'block';
+        }
+
+        function closeCourseModal() {
+            const modal = document.getElementById('courseModal');
+            modal.style.display = 'none';
+        }
+
+        function populateCourseList() {
+            const courseList = document.getElementById('courseList');
+            courseList.innerHTML = '';
+            
+            courseData.forEach(course => {
+                const courseItem = createCourseItem(course);
+                courseList.appendChild(courseItem);
+            });
+        }
+
+        function createCourseItem(course) {
+            const item = document.createElement('div');
+            item.className = 'course-item';
+            item.innerHTML = `
+                <div class="course-info">
+                    <div class="course-header">
+                        <span class="class-id">${course.classId}</span>
+                        <span class="qty-lessons">${course.qtyLessons} lessons remaining</span>
+                    </div>
+                    <div class="course-details">
+                        <div class="detail-row">
+                            <span class="label">Student:</span>
+                            <span class="value">${course.studentName}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Subject:</span>
+                            <span class="value">${course.subject}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Course ID:</span>
+                            <span class="value">${course.courseId}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="course-actions">
+                    <button class="action-btn ${currentAction === 'extend' ? 'extend-btn' : 'cancel-btn'}" 
+                            onclick="handleCourseAction('${course.classId}', '${currentAction}')">
+                        <i class="fas ${currentAction === 'extend' ? 'fa-plus' : 'fa-times'}"></i>
+                        ${currentAction === 'extend' ? 'Extend' : 'Cancel'}
+                    </button>
+                </div>
+            `;
+            return item;
+        }
+
+        function filterCourses() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const courseItems = document.querySelectorAll('.course-item');
+            
+            courseItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function handleCourseAction(classId, action) {
+            if (action === 'extend') {
+                // In real implementation, this would redirect to Wix form or API call
+                window.open('https://purpleruler.larksuite.com/share/base/form/shrusquF0kTZixa4bKNTqTUSPme', '_blank');
+            } else if (action === 'cancel') {
+                // Handle course cancellation
+                if (confirm(`Are you sure you want to cancel course ${classId}?`)) {
+                    alert(`Course ${classId} has been marked for cancellation.`);
+                    closeCourseModal();
+                }
+            }
+        }
+
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            const modal = document.getElementById('courseModal');
+            const studentModal = document.getElementById('studentModal');
+            if (event.target === modal) {
+                closeCourseModal();
+            }
+            if (event.target === studentModal) {
+                closeStudentModal();
+            }
+        }
+
+        // Student Management Functions
+        const studentData = [
+            {
+                id: 'STU-001',
+                name: 'Emma Johnson',
+                email: 'emma.johnson@email.com',
+                phone: '+44 7123 456789',
+                courses: ['AS-APY-Y9-EL-BIOLOGY']
+            },
+            {
+                id: 'STU-002',
+                name: 'James Smith',
+                email: 'james.smith@email.com',
+                phone: '+44 7234 567890',
+                courses: ['AS-APY-Y9-EL-ENGLISH', 'AS-STY-Y7-DG-MATHS']
+            },
+            {
+                id: 'STU-003',
+                name: 'Sophie Chen',
+                email: 'sophie.chen@email.com',
+                phone: '+44 7345 678901',
+                courses: ['AS-APY-Y9-EL-FRENCH']
+            },
+            {
+                id: 'STU-004',
+                name: 'Michael Brown',
+                email: 'michael.brown@email.com',
+                phone: '+44 7456 789012',
+                courses: ['AS-APY-Y9-EL-PHYSICS', 'AS-STY-Y7-DG-SCIENCE']
+            }
+        ];
+
+        let currentStudentAction = '';
+
+        function openStudentModal(action) {
+            currentStudentAction = action;
+            const modal = document.getElementById('studentModal');
+            const modalTitle = document.getElementById('studentModalTitle');
+            const addForm = document.getElementById('addStudentForm');
+            const removeForm = document.getElementById('removeStudentForm');
+            
+            if (action === 'add') {
+                modalTitle.textContent = '添加学生到现有课程组';
+                addForm.style.display = 'block';
+                removeForm.style.display = 'none';
+            } else if (action === 'remove') {
+                modalTitle.textContent = '移除学生';
+                addForm.style.display = 'none';
+                removeForm.style.display = 'block';
+                // Reset remove form sections
+                document.getElementById('removeAllSection').style.display = 'none';
+                document.getElementById('removeSpecificSection').style.display = 'none';
+            }
+            
+            modal.style.display = 'block';
+        }
+
+        function closeStudentModal() {
+            const modal = document.getElementById('studentModal');
+            modal.style.display = 'none';
+        }
+
+        function submitAddStudent() {
+            alert('学生添加功能将连接到Wix数据库进行处理');
+            closeStudentModal();
+        }
+
+        function showRemoveAllCourses() {
+            document.getElementById('removeAllSection').style.display = 'block';
+            document.getElementById('removeSpecificSection').style.display = 'none';
+            populateStudentList();
+        }
+
+        function showRemoveSpecificCourses() {
+            document.getElementById('removeAllSection').style.display = 'none';
+            document.getElementById('removeSpecificSection').style.display = 'block';
+            populateSpecificCourseList();
+        }
+
+        function populateStudentList() {
+            const studentList = document.getElementById('studentList');
+            studentList.innerHTML = '';
+            
+            studentData.forEach(student => {
+                const studentItem = createStudentItem(student);
+                studentList.appendChild(studentItem);
+            });
+        }
+
+        function createStudentItem(student) {
+            const item = document.createElement('div');
+            item.className = 'course-item';
+            item.innerHTML = `
+                <div class="course-info">
+                    <div class="course-header">
+                        <span class="class-id">${student.name}</span>
+                        <span class="qty-lessons">${student.courses.length} 门课程</span>
+                    </div>
+                    <div class="course-details">
+                        <div class="detail-row">
+                            <span class="label">学生ID:</span>
+                            <span class="value">${student.id}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">邮箱:</span>
+                            <span class="value">${student.email}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">课程:</span>
+                            <span class="value">${student.courses.join(', ')}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="course-actions">
+                    <button class="action-btn cancel-btn" 
+                            onclick="handleRemoveAllCourses('${student.id}')">
+                        <i class="fas fa-user-times"></i>
+                        移除所有课程
+                    </button>
+                </div>
+            `;
+            return item;
+        }
+
+        function populateSpecificCourseList() {
+            const courseList = document.getElementById('specificCourseList');
+            courseList.innerHTML = '';
+            
+            courseData.forEach(course => {
+                const courseItem = createSpecificCourseItem(course);
+                courseList.appendChild(courseItem);
+            });
+        }
+
+        function createSpecificCourseItem(course) {
+            const item = document.createElement('div');
+            item.className = 'course-item';
+            item.innerHTML = `
+                <div class="course-info">
+                    <div class="course-header">
+                        <span class="class-id">${course.classId}</span>
+                        <span class="qty-lessons">${course.qtyLessons} 节未来课程</span>
+                    </div>
+                    <div class="course-details">
+                        <div class="detail-row">
+                            <span class="label">学生:</span>
+                            <span class="value">${course.studentName}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">科目:</span>
+                            <span class="value">${course.subject}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">课程ID:</span>
+                            <span class="value">${course.courseId}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="course-actions">
+                    <button class="action-btn cancel-btn" 
+                            onclick="handleRemoveSpecificCourse('${course.classId}')">
+                        <i class="fas fa-times"></i>
+                        取消课程
+                    </button>
+                </div>
+            `;
+            return item;
+        }
+
+        function filterStudents() {
+            const searchTerm = document.getElementById('studentSearchInput').value.toLowerCase();
+            const studentItems = document.querySelectorAll('#studentList .course-item');
+            
+            studentItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function filterSpecificCourses() {
+            const searchTerm = document.getElementById('courseSearchInput').value.toLowerCase();
+            const courseItems = document.querySelectorAll('#specificCourseList .course-item');
+            
+            courseItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function handleRemoveAllCourses(studentId) {
+            const student = studentData.find(s => s.id === studentId);
+            if (confirm(`确认移除学生 ${student.name} 的所有课程吗？`)) {
+                alert(`学生 ${student.name} 的所有课程已移除`);
+                closeStudentModal();
+            }
+        }
+
+        function handleRemoveSpecificCourse(classId) {
+            const course = courseData.find(c => c.classId === classId);
+            if (confirm(`确认取消 ${course.studentName} 的 ${course.subject} 课程 (${classId}) 吗？`)) {
+                alert(`课程 ${classId} 已取消`);
+                closeStudentModal();
+            }
+        }
+    </script>
+
+    <style>
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .modal-content {
+            background-color: var(--card-background);
+            margin: 2% auto;
+            padding: 0;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .close {
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .close:hover {
+            opacity: 0.7;
+        }
+
+        .modal-body {
+            padding: 0;
+            max-height: 70vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .search-bar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: white;
+            padding: 2rem 2rem 1rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 0;
+        }
+
+        .course-list-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem 2rem 2rem 2rem;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .search-bar i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .course-list {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .course-item {
+            background: var(--card-background);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .course-item:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .course-info {
+            flex: 1;
+        }
+
+        .course-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .class-id {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+        }
+
+        .qty-lessons {
+            background: var(--accent-color);
+            color: var(--primary-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .course-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .detail-row {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .detail-row .label {
+            font-weight: 600;
+            color: var(--text-secondary);
+            min-width: 80px;
+        }
+
+        .detail-row .value {
+            color: var(--text-primary);
+        }
+
+        .course-actions {
+            margin-left: 2rem;
+        }
+
+        .action-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            min-width: 120px;
+            justify-content: center;
+        }
+
+        .extend-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .extend-btn:hover {
+            background-color: #7C3AED;
+            transform: translateY(-2px);
+        }
+
+        .cancel-btn {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .cancel-btn:hover {
+            background-color: #DC2626;
+            transform: translateY(-2px);
+        }
+
+        /* Responsive Design for Modal */
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 95%;
+                margin: 5% auto;
+            }
+
+            .modal-body {
+                padding: 1rem;
+            }
+
+            .course-item {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .course-actions {
+                margin-left: 0;
+            }
+
+            .course-details {
+                grid-template-columns: 1fr;
+            }
+
+            .course-header {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</body>
+</html>
