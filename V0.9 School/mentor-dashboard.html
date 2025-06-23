@@ -739,58 +739,7 @@
                 <h2>Mentor Dashboard</h2>
                 <div class="search-bar">
                     <input type="text" placeholder="Search...">
-                    <button class="btn btn-primary"><i class="fas fa-search"></i></button>
-                </div>
-            </div>
-
-            <div class="dashboard-sections">
-                <div class="section">
-                    <div class="section-header">
-                        <h3>Student Management</h3>
-                        <div>
-                            <button class="btn btn-primary" onclick="openModal('studentModal')">Manage Students</button>
-                        </div>
-                    </div>
-                    <div class="section-body">
-                        <p>Manage student enrollments and activities.</p>
-                        <div class="actions">
-                            <button class="btn btn-success" onclick="openModal('addStudentModal')">Add Student</button>
-                            <button class="btn btn-warning" onclick="openModal('removeStudentModal')">Remove Student</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <div class="section-header">
-                        <h3>Course Management</h3>
-                        <div>
-                            <button class="btn btn-primary" onclick="openModal('courseModal')">Manage Courses</button>
-                        </div>
-                    </div>
-                    <div class="section-body">
-                        <p>Manage course enrollments, cancellations and extensions.</p>
-                        <div class="actions">
-                            <button class="btn btn-success" onclick="openModal('courseEnrollModal')">Course Enrollment</button>
-                            <button class="btn btn-danger" onclick="openModal('courseCancelModal')">Course Cancellation</button>
-                            <button class="btn btn-info" onclick="openModal('courseExtendModal')">Course Extension</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <div class="section-header">
-                        <h3>Ticket Management</h3>
-                        <div>
-                            <button class="btn btn-primary" onclick="openModal('ticketModal')">Manage Tickets</button>
-                        </div>
-                    </div>
-                    <div class="section-body">
-                        <p>Submit support tickets and check status.</p>
-                        <div class="actions">
-                            <button class="btn btn-success" onclick="openModal('createTicketModal')">Create Ticket</button>
-                            <button class="btn btn-info" onclick="openModal('checkStatusModal')">Check Status</button>
-                        </div>
-                    </div>
+                    <button><i class="fas fa-search"></i></button>
                 </div>
             </div>
 
@@ -798,7 +747,7 @@
                 <div class="card">
                     <h3>Total Students</h3>
                     <div class="number">127</div>
-                    <div class="description">Students you serve</div>
+                    <div class="description">Enrolled with you</div>
                 </div>
                 <div class="card">
                     <h3>Active Students</h3>
@@ -817,63 +766,121 @@
                 </div>
             </div>
 
+            <div class="dashboard-sections">
+                <div class="section">
+                    <div class="section-header">
+                        <h3>Student Management</h3>
+                        <div>
+                            <button class="btn btn-primary" onclick="openStudentModal('add')">Add Student</button>
+                            <button class="btn btn-warning" onclick="openStudentModal('remove')">Remove Student</button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <p>Manage student enrollments and withdrawals</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-header">
+                        <h3>Course Management</h3>
+                        <div>
+                            <button class="btn btn-primary" onclick="openCourseModal('extend')">Course Extension</button>
+                            <button class="btn btn-danger" onclick="openCourseModal('cancel')">Course Cancellation</button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <p>Manage course extensions, cancellations and modifications</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-header">
+                        <h3>Ticket Management</h3>
+                        <button class="btn btn-primary">Submit Ticket</button>
+                    </div>
+                    <div class="section-body">
+                        <p>Submit support tickets and check status</p>
+                    </div>
+                </div>
+            </div>
+
             <div class="pricing-plans">
                 <h2>Pricing Plans</h2>
                 <div class="plans-container">
                     <div class="plan">
                         <div class="plan-header">
                             <h3>Full Time</h3>
-                            <div class="plan-price">$499 <span>/month</span></div>
+                            <div class="plan-price">£1,200 <span>/ month</span></div>
                         </div>
                         <div class="plan-features">
                             <ul>
-                                <li>40 hours per week</li>
-                                <li>All subjects included</li>
+                                <li>5 days per week</li>
+                                <li>All subjects covered</li>
                                 <li>Weekly progress reports</li>
                                 <li>24/7 support</li>
-                                <li>Certification included</li>
+                                <li>Exam preparation</li>
                             </ul>
                         </div>
                         <div class="plan-footer">
                             <button class="btn btn-primary">Select Plan</button>
                         </div>
                     </div>
+
                     <div class="plan">
                         <div class="plan-header">
                             <h3>Part Time</h3>
-                            <div class="plan-price">$299 <span>/month</span></div>
+                            <div class="plan-price">£800 <span>/ month</span></div>
                         </div>
                         <div class="plan-features">
                             <ul>
-                                <li>20 hours per week</li>
+                                <li>3 days per week</li>
                                 <li>Core subjects only</li>
                                 <li>Bi-weekly progress reports</li>
                                 <li>Business hours support</li>
-                                <li>Certification available</li>
+                                <li>Basic exam preparation</li>
                             </ul>
                         </div>
                         <div class="plan-footer">
                             <button class="btn btn-primary">Select Plan</button>
                         </div>
                     </div>
+
                     <div class="plan">
                         <div class="plan-header">
                             <h3>Mental Health Program</h3>
-                            <div class="plan-price">$199 <span>/month</span></div>
+                            <div class="plan-price">£500 <span>/ month</span></div>
                         </div>
                         <div class="plan-features">
                             <ul>
-                                <li>10 hours per week</li>
-                                <li>Mental health focus</li>
-                                <li>Monthly progress reports</li>
-                                <li>Scheduled support</li>
-                                <li>Wellness certificate</li>
+                                <li>2 days per week</li>
+                                <li>Therapeutic support</li>
+                                <li>Wellbeing assessments</li>
+                                <li>Counseling sessions</li>
+                                <li>Reintegration planning</li>
                             </ul>
                         </div>
                         <div class="plan-footer">
                             <button class="btn btn-primary">Select Plan</button>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Course Modal -->
+    <div id="courseModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="courseModalTitle">Course Extension</h3>
+                <button class="modal-close" onclick="closeCourseModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="search-bar" style="margin-bottom: 20px;">
+                    <input type="text" id="searchInput" placeholder="Search by student name, course ID, or subject..." onkeyup="filterCourses()">
+                </div>
+                <div id="courseList" class="course-list">
+                    <!-- Course items will be populated here -->
                 </div>
             </div>
         </div>
@@ -883,355 +890,414 @@
     <div id="studentModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Student Management</h3>
-                <button class="modal-close" onclick="closeModal('studentModal')">&times;</button>
+                <h3 id="studentModalTitle">Add Student</h3>
+                <button class="modal-close" onclick="closeStudentModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="search-bar" style="margin-bottom: 20px;">
-                    <input type="text" id="studentSearch" placeholder="Search by name, ID or class..." onkeyup="filterStudents()">
+                <!-- Add Student Form -->
+                <div id="addStudentForm" style="display: none;">
+                    <div class="form-group">
+                        <label for="studentName">Student Name</label>
+                        <input type="text" id="studentName" class="form-control" placeholder="Enter student name">
+                    </div>
+                    <div class="form-group">
+                        <label for="studentEmail">Email</label>
+                        <input type="email" id="studentEmail" class="form-control" placeholder="Enter student email">
+                    </div>
+                    <div class="form-group">
+                        <label for="studentPhone">Phone</label>
+                        <input type="text" id="studentPhone" class="form-control" placeholder="Enter student phone">
+                    </div>
+                    <div class="form-group">
+                        <label for="courseSelect">Select Course</label>
+                        <select id="courseSelect" class="form-control">
+                            <option value="">-- Select Course --</option>
+                            <option value="AS-APY-Y9-EL-BIOLOGY">Biology</option>
+                            <option value="AS-APY-Y9-EL-ENGLISH">English</option>
+                            <option value="AS-APY-Y9-EL-MATH">Mathematics</option>
+                            <option value="AS-APY-Y9-EL-PHYSICS">Physics</option>
+                            <option value="AS-APY-Y9-EL-CHEMISTRY">Chemistry</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" onclick="submitAddStudent()">Add Student</button>
+                    </div>
                 </div>
-                <div id="studentList">
-                    <!-- Student items will be added here dynamically -->
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary" onclick="closeModal('studentModal')">Close</button>
-            </div>
-        </div>
-    </div>
 
-    <!-- Course Modal -->
-    <div id="courseModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Course Management</h3>
-                <button class="modal-close" onclick="closeModal('courseModal')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="search-bar" style="margin-bottom: 20px;">
-                    <input type="text" id="courseSearch" placeholder="Search by course name, ID or subject..." onkeyup="filterCourses()">
-                </div>
-                <div id="courseList">
-                    <!-- Course items will be added here dynamically -->
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary" onclick="closeModal('courseModal')">Close</button>
-            </div>
-        </div>
-    </div>
+                <!-- Remove Student Form -->
+                <div id="removeStudentForm" style="display: none;">
+                    <div class="form-group">
+                        <label>Remove Options</label>
+                        <div style="margin-top: 10px;">
+                            <button class="btn btn-danger" onclick="showRemoveAllCourses()">Remove from All Courses</button>
+                            <button class="btn btn-warning" onclick="showRemoveSpecificCourses()">Remove from Specific Course</button>
+                        </div>
+                    </div>
 
-    <!-- Ticket Modal -->
-    <div id="ticketModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Ticket Management</h3>
-                <button class="modal-close" onclick="closeModal('ticketModal')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="search-bar" style="margin-bottom: 20px;">
-                    <input type="text" id="ticketSearch" placeholder="Search by ticket ID, subject or status..." onkeyup="filterTickets()">
+                    <!-- Remove from All Courses Section -->
+                    <div id="removeAllSection" style="display: none; margin-top: 20px;">
+                        <h4>Select Student to Remove from All Courses</h4>
+                        <div id="studentList" class="course-list">
+                            <!-- Student items will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Remove from Specific Course Section -->
+                    <div id="removeSpecificSection" style="display: none; margin-top: 20px;">
+                        <h4>Select Course to Remove Student From</h4>
+                        <div id="specificCourseList" class="course-list">
+                            <!-- Specific course items will be populated here -->
+                        </div>
+                    </div>
                 </div>
-                <div id="ticketList">
-                    <!-- Ticket items will be added here dynamically -->
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary" onclick="closeModal('ticketModal')">Close</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Sample data for students
-        const students = [
-            { id: 'ST-001', name: 'John Smith', class: 'Mathematics', grade: 'A', attendance: '95%', status: 'Active' },
-            { id: 'ST-002', name: 'Emily Johnson', class: 'Biology', grade: 'B+', attendance: '88%', status: 'Active' },
-            { id: 'ST-003', name: 'Michael Brown', class: 'Physics', grade: 'A-', attendance: '92%', status: 'Active' },
-            { id: 'ST-004', name: 'Sarah Davis', class: 'Chemistry', grade: 'B', attendance: '85%', status: 'Inactive' },
-            { id: 'ST-005', name: 'David Wilson', class: 'English', grade: 'A', attendance: '97%', status: 'Active' },
-        ];
-
-        // Sample data for courses
-        const courses = [
-            { id: 'CS-001', title: 'Introduction to Mathematics', subject: 'Mathematics', instructor: 'Dr. Robert Johnson', students: 25, progress: 65 },
-            { id: 'CS-002', title: 'Advanced Biology', subject: 'Biology', instructor: 'Prof. Emma Johnson', students: 18, progress: 42 },
-            { id: 'CS-003', title: 'Physics Fundamentals', subject: 'Physics', instructor: 'Dr. James Smith', students: 22, progress: 78 },
-            { id: 'CS-004', title: 'Organic Chemistry', subject: 'Chemistry', instructor: 'Prof. Lisa Davis', students: 15, progress: 30 },
-            { id: 'CS-005', title: 'English Literature', subject: 'English', instructor: 'Dr. William Brown', students: 28, progress: 55 },
-        ];
-
-        // Sample data for tickets
-        const tickets = [
-            { id: 'TK-001', title: 'Login Issue', subject: 'Technical', submittedBy: 'John Smith', date: '2023-06-15', status: 'Open', priority: 'High' },
-            { id: 'TK-002', title: 'Course Material Missing', subject: 'Content', submittedBy: 'Emily Johnson', date: '2023-06-14', status: 'In Progress', priority: 'Medium' },
-            { id: 'TK-003', title: 'Payment Problem', subject: 'Billing', submittedBy: 'Michael Brown', date: '2023-06-12', status: 'Closed', priority: 'Low' },
-            { id: 'TK-004', title: 'Assignment Feedback', subject: 'Academic', submittedBy: 'Sarah Davis', date: '2023-06-10', status: 'Open', priority: 'Medium' },
-            { id: 'TK-005', title: 'Account Access', subject: 'Technical', submittedBy: 'David Wilson', date: '2023-06-08', status: 'In Progress', priority: 'High' },
-        ];
-
-        // Function to open modal
-        function openModal(modalId) {
-            const modal = document.getElementById(modalId);
-            modal.style.display = 'flex';
-
-            // Load data based on modal type
-            if (modalId === 'studentModal') {
-                loadStudents();
-            } else if (modalId === 'courseModal') {
-                loadCourses();
-            } else if (modalId === 'ticketModal') {
-                loadTickets();
+        // Course Management Functions
+        const courseData = [
+            { 
+                classId: 'AS-APY-Y9-EL-BIOLOGY', 
+                studentName: 'Emma Johnson', 
+                subject: 'Biology', 
+                courseId: 'BD-001',
+                qtyLessons: 34
+            },
+            { 
+                classId: 'AS-APY-Y9-EL-ENGLISH', 
+                studentName: 'James Smith', 
+                subject: 'English', 
+                courseId: 'EN2-002',
+                qtyLessons: 47
+            },
+            { 
+                classId: 'AS-APY-Y9-EL-MATH', 
+                studentName: 'Michael Brown', 
+                subject: 'Mathematics', 
+                courseId: 'MT-003',
+                qtyLessons: 22
+            },
+            { 
+                classId: 'AS-APY-Y9-EL-PHYSICS', 
+                studentName: 'Sarah Davis', 
+                subject: 'Physics', 
+                courseId: 'PH-004',
+                qtyLessons: 15
+            },
+            { 
+                classId: 'AS-APY-Y9-EL-CHEMISTRY', 
+                studentName: 'David Wilson', 
+                subject: 'Chemistry', 
+                courseId: 'CH-005',
+                qtyLessons: 28
             }
+        ];
+
+        let currentAction = '';
+
+        function openCourseModal(action) {
+            currentAction = action;
+            const modal = document.getElementById('courseModal');
+            const modalTitle = document.getElementById('courseModalTitle');
+            
+            if (action === 'extend') {
+                modalTitle.textContent = 'Course Extension';
+            } else if (action === 'cancel') {
+                modalTitle.textContent = 'Course Cancellation';
+            }
+            
+            modal.style.display = 'flex';
+            populateCourseList();
         }
 
-        // Function to close modal
-        function closeModal(modalId) {
-            const modal = document.getElementById(modalId);
+        function closeCourseModal() {
+            const modal = document.getElementById('courseModal');
             modal.style.display = 'none';
         }
 
-        // Function to load students
-        function loadStudents() {
-            const studentList = document.getElementById('studentList');
-            studentList.innerHTML = '';
-
-            students.forEach(student => {
-                studentList.appendChild(createStudentItem(student));
-            });
-        }
-
-        // Function to create student item
-        function createStudentItem(student) {
-            const studentItem = document.createElement('div');
-            studentItem.className = 'student-item';
-            studentItem.innerHTML = `
-                <div class="student-info">
-                    <div class="student-name">${student.name}</div>
-                    <div class="student-meta">
-                        <span><i class="fas fa-id-card"></i> ${student.id}</span>
-                        <span><i class="fas fa-book"></i> ${student.class}</span>
-                        <span><i class="fas fa-chart-line"></i> Grade: ${student.grade}</span>
-                        <span><i class="fas fa-calendar-check"></i> Attendance: ${student.attendance}</span>
-                    </div>
-                </div>
-                <div class="student-actions">
-                    <button class="btn btn-info" onclick="viewStudent('${student.id}')"><i class="fas fa-eye"></i></button>
-                    <button class="btn btn-primary" onclick="editStudent('${student.id}')"><i class="fas fa-edit"></i></button>
-                    <button class="btn btn-danger" onclick="removeStudent('${student.id}')"><i class="fas fa-trash"></i></button>
-                </div>
-            `;
-            return studentItem;
-        }
-
-        // Function to filter students
-        function filterStudents() {
-            const searchTerm = document.getElementById('studentSearch').value.toLowerCase();
-            const studentList = document.getElementById('studentList');
-            studentList.innerHTML = '';
-
-            const filteredStudents = students.filter(student => 
-                student.name.toLowerCase().includes(searchTerm) ||
-                student.id.toLowerCase().includes(searchTerm) ||
-                student.class.toLowerCase().includes(searchTerm)
-            );
-
-            filteredStudents.forEach(student => {
-                studentList.appendChild(createStudentItem(student));
-            });
-        }
-
-        // Function to load courses
-        function loadCourses() {
+        function populateCourseList() {
             const courseList = document.getElementById('courseList');
             courseList.innerHTML = '';
-
-            courses.forEach(course => {
-                courseList.appendChild(createCourseItem(course));
+            
+            courseData.forEach(course => {
+                const courseItem = createCourseItem(course);
+                courseList.appendChild(courseItem);
             });
         }
 
-        // Function to create course item
         function createCourseItem(course) {
-            const courseItem = document.createElement('div');
-            courseItem.className = 'course-item';
-            courseItem.innerHTML = `
+            const item = document.createElement('div');
+            item.className = 'course-item';
+            item.innerHTML = `
                 <div class="course-info">
-                    <div class="course-title">${course.title}</div>
-                    <div class="course-meta">
-                        <span><i class="fas fa-id-card"></i> ${course.id}</span>
-                        <span><i class="fas fa-book"></i> ${course.subject}</span>
-                        <span><i class="fas fa-chalkboard-teacher"></i> ${course.instructor}</span>
-                        <span><i class="fas fa-users"></i> ${course.students} students</span>
+                    <div class="course-header">
+                        <span class="class-id">${course.classId}</span>
+                        <span class="qty-lessons">${course.qtyLessons} lessons remaining</span>
                     </div>
-                    <div class="course-progress">
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: ${course.progress}%"></div>
+                    <div class="course-details">
+                        <div class="detail-row">
+                            <span class="label">Student:</span>
+                            <span class="value">${course.studentName}</span>
                         </div>
-                        <div style="font-size: 12px; color: #777; margin-top: 5px;">${course.progress}% completed</div>
+                        <div class="detail-row">
+                            <span class="label">Subject:</span>
+                            <span class="value">${course.subject}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Course ID:</span>
+                            <span class="value">${course.courseId}</span>
+                        </div>
                     </div>
                 </div>
                 <div class="course-actions">
-                    <button class="btn btn-info" onclick="viewCourse('${course.id}')"><i class="fas fa-eye"></i></button>
-                    <button class="btn btn-primary" onclick="editCourse('${course.id}')"><i class="fas fa-edit"></i></button>
-                    <button class="btn btn-success" onclick="handleCourseAction('${course.id}', 'extend')"><i class="fas fa-calendar-plus"></i> Extend</button>
-                    <button class="btn btn-danger" onclick="handleCourseAction('${course.id}', 'cancel')"><i class="fas fa-times-circle"></i> Cancel</button>
+                    <button class="action-btn ${currentAction === 'extend' ? 'extend-btn' : 'cancel-btn'}" 
+                            onclick="handleCourseAction('${course.classId}', '${currentAction}')">
+                        <i class="fas ${currentAction === 'extend' ? 'fa-plus' : 'fa-times'}"></i>
+                        ${currentAction === 'extend' ? 'Extend' : 'Cancel'}
+                    </button>
                 </div>
             `;
-            return courseItem;
+            return item;
         }
 
-        // Function to filter courses
         function filterCourses() {
-            const searchTerm = document.getElementById('courseSearch').value.toLowerCase();
-            const courseList = document.getElementById('courseList');
-            courseList.innerHTML = '';
-
-            const filteredCourses = courses.filter(course => 
-                course.title.toLowerCase().includes(searchTerm) ||
-                course.id.toLowerCase().includes(searchTerm) ||
-                course.subject.toLowerCase().includes(searchTerm) ||
-                course.instructor.toLowerCase().includes(searchTerm)
-            );
-
-            filteredCourses.forEach(course => {
-                courseList.appendChild(createCourseItem(course));
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const courseItems = document.querySelectorAll('.course-item');
+            
+            courseItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
             });
         }
 
-        // Function to handle course actions (extend or cancel)
-        function handleCourseAction(courseId, action) {
-            const course = courses.find(c => c.id === courseId);
-            
+        function handleCourseAction(classId, action) {
             if (action === 'extend') {
-                // Redirect to course extension page
+                // 修改为跳转到新的课程延期页面
                 window.location.href = 'course-extension.html';
             } else if (action === 'cancel') {
-                if (confirm(`Are you sure you want to cancel the course: ${course.title}?`)) {
-                    alert(`Course ${course.title} has been cancelled successfully.`);
-                    // Here you would typically update the course status in the database
+                // Handle course cancellation
+                if (confirm(`Are you sure you want to cancel course ${classId}?`)) {
+                    alert(`Course ${classId} has been marked for cancellation.`);
+                    closeCourseModal();
                 }
             }
         }
 
-        // Function to load tickets
-        function loadTickets() {
-            const ticketList = document.getElementById('ticketList');
-            ticketList.innerHTML = '';
-
-            tickets.forEach(ticket => {
-                ticketList.appendChild(createTicketItem(ticket));
-            });
-        }
-
-        // Function to create ticket item
-        function createTicketItem(ticket) {
-            const ticketItem = document.createElement('div');
-            ticketItem.className = 'ticket-item';
-            
-            // Determine badge class based on status
-            let statusBadgeClass = '';
-            if (ticket.status === 'Open') statusBadgeClass = 'badge-warning';
-            else if (ticket.status === 'In Progress') statusBadgeClass = 'badge-info';
-            else if (ticket.status === 'Closed') statusBadgeClass = 'badge-success';
-            
-            // Determine priority badge class
-            let priorityBadgeClass = '';
-            if (ticket.priority === 'High') priorityBadgeClass = 'badge-danger';
-            else if (ticket.priority === 'Medium') priorityBadgeClass = 'badge-warning';
-            else if (ticket.priority === 'Low') priorityBadgeClass = 'badge-info';
-            
-            ticketItem.innerHTML = `
-                <div class="ticket-header">
-                    <div class="ticket-title">${ticket.title}</div>
-                    <div>
-                        <span class="badge ${statusBadgeClass}">${ticket.status}</span>
-                        <span class="badge ${priorityBadgeClass}">${ticket.priority}</span>
-                    </div>
-                </div>
-                <div class="ticket-meta">
-                    <span><i class="fas fa-id-card"></i> ${ticket.id}</span>
-                    <span><i class="fas fa-folder"></i> ${ticket.subject}</span>
-                    <span><i class="fas fa-user"></i> ${ticket.submittedBy}</span>
-                    <span><i class="fas fa-calendar"></i> ${ticket.date}</span>
-                </div>
-                <div class="ticket-footer">
-                    <div class="ticket-status">
-                        ${ticket.status === 'Closed' ? 'Resolved on ' + ticket.date : 'Last updated on ' + ticket.date}
-                    </div>
-                    <div class="ticket-actions">
-                        <button class="btn btn-info" onclick="viewTicket('${ticket.id}')"><i class="fas fa-eye"></i> View</button>
-                        ${ticket.status !== 'Closed' ? `<button class="btn btn-primary" onclick="updateTicket('${ticket.id}')"><i class="fas fa-edit"></i> Update</button>` : ''}
-                        ${ticket.status === 'Open' ? `<button class="btn btn-success" onclick="resolveTicket('${ticket.id}')"><i class="fas fa-check-circle"></i> Resolve</button>` : ''}
-                    </div>
-                </div>
-            `;
-            return ticketItem;
-        }
-
-        // Function to filter tickets
-        function filterTickets() {
-            const searchTerm = document.getElementById('ticketSearch').value.toLowerCase();
-            const ticketList = document.getElementById('ticketList');
-            ticketList.innerHTML = '';
-
-            const filteredTickets = tickets.filter(ticket => 
-                ticket.title.toLowerCase().includes(searchTerm) ||
-                ticket.id.toLowerCase().includes(searchTerm) ||
-                ticket.subject.toLowerCase().includes(searchTerm) ||
-                ticket.status.toLowerCase().includes(searchTerm) ||
-                ticket.submittedBy.toLowerCase().includes(searchTerm)
-            );
-
-            filteredTickets.forEach(ticket => {
-                ticketList.appendChild(createTicketItem(ticket));
-            });
-        }
-
-        // Placeholder functions for student actions
-        function viewStudent(studentId) {
-            alert(`Viewing student with ID: ${studentId}`);
-        }
-
-        function editStudent(studentId) {
-            alert(`Editing student with ID: ${studentId}`);
-        }
-
-        function removeStudent(studentId) {
-            if (confirm(`Are you sure you want to remove student with ID: ${studentId}?`)) {
-                alert(`Student with ID: ${studentId} has been removed.`);
-                // Here you would typically remove the student from the database
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            const modal = document.getElementById('courseModal');
+            const studentModal = document.getElementById('studentModal');
+            if (event.target === modal) {
+                closeCourseModal();
+            }
+            if (event.target === studentModal) {
+                closeStudentModal();
             }
         }
 
-        // Placeholder functions for course actions
-        function viewCourse(courseId) {
-            alert(`Viewing course with ID: ${courseId}`);
+        // Student Management Functions
+        const studentData = [
+            {
+                id: 'STU-001',
+                name: 'Emma Johnson',
+                email: 'emma.johnson@email.com',
+                phone: '+44 7123 456789',
+                courses: ['AS-APY-Y9-EL-BIOLOGY']
+            },
+            {
+                id: 'STU-002',
+                name: 'James Smith',
+                email: 'james.smith@email.com',
+                phone: '+44 7234 567890',
+                courses: ['AS-APY-Y9-EL-ENGLISH', 'AS-STY-Y7-DG-MATHS']
+            },
+            {
+                id: 'STU-003',
+                name: 'Sophie Chen',
+                email: 'sophie.chen@email.com',
+                phone: '+44 7345 678901',
+                courses: ['AS-APY-Y9-EL-FRENCH']
+            },
+            {
+                id: 'STU-004',
+                name: 'Michael Brown',
+                email: 'michael.brown@email.com',
+                phone: '+44 7456 789012',
+                courses: ['AS-APY-Y9-EL-PHYSICS', 'AS-STY-Y7-DG-SCIENCE']
+            }
+        ];
+
+        let currentStudentAction = '';
+
+        function openStudentModal(action) {
+            currentStudentAction = action;
+            const modal = document.getElementById('studentModal');
+            const modalTitle = document.getElementById('studentModalTitle');
+            const addForm = document.getElementById('addStudentForm');
+            const removeForm = document.getElementById('removeStudentForm');
+            
+            if (action === 'add') {
+                modalTitle.textContent = '添加学生到现有课程组';
+                addForm.style.display = 'block';
+                removeForm.style.display = 'none';
+            } else if (action === 'remove') {
+                modalTitle.textContent = '移除学生';
+                addForm.style.display = 'none';
+                removeForm.style.display = 'block';
+                // Reset remove form sections
+                document.getElementById('removeAllSection').style.display = 'none';
+                document.getElementById('removeSpecificSection').style.display = 'none';
+            }
+            
+            modal.style.display = 'block';
         }
 
-        function editCourse(courseId) {
-            alert(`Editing course with ID: ${courseId}`);
+        function closeStudentModal() {
+            const modal = document.getElementById('studentModal');
+            modal.style.display = 'none';
         }
 
-        // Placeholder functions for ticket actions
-        function viewTicket(ticketId) {
-            alert(`Viewing ticket with ID: ${ticketId}`);
+        function submitAddStudent() {
+            alert('学生添加功能将连接到Wix数据库进行处理');
+            closeStudentModal();
         }
 
-        function updateTicket(ticketId) {
-            alert(`Updating ticket with ID: ${ticketId}`);
+        function showRemoveAllCourses() {
+            document.getElementById('removeAllSection').style.display = 'block';
+            document.getElementById('removeSpecificSection').style.display = 'none';
+            populateStudentList();
         }
 
-        function resolveTicket(ticketId) {
-            if (confirm(`Are you sure you want to resolve ticket with ID: ${ticketId}?`)) {
-                alert(`Ticket with ID: ${ticketId} has been resolved.`);
-                // Here you would typically update the ticket status in the database
+        function showRemoveSpecificCourses() {
+            document.getElementById('removeAllSection').style.display = 'none';
+            document.getElementById('removeSpecificSection').style.display = 'block';
+            populateSpecificCourseList();
+        }
+
+        function populateStudentList() {
+            const studentList = document.getElementById('studentList');
+            studentList.innerHTML = '';
+            
+            studentData.forEach(student => {
+                const studentItem = createStudentItem(student);
+                studentList.appendChild(studentItem);
+            });
+        }
+
+        function createStudentItem(student) {
+            const item = document.createElement('div');
+            item.className = 'course-item';
+            item.innerHTML = `
+                <div class="course-info">
+                    <div class="course-header">
+                        <span class="class-id">${student.name}</span>
+                        <span class="qty-lessons">${student.courses.length} 门课程</span>
+                    </div>
+                    <div class="course-details">
+                        <div class="detail-row">
+                            <span class="label">学生ID:</span>
+                            <span class="value">${student.id}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">邮箱:</span>
+                            <span class="value">${student.email}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">课程:</span>
+                            <span class="value">${student.courses.join(', ')}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="course-actions">
+                    <button class="action-btn cancel-btn" 
+                            onclick="handleRemoveAllCourses('${student.id}')">
+                        <i class="fas fa-user-times"></i>
+                        移除所有课程
+                    </button>
+                </div>
+            `;
+            return item;
+        }
+
+        function populateSpecificCourseList() {
+            const courseList = document.getElementById('specificCourseList');
+            courseList.innerHTML = '';
+            
+            // Create a list of all courses with enrolled students
+            const coursesWithStudents = [];
+            studentData.forEach(student => {
+                student.courses.forEach(courseId => {
+                    const course = courseData.find(c => c.classId === courseId);
+                    if (course) {
+                        coursesWithStudents.push({
+                            courseId: courseId,
+                            courseName: course.subject,
+                            studentId: student.id,
+                            studentName: student.name
+                        });
+                    }
+                });
+            });
+            
+            coursesWithStudents.forEach(course => {
+                const courseItem = createSpecificCourseItem(course);
+                courseList.appendChild(courseItem);
+            });
+        }
+
+        function createSpecificCourseItem(course) {
+            const item = document.createElement('div');
+            item.className = 'course-item';
+            item.innerHTML = `
+                <div class="course-info">
+                    <div class="course-header">
+                        <span class="class-id">${course.courseId}</span>
+                        <span class="qty-lessons">${course.courseName}</span>
+                    </div>
+                    <div class="course-details">
+                        <div class="detail-row">
+                            <span class="label">学生:</span>
+                            <span class="value">${course.studentName}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">学生ID:</span>
+                            <span class="value">${course.studentId}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="course-actions">
+                    <button class="action-btn cancel-btn" 
+                            onclick="handleRemoveSpecificCourse('${course.studentId}', '${course.courseId}')">
+                        <i class="fas fa-times"></i>
+                        移除课程
+                    </button>
+                </div>
+            `;
+            return item;
+        }
+
+        function handleRemoveAllCourses(studentId) {
+            if (confirm(`确定要移除学生 ${studentId} 的所有课程吗？`)) {
+                alert(`学生 ${studentId} 的所有课程已被移除。`);
+                closeStudentModal();
+            }
+        }
+
+        function handleRemoveSpecificCourse(studentId, courseId) {
+            if (confirm(`确定要将学生 ${studentId} 从课程 ${courseId} 中移除吗？`)) {
+                alert(`学生 ${studentId} 已从课程 ${courseId} 中移除。`);
+                closeStudentModal();
             }
         }
 
         // Initialize the dashboard
         document.addEventListener('DOMContentLoaded', function() {
-            // You can add any initialization code here
+            // Any initialization code can go here
         });
     </script>
 </body>
