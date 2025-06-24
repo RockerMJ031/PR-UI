@@ -593,20 +593,20 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Student Name</th>
-                            <th>Program</th>
-                            <th>Amount</th>
                             <th>Date</th>
+                            <th>Student</th>
+                            <th>Description</th>
+                            <th>Amount</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Emma Thompson</td>
-                            <td>Full Time</td>
-                            <td>£1,200</td>
                             <td>2024-01-15</td>
+                            <td>Emma Johnson</td>
+                            <td>Biology Tutoring - January</td>
+                            <td>£280</td>
                             <td><span class="status-badge status-paid">Paid</span></td>
                             <td>
                                 <button class="btn btn-info" style="padding: 5px 10px; font-size: 0.8rem;">
@@ -616,23 +616,10 @@
                             </td>
                         </tr>
                         <tr>
-                            <td>James Wilson</td>
-                            <td>Part Time</td>
-                            <td>£35</td>
-                            <td>2024-01-14</td>
-                            <td><span class="status-badge status-paid">Paid</span></td>
-                            <td>
-                                <button class="btn btn-info" style="padding: 5px 10px; font-size: 0.8rem;">
-                                    <i class="fas fa-eye"></i>
-                                    View
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Sophie Davis</td>
-                            <td>Mental Health Program</td>
-                            <td>£149</td>
-                            <td>2024-01-13</td>
+                            <td>2024-01-12</td>
+                            <td>James Smith</td>
+                            <td>English & Maths - January</td>
+                            <td>£420</td>
                             <td><span class="status-badge status-pending">Pending</span></td>
                             <td>
                                 <button class="btn btn-info" style="padding: 5px 10px; font-size: 0.8rem;">
@@ -642,10 +629,10 @@
                             </td>
                         </tr>
                         <tr>
-                            <td>Michael Brown</td>
-                            <td>Foundation Program</td>
-                            <td>£850</td>
-                            <td>2024-01-12</td>
+                            <td>2024-01-08</td>
+                            <td>Sophie Chen</td>
+                            <td>French Tutoring - December</td>
+                            <td>£210</td>
                             <td><span class="status-badge status-overdue">Overdue</span></td>
                             <td>
                                 <button class="btn btn-info" style="padding: 5px 10px; font-size: 0.8rem;">
@@ -655,10 +642,23 @@
                             </td>
                         </tr>
                         <tr>
-                            <td>Olivia Johnson</td>
-                            <td>Academic Program</td>
-                            <td>£750</td>
-                            <td>2024-01-11</td>
+                            <td>2024-01-05</td>
+                            <td>Michael Brown</td>
+                            <td>Physics & Science - January</td>
+                            <td>£350</td>
+                            <td><span class="status-badge status-paid">Paid</span></td>
+                            <td>
+                                <button class="btn btn-info" style="padding: 5px 10px; font-size: 0.8rem;">
+                                    <i class="fas fa-eye"></i>
+                                    View
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2024-01-03</td>
+                            <td>Isabella Davis</td>
+                            <td>Mental Health Reading Program</td>
+                            <td>£149</td>
                             <td><span class="status-badge status-paid">Paid</span></td>
                             <td>
                                 <button class="btn btn-info" style="padding: 5px 10px; font-size: 0.8rem;">
@@ -670,76 +670,46 @@
                     </tbody>
                 </table>
             </div>
+
+            <!-- Payment Methods -->
+            <div class="pricing-section">
+                <h2 class="section-title">
+                    <i class="fas fa-credit-card"></i>
+                    Payment Information
+                </h2>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid var(--primary-color);">
+                        <h4 style="color: var(--primary-color); margin-bottom: 15px;">
+                            <i class="fas fa-university"></i>
+                            Bank Transfer
+                        </h4>
+                        <p><strong>Account Name:</strong> Purple Ruler Education</p>
+                        <p><strong>Sort Code:</strong> 12-34-56</p>
+                        <p><strong>Account Number:</strong> 12345678</p>
+                        <p><strong>Reference:</strong> Student Name + Invoice Number</p>
+                    </div>
+                    
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid var(--success-color);">
+                        <h4 style="color: var(--success-color); margin-bottom: 15px;">
+                            <i class="fas fa-mobile-alt"></i>
+                            Online Payment
+                        </h4>
+                        <p><strong>PayPal:</strong> payments@purpleruler.com</p>
+                        <p><strong>Stripe:</strong> Available on invoice</p>
+                        <p><strong>Direct Debit:</strong> Setup available</p>
+                        <p><strong>Card Payments:</strong> Visa, Mastercard accepted</p>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
     <script>
-        // Enhanced JavaScript for interactivity
+        // Add any JavaScript functionality here
         document.addEventListener('DOMContentLoaded', function() {
-            // Add click handlers for navigation links
-            const navLinks = document.querySelectorAll('.nav-link');
-            navLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    // Remove active class from all links
-                    navLinks.forEach(l => l.classList.remove('active'));
-                    // Add active class to clicked link
-                    this.classList.add('active');
-                    
-                    // 删除阻止导航的代码，允许正常跳转
-                });
-            });
-
-            // Add click handlers for buttons
-            const buttons = document.querySelectorAll('.btn');
-            buttons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const buttonText = this.textContent.trim();
-                    
-                    if (buttonText.includes('Generate Invoice')) {
-                        alert('Invoice generation feature coming soon!');
-                    } else if (buttonText.includes('Export Report')) {
-                        alert('Report export feature coming soon!');
-                    } else if (buttonText.includes('Add Student')) {
-                        alert('Student enrollment process will be implemented soon!');
-                    } else if (buttonText.includes('Subscribe')) {
-                        alert('Subscription process will be implemented soon!');
-                    } else if (buttonText.includes('Enroll Now')) {
-                        alert('Enrollment process will be implemented soon!');
-                    } else if (buttonText.includes('View')) {
-                        alert('Transaction details view coming soon!');
-                    }
-                });
-            });
-
-            // Add hover effects for pricing cards
-            const pricingCards = document.querySelectorAll('.pricing-card');
-            pricingCards.forEach(card => {
-                card.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-5px)';
-                });
-                
-                card.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0)';
-                });
-            });
-
-            // Add animation to stat cards
-            const statCards = document.querySelectorAll('.stat-card');
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.style.opacity = '1';
-                        entry.target.style.transform = 'translateY(0)';
-                    }
-                });
-            });
-
-            statCards.forEach(card => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
-                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-                observer.observe(card);
-            });
+            // Initialize any interactive elements
+            console.log('Finance page loaded successfully');
         });
     </script>
 </body>

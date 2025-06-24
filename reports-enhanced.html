@@ -571,10 +571,10 @@
                 <div class="report-card behaviour">
                     <div class="report-card-header">
                         <div class="icon">
-                            <i class="fas fa-user-check"></i>
+                            <i class="fas fa-clipboard-list"></i>
                         </div>
                         <h3>Behaviour Report</h3>
-                        <p>Student behaviour tracking and analysis</p>
+                        <p>Student behaviour tracking and interventions</p>
                     </div>
                     <div class="report-card-body">
                         <div class="report-info">
@@ -589,14 +589,14 @@
                     </div>
                 </div>
 
-                <!-- Teacher SCR Report (新增) -->
+                <!-- Teacher SCR Report -->
                 <div class="report-card teacher-scr">
                     <div class="report-card-header">
                         <div class="icon">
-                            <i class="fas fa-user-shield"></i>
+                            <i class="fas fa-chalkboard-teacher"></i>
                         </div>
                         <h3>Teacher SCR Report</h3>
-                        <p>DBS checks, safer recruitment & compliance</p>
+                        <p>Single Central Record for teaching staff</p>
                     </div>
                     <div class="report-card-body">
                         <div class="report-info">
@@ -615,22 +615,11 @@
     </div>
 
     <script>
-        // Mobile sidebar toggle
-        function toggleSidebar() {
-            const sidebar = document.querySelector('.sidebar');
-            sidebar.classList.toggle('open');
-        }
-
-        // Add mobile menu button if needed
-        if (window.innerWidth <= 768) {
-            const header = document.querySelector('.header');
-            const menuButton = document.createElement('button');
-            menuButton.innerHTML = '<i class="fas fa-bars"></i>';
-            menuButton.className = 'btn btn-secondary';
-            menuButton.onclick = toggleSidebar;
-            header.insertBefore(menuButton, header.firstChild);
-        }
+        // Add any JavaScript functionality here
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize any interactive elements
+            console.log('Reports page loaded successfully');
+        });
     </script>
 </body>
 </html>
-

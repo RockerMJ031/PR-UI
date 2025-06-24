@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+额bi<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -701,137 +701,29 @@
 
         .student-item:hover {
             border-color: var(--primary-color);
-            box-shadow: 0 4px 12px rgba(102, 51, 153, 0.1);
+            box-shadow: 0 4px 12px rgba(102, 51, 153, 0.15);
+            transform: translateY(-2px);
         }
 
-        .student-info {
-            flex: 1;
+        .student-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            border-radius: 8px 0 0 8px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
-        .student-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
+        .student-item:hover::before {
+            opacity: 1;
         }
 
-        .student-name {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-color);
-        }
-
-        .student-status {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            text-transform: uppercase;
-        }
-
-        .status-active {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status-pending {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .status-concern {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .status-inactive {
-            background: #e2e3e5;
-            color: #383d41;
-        }
-
-        .student-details {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-
-        .detail-row {
-            display: flex;
-            gap: 8px;
-        }
-
-        .detail-row .label {
-            font-weight: 500;
-            color: var(--text-light);
-            min-width: 80px;
-        }
-
-        .detail-row .value {
-            color: var(--text-color);
-        }
-
-        .student-actions {
-            margin-left: 20px;
-        }
-
-        .action-btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            min-width: 100px;
-            justify-content: center;
-        }
-
-        .add-btn {
-            background: var(--success-color);
-            color: white;
-        }
-
-        .add-btn:hover {
-            background: #218838;
-            transform: translateY(-1px);
-        }
-
-        .remove-btn {
-            background: var(--danger-color);
-            color: white;
-        }
-
-        .remove-btn:hover {
-            background: #c82333;
-            transform: translateY(-1px);
-        }
-
-        /* Pagination */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 25px;
-            gap: 10px;
-        }
-
-        .pagination button {
-            padding: 10px 15px;
-            border: 2px solid var(--border-color);
-            background: white;
-            color: var(--text-color);
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .pagination button:hover,
-        .pagination button.active {
-            background-color: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
+        .student-item {
+            position: relative;
         }
 
         /* Responsive Design */
@@ -853,7 +745,7 @@
             }
 
             .stats-overview {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: 1fr;
             }
 
             .filter-row {
@@ -861,8 +753,23 @@
                 align-items: stretch;
             }
 
-            .students-table-container {
-                overflow-x: auto;
+            .students-table {
+                font-size: 12px;
+            }
+
+            .students-table th,
+            .students-table td {
+                padding: 10px;
+            }
+
+            .student-info {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+
+            .action-buttons {
+                justify-content: center;
             }
 
             .modal-content {
@@ -870,30 +777,13 @@
                 margin: 5% auto;
             }
 
-            .modal-header {
-                padding: 15px 20px;
-            }
-
-            .search-bar {
-                padding: 15px 20px;
-            }
-
-            .student-list-container {
-                padding: 0 20px 20px;
-            }
-
-            .student-item {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 15px;
-            }
-
-            .student-actions {
-                margin-left: 0;
-            }
-
-            .student-details {
+            .form-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .remove-options {
+                flex-direction: column;
+                align-items: center;
             }
         }
     </style>
@@ -953,106 +843,84 @@
         </nav>
         
         <!-- Main Content -->
-        <div class="main-content">
+        <main class="main-content">
             <div class="header">
                 <h1>Student Management</h1>
                 <div class="header-actions">
-                    <button class="btn btn-success" id="addStudentsBtn">
-                        <i class="fas fa-plus"></i>
-                        Add Students
+                    <button class="btn btn-success" onclick="openStudentModal('add')">
+                        <i class="fas fa-user-plus"></i>
+                        Add Student
                     </button>
-                    <button class="btn btn-danger" id="removeStudentsBtn">
-                        <i class="fas fa-minus"></i>
-                        Remove Students
+                    <button class="btn btn-danger" onclick="openStudentModal('remove')">
+                        <i class="fas fa-user-minus"></i>
+                        Remove Student
                     </button>
                 </div>
             </div>
-            
+
             <!-- Stats Overview -->
             <div class="stats-overview">
                 <div class="stat-card">
-                    <div class="stat-number">248</div>
+                    <div class="stat-number">24</div>
                     <div class="stat-label">Total Students</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number">186</div>
+                    <div class="stat-number">18</div>
                     <div class="stat-label">Active Students</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number">42</div>
-                    <div class="stat-label">Pending Review</div>
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">Pending Approval</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number">7</div>
-                    <div class="stat-label">Leave Requests</div>
+                    <div class="stat-number">2</div>
+                    <div class="stat-label">Need Attention</div>
                 </div>
             </div>
-            
-            <!-- Filter Section (Search removed) -->
+
+            <!-- Filter Section -->
             <div class="filter-section">
                 <div class="filter-row">
                     <select class="filter-select" id="statusFilter">
-                        <option value="">All Statuses</option>
+                        <option value="">All Status</option>
                         <option value="active">Active</option>
                         <option value="pending">Pending</option>
-                        <option value="concern">Needs Help</option>
+                        <option value="concern">Need Attention</option>
                         <option value="inactive">Inactive</option>
                     </select>
                     
-                    <select class="filter-select" id="provisionFilter">
-                        <option value="">All Provisions</option>
-                        <option value="full-time">Full-time</option>
-                        <option value="part-time">Part-time</option>
-                        <option value="tutoring">Tutoring</option>
-                        <option value="mentoring">Mentoring</option>
-                        <option value="counseling">Counseling</option>
+                    <select class="filter-select" id="subjectFilter">
+                        <option value="">All Subjects</option>
+                        <option value="mathematics">Mathematics</option>
+                        <option value="english">English</option>
+                        <option value="science">Science</option>
+                        <option value="history">History</option>
                     </select>
                     
-                    <select class="filter-select" id="yearFilter">
-                        <option value="">All Year Groups</option>
-                        <option value="1">Year 1</option>
-                        <option value="2">Year 2</option>
-                        <option value="3">Year 3</option>
-                        <option value="4">Year 4</option>
-                        <option value="5">Year 5</option>
-                        <option value="6">Year 6</option>
-                        <option value="7">Year 7</option>
-                        <option value="8">Year 8</option>
-                        <option value="9">Year 9</option>
-                        <option value="10">Year 10</option>
-                        <option value="11">Year 11</option>
+                    <select class="filter-select" id="levelFilter">
+                        <option value="">All Levels</option>
+                        <option value="beginner">Beginner</option>
+                        <option value="intermediate">Intermediate</option>
+                        <option value="advanced">Advanced</option>
                     </select>
-                    
-                    <button class="btn btn-primary" id="applyFilters">
-                        <i class="fas fa-filter"></i>
-                        Apply Filters
-                    </button>
-                    
-                    <button class="btn btn-secondary" id="clearFilters">
-                        <i class="fas fa-times"></i>
-                        Clear
-                    </button>
                 </div>
             </div>
-            
+
             <!-- Students Table -->
             <div class="students-table-container">
                 <div class="table-header">
-                    <h3 class="table-title">All Students</h3>
-                    <div style="font-size: 14px; opacity: 0.9;">Showing 1-10 of 248 students</div>
+                    <h2 class="table-title">Student List</h2>
+                    <span>24 students total</span>
                 </div>
                 
                 <table class="students-table">
                     <thead>
                         <tr>
                             <th>Student</th>
-                            <th>Year Group</th>
-                            <th>Provision Type</th>
-                            <th>Start Date</th>
+                            <th>Subject</th>
+                            <th>Level</th>
+                            <th>Sessions</th>
                             <th>Status</th>
-                            <th>Attendance Ratio</th>
-                            <th>Qty of Leave Request</th>
-                            <th>Outstanding information Required</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -1060,123 +928,181 @@
                         <tr>
                             <td>
                                 <div class="student-info">
+                                    <div class="student-avatar">JD</div>
+                                    <div class="student-details">
+                                        <h4>John Doe</h4>
+                                        <p>john.doe@email.com</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Mathematics</td>
+                            <td>Intermediate</td>
+                            <td>12/20</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn leave-request-btn" title="Leave Request">
+                                        <i class="fas fa-calendar-times"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td>
+                                <div class="student-info">
                                     <div class="student-avatar">JS</div>
                                     <div class="student-details">
-                                        <h4>Jamie Smith</h4>
-                                        <p>jamie.smith@email.com</p>
+                                        <h4>Jane Smith</h4>
+                                        <p>jane.smith@email.com</p>
                                     </div>
                                 </div>
                             </td>
-                            <td>Year 10</td>
-                            <td>Full-time</td>
-                            <td>15 Sep 2023</td>
+                            <td>English</td>
+                            <td>Advanced</td>
+                            <td>8/15</td>
                             <td><span class="status-badge status-active">Active</span></td>
-                            <td>95%</td>
-                            <td>2</td>
-                            <td>Medical Certificate</td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="action-btn leave-request-btn" title="View Leave Request" onclick="viewLeaveRequest('STU001')">
+                                    <button class="action-btn leave-request-btn" title="Leave Request">
                                         <i class="fas fa-calendar-times"></i>
                                     </button>
                                 </div>
                             </td>
                         </tr>
+                        
                         <tr>
                             <td>
                                 <div class="student-info">
-                                    <div class="student-avatar">SJ</div>
+                                    <div class="student-avatar">MJ</div>
                                     <div class="student-details">
-                                        <h4>Sarah Johnson</h4>
-                                        <p>sarah.johnson@email.com</p>
+                                        <h4>Mike Johnson</h4>
+                                        <p>mike.johnson@email.com</p>
                                     </div>
                                 </div>
                             </td>
-                            <td>Year 9</td>
-                            <td>Tutoring</td>
-                            <td>03 Oct 2023</td>
-                            <td><span class="status-badge status-active">Active</span></td>
-                            <td>88%</td>
-                            <td>1</td>
-                            <td>None</td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="action-btn leave-request-btn" title="View Leave Request" onclick="viewLeaveRequest('STU002')">
-                                        <i class="fas fa-calendar-times"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="student-info">
-                                    <div class="student-avatar">MB</div>
-                                    <div class="student-details">
-                                        <h4>Michael Brown</h4>
-                                        <p>michael.brown@email.com</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>Year 6</td>
-                            <td>Mentoring</td>
-                            <td>22 Nov 2023</td>
-                            <td><span class="status-badge status-concern">Needs Help</span></td>
-                            <td>72%</td>
-                            <td>5</td>
-                            <td>Parent Meeting Required</td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="action-btn leave-request-btn" title="View Leave Request" onclick="viewLeaveRequest('STU003')">
-                                        <i class="fas fa-calendar-times"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="student-info">
-                                    <div class="student-avatar">EW</div>
-                                    <div class="student-details">
-                                        <h4>Emma Wilson</h4>
-                                        <p>emma.wilson@email.com</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>Year 11</td>
-                            <td>Counseling</td>
-                            <td>05 Jan 2024</td>
+                            <td>Science</td>
+                            <td>Beginner</td>
+                            <td>5/10</td>
                             <td><span class="status-badge status-pending">Pending</span></td>
-                            <td>92%</td>
-                            <td>0</td>
-                            <td>Enrollment Documents</td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="action-btn leave-request-btn" title="View Leave Request" onclick="viewLeaveRequest('STU004')">
+                                    <button class="action-btn leave-request-btn" title="Leave Request">
                                         <i class="fas fa-calendar-times"></i>
                                     </button>
                                 </div>
                             </td>
                         </tr>
+                        
                         <tr>
                             <td>
                                 <div class="student-info">
-                                    <div class="student-avatar">DL</div>
+                                    <div class="student-avatar">SW</div>
                                     <div class="student-details">
-                                        <h4>David Lee</h4>
-                                        <p>david.lee@email.com</p>
+                                        <h4>Sarah Wilson</h4>
+                                        <p>sarah.wilson@email.com</p>
                                     </div>
                                 </div>
                             </td>
-                            <td>Year 8</td>
-                            <td>Part-time</td>
-                            <td>12 Dec 2023</td>
+                            <td>History</td>
+                            <td>Intermediate</td>
+                            <td>15/20</td>
                             <td><span class="status-badge status-active">Active</span></td>
-                            <td>85%</td>
-                            <td>3</td>
-                            <td>None</td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="action-btn leave-request-btn" title="View Leave Request" onclick="viewLeaveRequest('STU005')">
+                                    <button class="action-btn leave-request-btn" title="Leave Request">
+                                        <i class="fas fa-calendar-times"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td>
+                                <div class="student-info">
+                                    <div class="student-avatar">AB</div>
+                                    <div class="student-details">
+                                        <h4>Alex Brown</h4>
+                                        <p>alex.brown@email.com</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Mathematics</td>
+                            <td>Advanced</td>
+                            <td>3/25</td>
+                            <td><span class="status-badge status-concern">Need Attention</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn leave-request-btn" title="Leave Request">
+                                        <i class="fas fa-calendar-times"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td>
+                                <div class="student-info">
+                                    <div class="student-avatar">LD</div>
+                                    <div class="student-details">
+                                        <h4>Lisa Davis</h4>
+                                        <p>lisa.davis@email.com</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>English</td>
+                            <td>Beginner</td>
+                            <td>7/12</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn leave-request-btn" title="Leave Request">
+                                        <i class="fas fa-calendar-times"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td>
+                                <div class="student-info">
+                                    <div class="student-avatar">TM</div>
+                                    <div class="student-details">
+                                        <h4>Tom Miller</h4>
+                                        <p>tom.miller@email.com</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Science</td>
+                            <td>Intermediate</td>
+                            <td>0/8</td>
+                            <td><span class="status-badge status-pending">Pending</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn leave-request-btn" title="Leave Request">
+                                        <i class="fas fa-calendar-times"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td>
+                                <div class="student-info">
+                                    <div class="student-avatar">EG</div>
+                                    <div class="student-details">
+                                        <h4>Emma Garcia</h4>
+                                        <p>emma.garcia@email.com</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>History</td>
+                            <td>Advanced</td>
+                            <td>18/20</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn leave-request-btn" title="Leave Request">
                                         <i class="fas fa-calendar-times"></i>
                                     </button>
                                 </div>
@@ -1184,150 +1110,129 @@
                         </tr>
                     </tbody>
                 </table>
-                
-                <!-- Pagination -->
-                <div class="pagination">
-                    <button>&laquo; Previous</button>
-                    <button class="active">1</button>
-                    <button>2</button>
-                    <button>3</button>
-                    <button>4</button>
-                    <button>5</button>
-                    <button>Next &raquo;</button>
-                </div>
             </div>
-        </div>
+        </main>
     </div>
 
-    <!-- Student Management Modal -->
+    <!-- Student Modal -->
     <div id="studentModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="studentModalTitle">Student Management</h2>
+                <h2 id="modalTitle">Add Student</h2>
                 <span class="close" onclick="closeStudentModal()">&times;</span>
             </div>
             <div class="modal-body">
-                <!-- Add Student Form -->
-                <div id="addStudentForm" style="display: none;">
-                    <div class="form-section">
-                        <h3>添加学生到现有课程组</h3>
-                        <p class="form-description">请填写学生基本信息和学术信息。如需注册新课程组，请使用课程注册功能。</p>
-                        
+                <!-- Add Student Section -->
+                <div id="addStudentSection" class="form-section">
+                    <h3>Add New Student</h3>
+                    <p class="form-description">Fill in the student details to add them to your mentoring program.</p>
+                    
+                    <form id="addStudentForm">
                         <div class="form-grid">
                             <div class="form-group">
-                                <label>学生姓名 *</label>
-                                <input type="text" id="studentName" placeholder="输入学生姓名" required>
+                                <label for="studentName">Full Name</label>
+                                <input type="text" id="studentName" name="studentName" required>
                             </div>
+                            
                             <div class="form-group">
-                                <label>学生邮箱 *</label>
-                                <input type="email" id="studentEmail" placeholder="输入学生邮箱" required>
+                                <label for="studentEmail">Email Address</label>
+                                <input type="email" id="studentEmail" name="studentEmail" required>
                             </div>
+                            
                             <div class="form-group">
-                                <label>联系电话</label>
-                                <input type="tel" id="studentPhone" placeholder="输入联系电话">
+                                <label for="studentPhone">Phone Number</label>
+                                <input type="tel" id="studentPhone" name="studentPhone">
                             </div>
+                            
                             <div class="form-group">
-                                <label>年级组 *</label>
-                                <select id="yearGroup" required>
-                                    <option value="">选择年级组</option>
-                                    <option value="Year 7">Year 7</option>
-                                    <option value="Year 8">Year 8</option>
-                                    <option value="Year 9">Year 9</option>
-                                    <option value="Year 10">Year 10</option>
-                                    <option value="Year 11">Year 11</option>
+                                <label for="studentSubject">Subject</label>
+                                <select id="studentSubject" name="studentSubject" required>
+                                    <option value="">Select Subject</option>
+                                    <option value="mathematics">Mathematics</option>
+                                    <option value="english">English</option>
+                                    <option value="science">Science</option>
+                                    <option value="history">History</option>
                                 </select>
                             </div>
+                            
                             <div class="form-group">
-                                <label>当前成绩</label>
-                                <input type="text" id="currentGrade" placeholder="输入当前成绩">
-                            </div>
-                            <div class="form-group">
-                                <label>SEND CODE</label>
-                                <input type="text" id="sendCode" placeholder="输入SEND CODE">
-                            </div>
-                            <div class="form-group">
-                                <label>考试委员会</label>
-                                <select id="examBoard">
-                                    <option value="">选择考试委员会</option>
-                                    <option value="AQA">AQA</option>
-                                    <option value="Edexcel">Edexcel</option>
-                                    <option value="OCR">OCR</option>
-                                    <option value="WJEC">WJEC</option>
-                                    <option value="CIE">CIE</option>
+                                <label for="studentLevel">Level</label>
+                                <select id="studentLevel" name="studentLevel" required>
+                                    <option value="">Select Level</option>
+                                    <option value="beginner">Beginner</option>
+                                    <option value="intermediate">Intermediate</option>
+                                    <option value="advanced">Advanced</option>
                                 </select>
                             </div>
+                            
                             <div class="form-group">
-                                <label>现有课程组 *</label>
-                                <select id="existingGroup" required>
-                                    <option value="">选择现有课程组</option>
-                                    <option value="AS-APY-Y9-EL-BIOLOGY">AS-APY-Y9-EL-BIOLOGY</option>
-                                    <option value="AS-APY-Y9-EL-ENGLISH">AS-APY-Y9-EL-ENGLISH</option>
-                                    <option value="AS-STY-Y7-DG-MATHS">AS-STY-Y7-DG-MATHS</option>
-                                    <option value="AS-APY-Y9-EL-FRENCH">AS-APY-Y9-EL-FRENCH</option>
-                                    <option value="AS-APY-Y9-EL-PHYSICS">AS-APY-Y9-EL-PHYSICS</option>
-                                </select>
+                                <label for="sessionCount">Number of Sessions</label>
+                                <input type="number" id="sessionCount" name="sessionCount" min="1" max="50" value="10">
                             </div>
                         </div>
                         
                         <div class="form-actions">
-                            <button type="button" class="btn btn-primary" onclick="submitAddStudent()">
-                                <i class="fas fa-plus"></i>
-                                添加学生
-                            </button>
-                            <button type="button" class="btn btn-secondary" onclick="closeStudentModal()">
-                                取消
-                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="closeStudentModal()">Cancel</button>
+                            <button type="submit" class="btn btn-success">Add Student</button>
                         </div>
-                        
-                        <div class="form-note">
-                            <p><strong>注意：</strong>如需为新课程组注册学生，请使用 <a href="#" onclick="alert('将跳转到课程注册页面')">课程注册</a> 功能。</p>
-                        </div>
+                    </form>
+                    
+                    <div class="form-note">
+                        <p><strong>Note:</strong> The student will receive an email invitation to join the mentoring program. They will need to accept the invitation before sessions can begin. <a href="#">Learn more about the invitation process</a>.</p>
                     </div>
                 </div>
                 
-                <!-- Remove Student Form -->
-                <div id="removeStudentForm" style="display: none;">
-                    <div class="form-section">
-                        <h3>移除学生选项</h3>
-                        <p class="form-description">请选择移除方式：移除学生的所有课程或仅移除特定课程。</p>
+                <!-- Remove Student Section -->
+                <div id="removeStudentSection" class="form-section" style="display: none;">
+                    <h3>Remove Student</h3>
+                    <p class="form-description">Choose how you would like to remove students from your program.</p>
+                    
+                    <div class="remove-options">
+                        <button class="btn btn-danger" onclick="showRemoveAllCourses()">Remove All Courses</button>
+                        <button class="btn btn-secondary" onclick="showRemoveSpecificCourses()">Remove Specific Courses</button>
+                    </div>
+                    
+                    <!-- Remove All Courses -->
+                    <div id="removeAllSection" style="display: none;">
+                        <h4>Remove All Courses</h4>
+                        <p class="form-description">This will remove all students from all courses. This action cannot be undone.</p>
                         
-                        <div class="remove-options">
-                            <button type="button" class="btn btn-danger" onclick="showRemoveAllCourses()">
-                                <i class="fas fa-user-times"></i>
-                                移除学生所有课程
-                            </button>
-                            <button type="button" class="btn btn-warning" onclick="showRemoveSpecificCourses()">
-                                <i class="fas fa-list"></i>
-                                移除特定课程
-                            </button>
+                        <div class="search-bar" style="position: relative;">
+                            <input type="text" id="searchAllStudents" placeholder="Search students...">
+                            <i class="fas fa-search"></i>
                         </div>
                         
-                        <!-- Remove All Courses Section -->
-                        <div id="removeAllSection" style="display: none;">
-                            <h4>移除学生所有课程</h4>
-                            <div class="search-bar">
-                                <input type="text" id="studentSearchInput" placeholder="搜索学生姓名或ID..." onkeyup="filterStudents()">
-                                <i class="fas fa-search"></i>
-                            </div>
-                            <div class="student-list-container">
-                                <div class="student-list" id="studentList">
-                                    <!-- Student items will be populated here -->
-                                </div>
+                        <div class="student-list-container">
+                            <div id="allStudentsList" class="student-list">
+                                <!-- Students will be populated here -->
                             </div>
                         </div>
                         
-                        <!-- Remove Specific Courses Section -->
-                        <div id="removeSpecificSection" style="display: none;">
-                            <h4>移除特定课程</h4>
-                            <div class="search-bar">
-                                <input type="text" id="courseSearchInput" placeholder="搜索课程ID、科目或学生..." onkeyup="filterSpecificCourses()">
-                                <i class="fas fa-search"></i>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="closeStudentModal()">Cancel</button>
+                            <button type="button" class="btn btn-danger" onclick="handleRemoveAllCourses()">Remove All Courses</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Remove Specific Courses -->
+                    <div id="removeSpecificSection" style="display: none;">
+                        <h4>Remove Specific Courses</h4>
+                        <p class="form-description">Select students and specific courses to remove.</p>
+                        
+                        <div class="search-bar" style="position: relative;">
+                            <input type="text" id="searchSpecificStudents" placeholder="Search students...">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        
+                        <div class="student-list-container">
+                            <div id="specificStudentsList" class="student-list">
+                                <!-- Students will be populated here -->
                             </div>
-                            <div class="student-list-container">
-                                <div class="student-list" id="specificCourseList">
-                                    <!-- Specific course items will be populated here -->
-                                </div>
-                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="closeStudentModal()">Cancel</button>
+                            <button type="button" class="btn btn-danger" onclick="handleRemoveSpecificCourse()">Remove Selected Courses</button>
                         </div>
                     </div>
                 </div>
@@ -1336,99 +1241,81 @@
     </div>
 
     <script>
-        // Filter functionality
-        document.getElementById('applyFilters').addEventListener('click', function() {
-            const statusFilter = document.getElementById('statusFilter').value;
-            const provisionFilter = document.getElementById('provisionFilter').value;
-            const yearFilter = document.getElementById('yearFilter').value;
-            
-            console.log('Applying filters:', {
-                status: statusFilter,
-                provision: provisionFilter,
-                year: yearFilter
-            });
-            
-            // Here you would implement the actual filtering logic
-            alert('Filters applied successfully!');
-        });
-
-        document.getElementById('clearFilters').addEventListener('click', function() {
-            document.getElementById('statusFilter').value = '';
-            document.getElementById('provisionFilter').value = '';
-            document.getElementById('yearFilter').value = '';
-            
-            console.log('Filters cleared');
-            alert('Filters cleared!');
-        });
-
-        // Sample student data for Add/Remove functionality
+        // Sample student data
         const studentData = [
             {
-                studentId: 'STU-001',
-                studentName: 'Emma Johnson',
-                yearGroup: 'Year 9',
-                provisionType: 'Full-time',
-                startDate: '2024-01-15',
-                status: 'Active'
+                id: 1,
+                name: "John Doe",
+                email: "john.doe@email.com",
+                phone: "+1 234 567 8901",
+                subject: "Mathematics",
+                level: "Intermediate",
+                sessions: "12/20",
+                status: "active",
+                courses: ["Algebra", "Geometry", "Calculus"]
             },
             {
-                studentId: 'STU-002',
-                studentName: 'James Smith',
-                yearGroup: 'Year 8',
-                provisionType: 'Part-time',
-                startDate: '2024-02-01',
-                status: 'Active'
+                id: 2,
+                name: "Jane Smith",
+                email: "jane.smith@email.com",
+                phone: "+1 234 567 8902",
+                subject: "English",
+                level: "Advanced",
+                sessions: "8/15",
+                status: "active",
+                courses: ["Literature", "Writing", "Grammar"]
             },
             {
-                studentId: 'STU-003',
-                studentName: 'Sophie Chen',
-                yearGroup: 'Year 10',
-                provisionType: 'Tutoring',
-                startDate: '2024-01-20',
-                status: 'Pending'
+                id: 3,
+                name: "Mike Johnson",
+                email: "mike.johnson@email.com",
+                phone: "+1 234 567 8903",
+                subject: "Science",
+                level: "Beginner",
+                sessions: "5/10",
+                status: "pending",
+                courses: ["Biology", "Chemistry"]
             },
             {
-                studentId: 'STU-004',
-                studentName: 'Michael Brown',
-                yearGroup: 'Year 7',
-                provisionType: 'Full-time',
-                startDate: '2024-03-01',
-                status: 'Active'
+                id: 4,
+                name: "Sarah Wilson",
+                email: "sarah.wilson@email.com",
+                phone: "+1 234 567 8904",
+                subject: "History",
+                level: "Intermediate",
+                sessions: "15/20",
+                status: "active",
+                courses: ["World History", "American History"]
             },
             {
-                studentId: 'STU-005',
-                studentName: 'Isabella Davis',
-                yearGroup: 'Year 11',
-                provisionType: 'Mentoring',
-                startDate: '2024-02-15',
-                status: 'Active'
-            },
-            {
-                studentId: 'STU-006',
-                studentName: 'Oliver Wilson',
-                yearGroup: 'Year 6',
-                provisionType: 'Counseling',
-                startDate: '2024-01-10',
-                status: 'Concern'
+                id: 5,
+                name: "Alex Brown",
+                email: "alex.brown@email.com",
+                phone: "+1 234 567 8905",
+                subject: "Mathematics",
+                level: "Advanced",
+                sessions: "3/25",
+                status: "concern",
+                courses: ["Advanced Calculus", "Statistics"]
             }
         ];
 
-        let currentStudentAction = '';
-
-        function openStudentModal(action) {
+        // Modal functions
+        function openStudentModal(type) {
             const modal = document.getElementById('studentModal');
-            const addForm = document.getElementById('addStudentForm');
-            const removeForm = document.getElementById('removeStudentForm');
+            const modalTitle = document.getElementById('modalTitle');
+            const addSection = document.getElementById('addStudentSection');
+            const removeSection = document.getElementById('removeStudentSection');
             
-            if (action === 'add') {
-                addForm.style.display = 'block';
-                removeForm.style.display = 'none';
-            } else if (action === 'remove') {
-                addForm.style.display = 'none';
-                removeForm.style.display = 'block';
-                // Hide both remove subsections initially
-                document.getElementById('removeAllSection').style.display = 'none';
-                document.getElementById('removeSpecificSection').style.display = 'none';
+            if (type === 'add') {
+                modalTitle.textContent = 'Add Student';
+                addSection.style.display = 'block';
+                removeSection.style.display = 'none';
+            } else if (type === 'remove') {
+                modalTitle.textContent = 'Remove Student';
+                addSection.style.display = 'none';
+                removeSection.style.display = 'block';
+                populateStudentList();
             }
             
             modal.style.display = 'block';
@@ -1437,119 +1324,70 @@
         function closeStudentModal() {
             const modal = document.getElementById('studentModal');
             modal.style.display = 'none';
+            
+            // Reset form
+            document.getElementById('addStudentForm').reset();
+            
+            // Hide remove sections
+            document.getElementById('removeAllSection').style.display = 'none';
+            document.getElementById('removeSpecificSection').style.display = 'none';
         }
 
-        // Submit add student form
-        function submitAddStudent() {
-            // Get form data
-            const formData = {
-                name: document.getElementById('studentName').value,
-                email: document.getElementById('studentEmail').value,
-                phone: document.getElementById('studentPhone').value,
-                yearGroup: document.getElementById('yearGroup').value,
-                currentGrade: document.getElementById('currentGrade').value,
-                sendCode: document.getElementById('sendCode').value,
-                examBoard: document.getElementById('examBoard').value,
-                existingGroup: document.getElementById('existingGroup').value
+        // Form submission
+        document.getElementById('addStudentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const studentData = {
+                name: formData.get('studentName'),
+                email: formData.get('studentEmail'),
+                phone: formData.get('studentPhone'),
+                subject: formData.get('studentSubject'),
+                level: formData.get('studentLevel'),
+                sessions: formData.get('sessionCount')
             };
             
-            // Validate required fields
-            if (!formData.name || !formData.email || !formData.existingGroup) {
-                alert('请填写所有必填字段');
-                return;
-            }
+            console.log('Adding student:', studentData);
             
-            // Here you would integrate with Wix to add the student
-            alert('学生添加功能将与Wix系统集成');
-            console.log('Adding student:', formData);
-            
-            // Close modal and reset form
+            // Here you would typically send the data to your backend
+            alert('Student added successfully!');
             closeStudentModal();
-            document.getElementById('addStudentForm').reset();
-        }
+        });
 
-        // Show remove all courses section
+        // Remove student functions
         function showRemoveAllCourses() {
             document.getElementById('removeAllSection').style.display = 'block';
             document.getElementById('removeSpecificSection').style.display = 'none';
-            populateRemoveAllStudentList();
+            populateStudentList('all');
         }
 
-        // Show remove specific courses section
         function showRemoveSpecificCourses() {
             document.getElementById('removeAllSection').style.display = 'none';
             document.getElementById('removeSpecificSection').style.display = 'block';
-            populateRemoveSpecificStudentList();
+            populateStudentList('specific');
         }
 
-        // Populate student list for remove all courses
-        function populateRemoveAllStudentList() {
-            const container = document.getElementById('studentList');
-            container.innerHTML = '';
+        function populateStudentList(type = 'all') {
+            const listContainer = type === 'all' ? 
+                document.getElementById('allStudentsList') : 
+                document.getElementById('specificStudentsList');
             
-            // Enhanced student data with course information
-            const enhancedStudentData = [
-                {
-                    id: 1,
-                    name: "Alice Johnson",
-                    email: "alice.johnson@email.com",
-                    phone: "07123456789",
-                    yearGroup: "Year 11",
-                    currentGrade: "B+",
-                    sendCode: "SEND001",
-                    examBoard: "AQA",
-                    status: "Active",
-                    courses: [
-                        { classId: "MATH101", subject: "Mathematics", futureLessons: 12 },
-                        { classId: "PHYS201", subject: "Physics", futureLessons: 8 }
-                    ]
-                },
-                {
-                    id: 2,
-                    name: "Bob Smith",
-                    email: "bob.smith@email.com",
-                    phone: "07987654321",
-                    yearGroup: "Year 12",
-                    currentGrade: "A-",
-                    sendCode: "SEND002",
-                    examBoard: "Edexcel",
-                    status: "Active",
-                    courses: [
-                        { classId: "CHEM301", subject: "Chemistry", futureLessons: 15 },
-                        { classId: "BIO401", subject: "Biology", futureLessons: 10 }
-                    ]
-                },
-                {
-                    id: 3,
-                    name: "Carol Davis",
-                    email: "carol.davis@email.com",
-                    phone: "07456789123",
-                    yearGroup: "Year 10",
-                    currentGrade: "A",
-                    sendCode: "SEND003",
-                    examBoard: "OCR",
-                    status: "Active",
-                    courses: [
-                        { classId: "ENG501", subject: "English Literature", futureLessons: 6 }
-                    ]
-                }
-            ];
+            listContainer.innerHTML = '';
             
-            enhancedStudentData.forEach(student => {
-                const studentItem = createRemoveAllStudentItem(student);
-                container.appendChild(studentItem);
+            studentData.forEach(student => {
+                const studentItem = createStudentItem(student, type);
+                listContainer.appendChild(studentItem);
             });
         }
 
-        // Create student item for remove all courses
-        function createRemoveAllStudentItem(student) {
+        function createStudentItem(student, type) {
             const div = document.createElement('div');
             div.className = 'student-item';
             div.innerHTML = `
                 <div class="student-info">
                     <div class="student-header">
                         <span class="student-name">${student.name}</span>
-                        <span class="student-status status-${student.status.toLowerCase()}">${student.status}</span>
+                        <span class="student-status status-${student.status}">${student.status}</span>
                     </div>
                     <div class="student-details">
                         <div class="detail-row">
@@ -1557,288 +1395,127 @@
                             <span class="value">${student.email}</span>
                         </div>
                         <div class="detail-row">
-                            <span class="label">Year Group:</span>
-                            <span class="value">${student.yearGroup}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="label">Current Grade:</span>
-                            <span class="value">${student.currentGrade}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="label">SEND Code:</span>
-                            <span class="value">${student.sendCode}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="label">Exam Board:</span>
-                            <span class="value">${student.examBoard}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="label">Total Courses:</span>
-                            <span class="value">${student.courses.length}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="student-actions">
-                    <button class="btn remove-btn" onclick="handleRemoveAllCourses(${student.id})">
-                        <i class="fas fa-user-times"></i>
-                        Remove All Courses
-                    </button>
-                </div>
-            `;
-            return div;
-        }
-
-        // Populate student list for remove specific courses
-        function populateRemoveSpecificStudentList() {
-            const container = document.getElementById('specificCourseList');
-            container.innerHTML = '';
-            
-            // Sample course data with student information
-            const courseData = [
-                {
-                    studentId: 1,
-                    studentName: "Alice Johnson",
-                    classId: "MATH101",
-                    subject: "Mathematics",
-                    futureLessons: 12
-                },
-                {
-                    studentId: 1,
-                    studentName: "Alice Johnson",
-                    classId: "PHYS201",
-                    subject: "Physics",
-                    futureLessons: 8
-                },
-                {
-                    studentId: 2,
-                    studentName: "Bob Smith",
-                    classId: "CHEM301",
-                    subject: "Chemistry",
-                    futureLessons: 15
-                },
-                {
-                    studentId: 2,
-                    studentName: "Bob Smith",
-                    classId: "BIO401",
-                    subject: "Biology",
-                    futureLessons: 10
-                },
-                {
-                    studentId: 3,
-                    studentName: "Carol Davis",
-                    classId: "ENG501",
-                    subject: "English Literature",
-                    futureLessons: 6
-                }
-            ];
-            
-            courseData.forEach(course => {
-                const courseItem = createSpecificCourseItem(course);
-                container.appendChild(courseItem);
-            });
-        }
-
-        // Create specific course item
-        function createSpecificCourseItem(course) {
-            const div = document.createElement('div');
-            div.className = 'student-item';
-            div.innerHTML = `
-                <div class="student-info">
-                    <div class="student-header">
-                        <span class="student-name">${course.studentName}</span>
-                        <span class="student-status">${course.classId}</span>
-                    </div>
-                    <div class="student-details">
-                        <div class="detail-row">
-                            <span class="label">Class ID:</span>
-                            <span class="value">${course.classId}</span>
-                        </div>
-                        <div class="detail-row">
                             <span class="label">Subject:</span>
-                            <span class="value">${course.subject}</span>
+                            <span class="value">${student.subject}</span>
                         </div>
                         <div class="detail-row">
-                            <span class="label">Future Lessons:</span>
-                            <span class="value">${course.futureLessons}</span>
+                            <span class="label">Level:</span>
+                            <span class="value">${student.level}</span>
                         </div>
                         <div class="detail-row">
-                            <span class="label">Student:</span>
-                            <span class="value">${course.studentName}</span>
+                            <span class="label">Sessions:</span>
+                            <span class="value">${student.sessions}</span>
                         </div>
+                        ${type === 'specific' ? `
+                        <div class="detail-row">
+                            <span class="label">Courses:</span>
+                            <span class="value">${student.courses.join(', ')}</span>
+                        </div>
+                        ` : ''}
                     </div>
                 </div>
                 <div class="student-actions">
-                    <button class="btn cancel-btn" onclick="handleRemoveSpecificCourse(${course.studentId}, '${course.classId}')">
-                        <i class="fas fa-times"></i>
+                    ${type === 'all' ? `
+                    <button class="btn btn-danger remove-btn" onclick="removeStudent(${student.id})">
+                        <i class="fas fa-trash"></i>
+                        Remove All
+                    </button>
+                    ` : `
+                    <button class="btn btn-danger remove-btn" onclick="removeSpecificCourse(${student.id})">
+                        <i class="fas fa-minus-circle"></i>
                         Remove Course
                     </button>
+                    `}
                 </div>
             `;
             return div;
-        }
-
-        // Handle remove all courses for a student
-        function handleRemoveAllCourses(studentId) {
-            if (confirm(`确定要移除该学生的所有课程吗？`)) {
-                // Here you would integrate with Wix to remove all courses
-                alert('移除所有课程功能将与Wix系统集成');
-                console.log('Removing all courses for student:', studentId);
-            }
-        }
-
-        // Handle remove specific course
-        function handleRemoveSpecificCourse(studentId, classId) {
-            if (confirm(`确定要移除课程 ${classId} 吗？`)) {
-                // Here you would integrate with Wix to remove specific course
-                alert('移除特定课程功能将与Wix系统集成');
-                console.log('Removing course:', classId, 'for student:', studentId);
-            }
         }
 
         // Filter functions
         function filterStudents() {
-            const searchTerm = document.getElementById('studentSearchInput').value.toLowerCase();
-            const container = document.getElementById('studentList');
-            const items = container.querySelectorAll('.student-item');
-            
-            items.forEach(item => {
-                const text = item.textContent.toLowerCase();
-                if (text.includes(searchTerm)) {
-                    item.style.display = 'flex';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
+            // Implementation for filtering students
+            console.log('Filtering students');
         }
 
         function filterSpecificCourses() {
-            const searchTerm = document.getElementById('courseSearchInput').value.toLowerCase();
-            const container = document.getElementById('specificCourseList');
-            const items = container.querySelectorAll('.student-item');
+            // Implementation for filtering specific courses
+            console.log('Filtering specific courses');
+        }
+
+        // Search functions
+        document.getElementById('searchAllStudents')?.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const studentItems = document.querySelectorAll('#allStudentsList .student-item');
             
-            items.forEach(item => {
-                const text = item.textContent.toLowerCase();
-                if (text.includes(searchTerm)) {
+            studentItems.forEach(item => {
+                const studentName = item.querySelector('.student-name').textContent.toLowerCase();
+                const studentEmail = item.querySelector('.detail-row .value').textContent.toLowerCase();
+                
+                if (studentName.includes(searchTerm) || studentEmail.includes(searchTerm)) {
                     item.style.display = 'flex';
                 } else {
                     item.style.display = 'none';
                 }
             });
-        }
+        });
 
-        function populateStudentList() {
-            const studentList = document.getElementById('studentList');
-            studentList.innerHTML = '';
-            
-            studentData.forEach(student => {
-                const studentItem = createStudentItem(student);
-                studentList.appendChild(studentItem);
-            });
-        }
-
-        function createStudentItem(student) {
-            const item = document.createElement('div');
-            item.className = 'student-item';
-            item.innerHTML = `
-                <div class="student-info">
-                    <div class="student-header">
-                        <span class="student-name">${student.studentName}</span>
-                        <span class="student-status status-${student.status.toLowerCase()}">${student.status}</span>
-                    </div>
-                    <div class="student-details">
-                        <div class="detail-row">
-                            <span class="label">Student ID:</span>
-                            <span class="value">${student.studentId}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="label">Year Group:</span>
-                            <span class="value">${student.yearGroup}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="label">Provision Type:</span>
-                            <span class="value">${student.provisionType}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="label">Start Date:</span>
-                            <span class="value">${student.startDate}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="student-actions">
-                    <button class="action-btn ${currentStudentAction === 'add' ? 'add-btn' : 'remove-btn'}" 
-                            onclick="handleStudentAction('${student.studentId}', '${currentStudentAction}')">
-                        <i class="fas ${currentStudentAction === 'add' ? 'fa-plus' : 'fa-minus'}"></i>
-                        ${currentStudentAction === 'add' ? 'Add' : 'Remove'}
-                    </button>
-                </div>
-            `;
-            return item;
-        }
-
-        function filterStudents() {
-            const searchTerm = document.getElementById('studentSearchInput').value.toLowerCase();
-            const studentItems = document.querySelectorAll('.student-item');
+        document.getElementById('searchSpecificStudents')?.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const studentItems = document.querySelectorAll('#specificStudentsList .student-item');
             
             studentItems.forEach(item => {
-                const text = item.textContent.toLowerCase();
-                if (text.includes(searchTerm)) {
-                    item.style.display = 'block';
+                const studentName = item.querySelector('.student-name').textContent.toLowerCase();
+                const studentEmail = item.querySelector('.detail-row .value').textContent.toLowerCase();
+                
+                if (studentName.includes(searchTerm) || studentEmail.includes(searchTerm)) {
+                    item.style.display = 'flex';
                 } else {
                     item.style.display = 'none';
                 }
             });
-        }
-
-        function handleStudentAction(studentId, action) {
-            if (action === 'add') {
-                // In real implementation, this would redirect to Wix form or API call
-                window.open('https://purpleruler.larksuite.com/share/base/form/shrus1sQDc4LW4xpAQvpThPAO1c', '_blank');
-            } else if (action === 'remove') {
-                // Handle student removal
-                if (confirm(`Are you sure you want to remove student ${studentId}?`)) {
-                    alert(`Student ${studentId} has been marked for removal.`);
-                    closeStudentModal();
-                }
-            }
-        }
-
-        // Action buttons
-        document.getElementById('addStudentsBtn').addEventListener('click', function() {
-            openStudentModal('add');
         });
 
-        document.getElementById('removeStudentsBtn').addEventListener('click', function() {
-            openStudentModal('remove');
-        });
-
-        // Close modal when clicking outside of it
-        window.onclick = function(event) {
-            const studentModal = document.getElementById('studentModal');
-            if (event.target === studentModal) {
+        // Remove functions
+        function handleRemoveAllCourses() {
+            if (confirm('Are you sure you want to remove all courses for all students? This action cannot be undone.')) {
+                console.log('Removing all courses for all students');
+                alert('All courses removed successfully!');
                 closeStudentModal();
             }
         }
 
-        // Leave request function
-        function viewLeaveRequest(studentId) {
-            alert(`Viewing leave request for student: ${studentId}`);
+        function handleRemoveSpecificCourse() {
+            if (confirm('Are you sure you want to remove the selected courses? This action cannot be undone.')) {
+                console.log('Removing specific courses');
+                alert('Selected courses removed successfully!');
+                closeStudentModal();
+            }
         }
 
-        // 删除第790-799行的整个代码块
-        // Navigation links
-        // document.querySelectorAll('.nav-link').forEach(link => {
-        //     link.addEventListener('click', function(e) {
-        //         e.preventDefault();
-        //         
-        //         // Remove active class from all links
-        //         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-        //         
-        //         // Add active class to clicked link
-        //         this.classList.add('active');
-        //         
-        //         console.log('Navigation clicked:', this.textContent.trim());
-        //     });
-        // });
+        function removeStudent(studentId) {
+            if (confirm('Are you sure you want to remove all courses for this student?')) {
+                console.log('Removing all courses for student:', studentId);
+                // Remove student logic here
+            }
+        }
+
+        function removeSpecificCourse(studentId) {
+            console.log('Removing specific course for student:', studentId);
+            // Remove specific course logic here
+        }
+
+        // Filter event listeners
+        document.getElementById('statusFilter').addEventListener('change', filterStudents);
+        document.getElementById('subjectFilter').addEventListener('change', filterStudents);
+        document.getElementById('levelFilter').addEventListener('change', filterStudents);
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('studentModal');
+            if (event.target === modal) {
+                closeStudentModal();
+            }
+        });
     </script>
 </body>
 </html>
