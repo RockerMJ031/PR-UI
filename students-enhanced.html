@@ -1,0 +1,1844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Students - Mentor Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #663399;
+            --primary-dark: #4a2570;
+            --primary-light: #8a5bb8;
+            --secondary-color: #f8f9fa;
+            --text-color: #333;
+            --text-light: #666;
+            --border-color: #e0e0e0;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+            --white: #ffffff;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+            --border-radius: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar - Using mentor-dashboard.html style */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .logo {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .nav-menu {
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            margin: 5px 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            border-right: 3px solid white;
+        }
+
+        .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .user-profile {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        /* Stats Cards */
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            border-left: 5px solid var(--primary-color);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background-color: white;
+            font-size: 14px;
+            min-width: 150px;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        /* Student Table */
+        .students-table-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 25px;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+        }
+
+        .table-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .students-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .students-table th {
+            text-align: left;
+            padding: 18px 20px;
+            background-color: #f8f9fa;
+            border-bottom: 2px solid var(--border-color);
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .students-table td {
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .students-table tr:hover {
+            background-color: rgba(102, 51, 153, 0.05);
+        }
+
+        .student-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .student-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .student-details h4 {
+            margin: 0;
+            font-size: 15px;
+            color: var(--text-color);
+            font-weight: 600;
+        }
+
+        .student-details p {
+            margin: 4px 0 0 0;
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-active {
+            background-color: rgba(40, 167, 69, 0.15);
+            color: var(--success-color);
+        }
+
+        .status-pending {
+            background-color: rgba(255, 193, 7, 0.15);
+            color: var(--warning-color);
+        }
+
+        .status-concern {
+            background-color: rgba(220, 53, 69, 0.15);
+            color: var(--danger-color);
+        }
+
+        .status-inactive {
+            background-color: rgba(108, 117, 125, 0.15);
+            color: #6c757d;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            color: white;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .leave-request-btn {
+            background-color: var(--info-color);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 2% auto;
+            padding: 0;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .close {
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+            transition: opacity 0.3s;
+        }
+
+        .close:hover {
+            opacity: 0.7;
+        }
+
+        .modal-body {
+            padding: 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .search-bar {
+            position: sticky;
+            top: 0;
+            background: white;
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--border-color);
+            z-index: 10;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .search-bar i {
+            position: absolute;
+            right: 45px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+
+        .student-list-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 30px 30px;
+        }
+
+        .student-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Form Styles */
+        .form-section {
+            padding: 20px;
+        }
+
+        .form-section h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .form-description {
+            color: var(--text-light);
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .form-note {
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--info-color);
+            padding: 15px;
+            border-radius: var(--border-radius);
+        }
+
+        .form-note p {
+            margin: 0;
+            color: var(--text-color);
+            font-size: 14px;
+        }
+
+        .form-note a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .form-note a:hover {
+            text-decoration: underline;
+        }
+
+        .remove-options {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .remove-options .btn {
+            min-width: 200px;
+            padding: 15px 25px;
+            font-size: 16px;
+        }
+
+        #removeAllSection h4,
+        #removeSpecificSection h4 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        /* Student Item Styles for Modal */
+        .student-item {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .student-item:hover {
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow);
+        }
+
+        .student-info {
+            flex: 1;
+        }
+
+        .student-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .student-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--text-color);
+        }
+
+        .student-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .student-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 8px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .detail-row .label {
+            font-weight: 600;
+            color: var(--text-light);
+            font-size: 13px;
+        }
+
+        .detail-row .value {
+            color: var(--text-color);
+            font-size: 13px;
+        }
+
+        .student-actions {
+            margin-left: 20px;
+        }
+
+        .add-btn {
+            background-color: var(--success-color);
+        }
+
+        .remove-btn {
+            background-color: var(--danger-color);
+        }
+
+        .cancel-btn {
+            background-color: var(--danger-color);
+        }
+
+        .extend-btn {
+            background-color: var(--info-color);
+        }
+
+        .student-item {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .student-item:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 12px rgba(102, 51, 153, 0.1);
+        }
+
+        .student-info {
+            flex: 1;
+        }
+
+        .student-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .student-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .student-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-concern {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-inactive {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .student-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .detail-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .detail-row .label {
+            font-weight: 500;
+            color: var(--text-light);
+            min-width: 80px;
+        }
+
+        .detail-row .value {
+            color: var(--text-color);
+        }
+
+        .student-actions {
+            margin-left: 20px;
+        }
+
+        .action-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 100px;
+            justify-content: center;
+        }
+
+        .add-btn {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .add-btn:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+
+        .remove-btn {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .remove-btn:hover {
+            background: #c82333;
+            transform: translateY(-1px);
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 25px;
+            gap: 10px;
+        }
+
+        .pagination button {
+            padding: 10px 15px;
+            border: 2px solid var(--border-color);
+            background: white;
+            color: var(--text-color);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pagination button:hover,
+        .pagination button.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .stats-overview {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .filter-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .students-table-container {
+                overflow-x: auto;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 5% auto;
+            }
+
+            .modal-header {
+                padding: 15px 20px;
+            }
+
+            .search-bar {
+                padding: 15px 20px;
+            }
+
+            .student-list-container {
+                padding: 0 20px 20px;
+            }
+
+            .student-item {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+            }
+
+            .student-actions {
+                margin-left: 0;
+            }
+
+            .student-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="logo">
+                <h2>Mentor Portal</h2>
+            </div>
+            
+            <div class="nav-menu">
+                <div class="nav-item">
+                    <a href="mentor-dashboard.html" class="nav-link">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Dashboard
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="students-enhanced.html" class="nav-link active">
+                        <i class="fas fa-users"></i>
+                        Students
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="sessions-enhanced.html" class="nav-link">
+                        <i class="fas fa-calendar-alt"></i>
+                        Sessions
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="reports-enhanced.html" class="nav-link">
+                        <i class="fas fa-chart-bar"></i>
+                        Reports
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="finance.html" class="nav-link">
+                        <i class="fas fa-pound-sign"></i>
+                        Finance
+                    </a>
+                </div>
+            </div>
+            
+            <div class="user-profile">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight: 600;">John Mentor</div>
+                        <div style="font-size: 0.8rem; opacity: 0.8;">Mentor</div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h1>Student Management</h1>
+                <div class="header-actions">
+                    <button class="btn btn-success" id="addStudentsBtn">
+                        <i class="fas fa-plus"></i>
+                        Add Students
+                    </button>
+                    <button class="btn btn-danger" id="removeStudentsBtn">
+                        <i class="fas fa-minus"></i>
+                        Remove Students
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Stats Overview -->
+            <div class="stats-overview">
+                <div class="stat-card">
+                    <div class="stat-number">248</div>
+                    <div class="stat-label">Total Students</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">186</div>
+                    <div class="stat-label">Active Students</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">42</div>
+                    <div class="stat-label">Pending Review</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">7</div>
+                    <div class="stat-label">Leave Requests</div>
+                </div>
+            </div>
+            
+            <!-- Filter Section (Search removed) -->
+            <div class="filter-section">
+                <div class="filter-row">
+                    <select class="filter-select" id="statusFilter">
+                        <option value="">All Statuses</option>
+                        <option value="active">Active</option>
+                        <option value="pending">Pending</option>
+                        <option value="concern">Needs Help</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                    
+                    <select class="filter-select" id="provisionFilter">
+                        <option value="">All Provisions</option>
+                        <option value="full-time">Full-time</option>
+                        <option value="part-time">Part-time</option>
+                        <option value="tutoring">Tutoring</option>
+                        <option value="mentoring">Mentoring</option>
+                        <option value="counseling">Counseling</option>
+                    </select>
+                    
+                    <select class="filter-select" id="yearFilter">
+                        <option value="">All Year Groups</option>
+                        <option value="1">Year 1</option>
+                        <option value="2">Year 2</option>
+                        <option value="3">Year 3</option>
+                        <option value="4">Year 4</option>
+                        <option value="5">Year 5</option>
+                        <option value="6">Year 6</option>
+                        <option value="7">Year 7</option>
+                        <option value="8">Year 8</option>
+                        <option value="9">Year 9</option>
+                        <option value="10">Year 10</option>
+                        <option value="11">Year 11</option>
+                    </select>
+                    
+                    <button class="btn btn-primary" id="applyFilters">
+                        <i class="fas fa-filter"></i>
+                        Apply Filters
+                    </button>
+                    
+                    <button class="btn btn-secondary" id="clearFilters">
+                        <i class="fas fa-times"></i>
+                        Clear
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Students Table -->
+            <div class="students-table-container">
+                <div class="table-header">
+                    <h3 class="table-title">All Students</h3>
+                    <div style="font-size: 14px; opacity: 0.9;">Showing 1-10 of 248 students</div>
+                </div>
+                
+                <table class="students-table">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Year Group</th>
+                            <th>Provision Type</th>
+                            <th>Start Date</th>
+                            <th>Status</th>
+                            <th>Attendance Ratio</th>
+                            <th>Qty of Leave Request</th>
+                            <th>Outstanding information Required</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="student-info">
+                                    <div class="student-avatar">JS</div>
+                                    <div class="student-details">
+                                        <h4>Jamie Smith</h4>
+                                        <p>jamie.smith@email.com</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Year 10</td>
+                            <td>Full-time</td>
+                            <td>15 Sep 2023</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>95%</td>
+                            <td>2</td>
+                            <td>Medical Certificate</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn leave-request-btn" title="View Leave Request" onclick="viewLeaveRequest('STU001')">
+                                        <i class="fas fa-calendar-times"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="student-info">
+                                    <div class="student-avatar">SJ</div>
+                                    <div class="student-details">
+                                        <h4>Sarah Johnson</h4>
+                                        <p>sarah.johnson@email.com</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Year 9</td>
+                            <td>Tutoring</td>
+                            <td>03 Oct 2023</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>88%</td>
+                            <td>1</td>
+                            <td>None</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn leave-request-btn" title="View Leave Request" onclick="viewLeaveRequest('STU002')">
+                                        <i class="fas fa-calendar-times"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="student-info">
+                                    <div class="student-avatar">MB</div>
+                                    <div class="student-details">
+                                        <h4>Michael Brown</h4>
+                                        <p>michael.brown@email.com</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Year 6</td>
+                            <td>Mentoring</td>
+                            <td>22 Nov 2023</td>
+                            <td><span class="status-badge status-concern">Needs Help</span></td>
+                            <td>72%</td>
+                            <td>5</td>
+                            <td>Parent Meeting Required</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn leave-request-btn" title="View Leave Request" onclick="viewLeaveRequest('STU003')">
+                                        <i class="fas fa-calendar-times"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="student-info">
+                                    <div class="student-avatar">EW</div>
+                                    <div class="student-details">
+                                        <h4>Emma Wilson</h4>
+                                        <p>emma.wilson@email.com</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Year 11</td>
+                            <td>Counseling</td>
+                            <td>05 Jan 2024</td>
+                            <td><span class="status-badge status-pending">Pending</span></td>
+                            <td>92%</td>
+                            <td>0</td>
+                            <td>Enrollment Documents</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn leave-request-btn" title="View Leave Request" onclick="viewLeaveRequest('STU004')">
+                                        <i class="fas fa-calendar-times"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="student-info">
+                                    <div class="student-avatar">DL</div>
+                                    <div class="student-details">
+                                        <h4>David Lee</h4>
+                                        <p>david.lee@email.com</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Year 8</td>
+                            <td>Part-time</td>
+                            <td>12 Dec 2023</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                            <td>85%</td>
+                            <td>3</td>
+                            <td>None</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn leave-request-btn" title="View Leave Request" onclick="viewLeaveRequest('STU005')">
+                                        <i class="fas fa-calendar-times"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <!-- Pagination -->
+                <div class="pagination">
+                    <button>&laquo; Previous</button>
+                    <button class="active">1</button>
+                    <button>2</button>
+                    <button>3</button>
+                    <button>4</button>
+                    <button>5</button>
+                    <button>Next &raquo;</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Management Modal -->
+    <div id="studentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="studentModalTitle">Student Management</h2>
+                <span class="close" onclick="closeStudentModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <!-- Add Student Form -->
+                <div id="addStudentForm" style="display: none;">
+                    <div class="form-section">
+                        <h3>添加学生到现有课程组</h3>
+                        <p class="form-description">请填写学生基本信息和学术信息。如需注册新课程组，请使用课程注册功能。</p>
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>学生姓名 *</label>
+                                <input type="text" id="studentName" placeholder="输入学生姓名" required>
+                            </div>
+                            <div class="form-group">
+                                <label>学生邮箱 *</label>
+                                <input type="email" id="studentEmail" placeholder="输入学生邮箱" required>
+                            </div>
+                            <div class="form-group">
+                                <label>联系电话</label>
+                                <input type="tel" id="studentPhone" placeholder="输入联系电话">
+                            </div>
+                            <div class="form-group">
+                                <label>年级组 *</label>
+                                <select id="yearGroup" required>
+                                    <option value="">选择年级组</option>
+                                    <option value="Year 7">Year 7</option>
+                                    <option value="Year 8">Year 8</option>
+                                    <option value="Year 9">Year 9</option>
+                                    <option value="Year 10">Year 10</option>
+                                    <option value="Year 11">Year 11</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>当前成绩</label>
+                                <input type="text" id="currentGrade" placeholder="输入当前成绩">
+                            </div>
+                            <div class="form-group">
+                                <label>SEND CODE</label>
+                                <input type="text" id="sendCode" placeholder="输入SEND CODE">
+                            </div>
+                            <div class="form-group">
+                                <label>考试委员会</label>
+                                <select id="examBoard">
+                                    <option value="">选择考试委员会</option>
+                                    <option value="AQA">AQA</option>
+                                    <option value="Edexcel">Edexcel</option>
+                                    <option value="OCR">OCR</option>
+                                    <option value="WJEC">WJEC</option>
+                                    <option value="CIE">CIE</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>现有课程组 *</label>
+                                <select id="existingGroup" required>
+                                    <option value="">选择现有课程组</option>
+                                    <option value="AS-APY-Y9-EL-BIOLOGY">AS-APY-Y9-EL-BIOLOGY</option>
+                                    <option value="AS-APY-Y9-EL-ENGLISH">AS-APY-Y9-EL-ENGLISH</option>
+                                    <option value="AS-STY-Y7-DG-MATHS">AS-STY-Y7-DG-MATHS</option>
+                                    <option value="AS-APY-Y9-EL-FRENCH">AS-APY-Y9-EL-FRENCH</option>
+                                    <option value="AS-APY-Y9-EL-PHYSICS">AS-APY-Y9-EL-PHYSICS</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-primary" onclick="submitAddStudent()">
+                                <i class="fas fa-plus"></i>
+                                添加学生
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="closeStudentModal()">
+                                取消
+                            </button>
+                        </div>
+                        
+                        <div class="form-note">
+                            <p><strong>注意：</strong>如需为新课程组注册学生，请使用 <a href="#" onclick="alert('将跳转到课程注册页面')">课程注册</a> 功能。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Remove Student Form -->
+                <div id="removeStudentForm" style="display: none;">
+                    <div class="form-section">
+                        <h3>移除学生选项</h3>
+                        <p class="form-description">请选择移除方式：移除学生的所有课程或仅移除特定课程。</p>
+                        
+                        <div class="remove-options">
+                            <button type="button" class="btn btn-danger" onclick="showRemoveAllCourses()">
+                                <i class="fas fa-user-times"></i>
+                                移除学生所有课程
+                            </button>
+                            <button type="button" class="btn btn-warning" onclick="showRemoveSpecificCourses()">
+                                <i class="fas fa-list"></i>
+                                移除特定课程
+                            </button>
+                        </div>
+                        
+                        <!-- Remove All Courses Section -->
+                        <div id="removeAllSection" style="display: none;">
+                            <h4>移除学生所有课程</h4>
+                            <div class="search-bar">
+                                <input type="text" id="studentSearchInput" placeholder="搜索学生姓名或ID..." onkeyup="filterStudents()">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <div class="student-list-container">
+                                <div class="student-list" id="studentList">
+                                    <!-- Student items will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Remove Specific Courses Section -->
+                        <div id="removeSpecificSection" style="display: none;">
+                            <h4>移除特定课程</h4>
+                            <div class="search-bar">
+                                <input type="text" id="courseSearchInput" placeholder="搜索课程ID、科目或学生..." onkeyup="filterSpecificCourses()">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <div class="student-list-container">
+                                <div class="student-list" id="specificCourseList">
+                                    <!-- Specific course items will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Filter functionality
+        document.getElementById('applyFilters').addEventListener('click', function() {
+            const statusFilter = document.getElementById('statusFilter').value;
+            const provisionFilter = document.getElementById('provisionFilter').value;
+            const yearFilter = document.getElementById('yearFilter').value;
+            
+            console.log('Applying filters:', {
+                status: statusFilter,
+                provision: provisionFilter,
+                year: yearFilter
+            });
+            
+            // Here you would implement the actual filtering logic
+            alert('Filters applied successfully!');
+        });
+
+        document.getElementById('clearFilters').addEventListener('click', function() {
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('provisionFilter').value = '';
+            document.getElementById('yearFilter').value = '';
+            
+            console.log('Filters cleared');
+            alert('Filters cleared!');
+        });
+
+        // Sample student data for Add/Remove functionality
+        const studentData = [
+            {
+                studentId: 'STU-001',
+                studentName: 'Emma Johnson',
+                yearGroup: 'Year 9',
+                provisionType: 'Full-time',
+                startDate: '2024-01-15',
+                status: 'Active'
+            },
+            {
+                studentId: 'STU-002',
+                studentName: 'James Smith',
+                yearGroup: 'Year 8',
+                provisionType: 'Part-time',
+                startDate: '2024-02-01',
+                status: 'Active'
+            },
+            {
+                studentId: 'STU-003',
+                studentName: 'Sophie Chen',
+                yearGroup: 'Year 10',
+                provisionType: 'Tutoring',
+                startDate: '2024-01-20',
+                status: 'Pending'
+            },
+            {
+                studentId: 'STU-004',
+                studentName: 'Michael Brown',
+                yearGroup: 'Year 7',
+                provisionType: 'Full-time',
+                startDate: '2024-03-01',
+                status: 'Active'
+            },
+            {
+                studentId: 'STU-005',
+                studentName: 'Isabella Davis',
+                yearGroup: 'Year 11',
+                provisionType: 'Mentoring',
+                startDate: '2024-02-15',
+                status: 'Active'
+            },
+            {
+                studentId: 'STU-006',
+                studentName: 'Oliver Wilson',
+                yearGroup: 'Year 6',
+                provisionType: 'Counseling',
+                startDate: '2024-01-10',
+                status: 'Concern'
+            }
+        ];
+
+        let currentStudentAction = '';
+
+        function openStudentModal(action) {
+            const modal = document.getElementById('studentModal');
+            const addForm = document.getElementById('addStudentForm');
+            const removeForm = document.getElementById('removeStudentForm');
+            
+            if (action === 'add') {
+                addForm.style.display = 'block';
+                removeForm.style.display = 'none';
+            } else if (action === 'remove') {
+                addForm.style.display = 'none';
+                removeForm.style.display = 'block';
+                // Hide both remove subsections initially
+                document.getElementById('removeAllSection').style.display = 'none';
+                document.getElementById('removeSpecificSection').style.display = 'none';
+            }
+            
+            modal.style.display = 'block';
+        }
+
+        function closeStudentModal() {
+            const modal = document.getElementById('studentModal');
+            modal.style.display = 'none';
+        }
+
+        // Submit add student form
+        function submitAddStudent() {
+            // Get form data
+            const formData = {
+                name: document.getElementById('studentName').value,
+                email: document.getElementById('studentEmail').value,
+                phone: document.getElementById('studentPhone').value,
+                yearGroup: document.getElementById('yearGroup').value,
+                currentGrade: document.getElementById('currentGrade').value,
+                sendCode: document.getElementById('sendCode').value,
+                examBoard: document.getElementById('examBoard').value,
+                existingGroup: document.getElementById('existingGroup').value
+            };
+            
+            // Validate required fields
+            if (!formData.name || !formData.email || !formData.existingGroup) {
+                alert('请填写所有必填字段');
+                return;
+            }
+            
+            // Here you would integrate with Wix to add the student
+            alert('学生添加功能将与Wix系统集成');
+            console.log('Adding student:', formData);
+            
+            // Close modal and reset form
+            closeStudentModal();
+            document.getElementById('addStudentForm').reset();
+        }
+
+        // Show remove all courses section
+        function showRemoveAllCourses() {
+            document.getElementById('removeAllSection').style.display = 'block';
+            document.getElementById('removeSpecificSection').style.display = 'none';
+            populateRemoveAllStudentList();
+        }
+
+        // Show remove specific courses section
+        function showRemoveSpecificCourses() {
+            document.getElementById('removeAllSection').style.display = 'none';
+            document.getElementById('removeSpecificSection').style.display = 'block';
+            populateRemoveSpecificStudentList();
+        }
+
+        // Populate student list for remove all courses
+        function populateRemoveAllStudentList() {
+            const container = document.getElementById('studentList');
+            container.innerHTML = '';
+            
+            // Enhanced student data with course information
+            const enhancedStudentData = [
+                {
+                    id: 1,
+                    name: "Alice Johnson",
+                    email: "alice.johnson@email.com",
+                    phone: "07123456789",
+                    yearGroup: "Year 11",
+                    currentGrade: "B+",
+                    sendCode: "SEND001",
+                    examBoard: "AQA",
+                    status: "Active",
+                    courses: [
+                        { classId: "MATH101", subject: "Mathematics", futureLessons: 12 },
+                        { classId: "PHYS201", subject: "Physics", futureLessons: 8 }
+                    ]
+                },
+                {
+                    id: 2,
+                    name: "Bob Smith",
+                    email: "bob.smith@email.com",
+                    phone: "07987654321",
+                    yearGroup: "Year 12",
+                    currentGrade: "A-",
+                    sendCode: "SEND002",
+                    examBoard: "Edexcel",
+                    status: "Active",
+                    courses: [
+                        { classId: "CHEM301", subject: "Chemistry", futureLessons: 15 },
+                        { classId: "BIO401", subject: "Biology", futureLessons: 10 }
+                    ]
+                },
+                {
+                    id: 3,
+                    name: "Carol Davis",
+                    email: "carol.davis@email.com",
+                    phone: "07456789123",
+                    yearGroup: "Year 10",
+                    currentGrade: "A",
+                    sendCode: "SEND003",
+                    examBoard: "OCR",
+                    status: "Active",
+                    courses: [
+                        { classId: "ENG501", subject: "English Literature", futureLessons: 6 }
+                    ]
+                }
+            ];
+            
+            enhancedStudentData.forEach(student => {
+                const studentItem = createRemoveAllStudentItem(student);
+                container.appendChild(studentItem);
+            });
+        }
+
+        // Create student item for remove all courses
+        function createRemoveAllStudentItem(student) {
+            const div = document.createElement('div');
+            div.className = 'student-item';
+            div.innerHTML = `
+                <div class="student-info">
+                    <div class="student-header">
+                        <span class="student-name">${student.name}</span>
+                        <span class="student-status status-${student.status.toLowerCase()}">${student.status}</span>
+                    </div>
+                    <div class="student-details">
+                        <div class="detail-row">
+                            <span class="label">Email:</span>
+                            <span class="value">${student.email}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Year Group:</span>
+                            <span class="value">${student.yearGroup}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Current Grade:</span>
+                            <span class="value">${student.currentGrade}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">SEND Code:</span>
+                            <span class="value">${student.sendCode}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Exam Board:</span>
+                            <span class="value">${student.examBoard}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Total Courses:</span>
+                            <span class="value">${student.courses.length}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="student-actions">
+                    <button class="btn remove-btn" onclick="handleRemoveAllCourses(${student.id})">
+                        <i class="fas fa-user-times"></i>
+                        Remove All Courses
+                    </button>
+                </div>
+            `;
+            return div;
+        }
+
+        // Populate student list for remove specific courses
+        function populateRemoveSpecificStudentList() {
+            const container = document.getElementById('specificCourseList');
+            container.innerHTML = '';
+            
+            // Sample course data with student information
+            const courseData = [
+                {
+                    studentId: 1,
+                    studentName: "Alice Johnson",
+                    classId: "MATH101",
+                    subject: "Mathematics",
+                    futureLessons: 12
+                },
+                {
+                    studentId: 1,
+                    studentName: "Alice Johnson",
+                    classId: "PHYS201",
+                    subject: "Physics",
+                    futureLessons: 8
+                },
+                {
+                    studentId: 2,
+                    studentName: "Bob Smith",
+                    classId: "CHEM301",
+                    subject: "Chemistry",
+                    futureLessons: 15
+                },
+                {
+                    studentId: 2,
+                    studentName: "Bob Smith",
+                    classId: "BIO401",
+                    subject: "Biology",
+                    futureLessons: 10
+                },
+                {
+                    studentId: 3,
+                    studentName: "Carol Davis",
+                    classId: "ENG501",
+                    subject: "English Literature",
+                    futureLessons: 6
+                }
+            ];
+            
+            courseData.forEach(course => {
+                const courseItem = createSpecificCourseItem(course);
+                container.appendChild(courseItem);
+            });
+        }
+
+        // Create specific course item
+        function createSpecificCourseItem(course) {
+            const div = document.createElement('div');
+            div.className = 'student-item';
+            div.innerHTML = `
+                <div class="student-info">
+                    <div class="student-header">
+                        <span class="student-name">${course.studentName}</span>
+                        <span class="student-status">${course.classId}</span>
+                    </div>
+                    <div class="student-details">
+                        <div class="detail-row">
+                            <span class="label">Class ID:</span>
+                            <span class="value">${course.classId}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Subject:</span>
+                            <span class="value">${course.subject}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Future Lessons:</span>
+                            <span class="value">${course.futureLessons}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Student:</span>
+                            <span class="value">${course.studentName}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="student-actions">
+                    <button class="btn cancel-btn" onclick="handleRemoveSpecificCourse(${course.studentId}, '${course.classId}')">
+                        <i class="fas fa-times"></i>
+                        Remove Course
+                    </button>
+                </div>
+            `;
+            return div;
+        }
+
+        // Handle remove all courses for a student
+        function handleRemoveAllCourses(studentId) {
+            if (confirm(`确定要移除该学生的所有课程吗？`)) {
+                // Here you would integrate with Wix to remove all courses
+                alert('移除所有课程功能将与Wix系统集成');
+                console.log('Removing all courses for student:', studentId);
+            }
+        }
+
+        // Handle remove specific course
+        function handleRemoveSpecificCourse(studentId, classId) {
+            if (confirm(`确定要移除课程 ${classId} 吗？`)) {
+                // Here you would integrate with Wix to remove specific course
+                alert('移除特定课程功能将与Wix系统集成');
+                console.log('Removing course:', classId, 'for student:', studentId);
+            }
+        }
+
+        // Filter functions
+        function filterStudents() {
+            const searchTerm = document.getElementById('studentSearchInput').value.toLowerCase();
+            const container = document.getElementById('studentList');
+            const items = container.querySelectorAll('.student-item');
+            
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function filterSpecificCourses() {
+            const searchTerm = document.getElementById('courseSearchInput').value.toLowerCase();
+            const container = document.getElementById('specificCourseList');
+            const items = container.querySelectorAll('.student-item');
+            
+            items.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function populateStudentList() {
+            const studentList = document.getElementById('studentList');
+            studentList.innerHTML = '';
+            
+            studentData.forEach(student => {
+                const studentItem = createStudentItem(student);
+                studentList.appendChild(studentItem);
+            });
+        }
+
+        function createStudentItem(student) {
+            const item = document.createElement('div');
+            item.className = 'student-item';
+            item.innerHTML = `
+                <div class="student-info">
+                    <div class="student-header">
+                        <span class="student-name">${student.studentName}</span>
+                        <span class="student-status status-${student.status.toLowerCase()}">${student.status}</span>
+                    </div>
+                    <div class="student-details">
+                        <div class="detail-row">
+                            <span class="label">Student ID:</span>
+                            <span class="value">${student.studentId}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Year Group:</span>
+                            <span class="value">${student.yearGroup}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Provision Type:</span>
+                            <span class="value">${student.provisionType}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Start Date:</span>
+                            <span class="value">${student.startDate}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="student-actions">
+                    <button class="action-btn ${currentStudentAction === 'add' ? 'add-btn' : 'remove-btn'}" 
+                            onclick="handleStudentAction('${student.studentId}', '${currentStudentAction}')">
+                        <i class="fas ${currentStudentAction === 'add' ? 'fa-plus' : 'fa-minus'}"></i>
+                        ${currentStudentAction === 'add' ? 'Add' : 'Remove'}
+                    </button>
+                </div>
+            `;
+            return item;
+        }
+
+        function filterStudents() {
+            const searchTerm = document.getElementById('studentSearchInput').value.toLowerCase();
+            const studentItems = document.querySelectorAll('.student-item');
+            
+            studentItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        function handleStudentAction(studentId, action) {
+            if (action === 'add') {
+                // In real implementation, this would redirect to Wix form or API call
+                window.open('https://purpleruler.larksuite.com/share/base/form/shrus1sQDc4LW4xpAQvpThPAO1c', '_blank');
+            } else if (action === 'remove') {
+                // Handle student removal
+                if (confirm(`Are you sure you want to remove student ${studentId}?`)) {
+                    alert(`Student ${studentId} has been marked for removal.`);
+                    closeStudentModal();
+                }
+            }
+        }
+
+        // Action buttons
+        document.getElementById('addStudentsBtn').addEventListener('click', function() {
+            openStudentModal('add');
+        });
+
+        document.getElementById('removeStudentsBtn').addEventListener('click', function() {
+            openStudentModal('remove');
+        });
+
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            const studentModal = document.getElementById('studentModal');
+            if (event.target === studentModal) {
+                closeStudentModal();
+            }
+        }
+
+        // Leave request function
+        function viewLeaveRequest(studentId) {
+            alert(`Viewing leave request for student: ${studentId}`);
+        }
+
+        // 删除第790-799行的整个代码块
+        // Navigation links
+        // document.querySelectorAll('.nav-link').forEach(link => {
+        //     link.addEventListener('click', function(e) {
+        //         e.preventDefault();
+        //         
+        //         // Remove active class from all links
+        //         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        //         
+        //         // Add active class to clicked link
+        //         this.classList.add('active');
+        //         
+        //         console.log('Navigation clicked:', this.textContent.trim());
+        //     });
+        // });
+    </script>
+</body>
+</html>
