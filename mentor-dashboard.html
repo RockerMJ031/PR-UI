@@ -712,6 +712,31 @@
 
             <!-- Action Sections -->
             <div class="action-sections">
+                <!-- Course Management Section - 移到第一个位置 -->
+                <div class="action-section">
+                    <h2 class="section-title">
+                        <i class="fas fa-graduation-cap"></i>
+                        Course Management
+                    </h2>
+                    <p class="section-description">
+                        Manage course extensions, cancellations and new courses
+                    </p>
+                    <div class="action-buttons">
+                        <a href="https://purpleruler.larksuite.com/share/base/form/shrus1sQDc4LW4xpAQvpThPAO1c" target="_blank" class="btn btn-success">
+                            <i class="fas fa-plus-circle"></i>
+                            Course Enrolment
+                        </a>
+                        <button class="btn btn-primary" onclick="openCourseModal('extend')">
+                            <i class="fas fa-plus"></i>
+                            Course Extension
+                        </button>
+                        <button class="btn btn-secondary" onclick="openCourseModal('cancel')">
+                            <i class="fas fa-times"></i>
+                            Cancel Course
+                        </button>
+                    </div>
+                </div>
+                
                 <!-- Tutoring Student Management Section -->
                 <div class="action-section">
                     <h2 class="section-title">
@@ -756,31 +781,6 @@
                         <button class="btn btn-warning" onclick="removeAPStudent()">
                             <i class="fas fa-minus"></i>
                             Remove Student
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Course Management Section -->
-                <div class="action-section">
-                    <h2 class="section-title">
-                        <i class="fas fa-graduation-cap"></i>
-                        Course Management
-                    </h2>
-                    <p class="section-description">
-                        Manage course extensions, cancellations and new courses
-                    </p>
-                    <div class="action-buttons">
-                        <a href="https://purpleruler.larksuite.com/share/base/form/shrus1sQDc4LW4xpAQvpThPAO1c" target="_blank" class="btn btn-success">
-                            <i class="fas fa-plus-circle"></i>
-                            Course Enrolment
-                        </a>
-                        <button class="btn btn-primary" onclick="openCourseModal('extend')">
-                            <i class="fas fa-plus"></i>
-                            Course Extension
-                        </button>
-                        <button class="btn btn-secondary" onclick="openCourseModal('cancel')">
-                            <i class="fas fa-times"></i>
-                            Cancel Course
                         </button>
                     </div>
                 </div>
@@ -1079,6 +1079,19 @@
                             <option value="support">SEN Support</option>
                             <option value="ehcp">EHCP</option>
                         </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="ehcpFile">EHCP Document Upload</label>
+                        <div class="file-upload-container">
+                            <input type="file" id="ehcpFile" name="ehcpFile" accept=".pdf,.doc,.docx,.txt" class="file-input">
+                            <label for="ehcpFile" class="file-upload-label">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span class="file-upload-text">Choose EHCP document or drag and drop</span>
+                            </label>
+                            <div class="file-upload-info">
+                                <small>Supported formats: PDF, DOC, DOCX, TXT (Max 10MB)</small>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="ehcpDetails">EHCP Details</label>
@@ -1611,9 +1624,30 @@
             return planNames[planType] || planType;
         }
         
-        // Initialize on page load
+        // File Upload Handler
         document.addEventListener('DOMContentLoaded', function() {
-            updateAPStudentCount();
+            const fileInput = document.getElementById('ehcpFile');
+            const fileUploadText = document.querySelector('.file-upload-text');
+            
+            if (fileInput) {
+                fileInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        // Check file size (10MB limit)
+                        if (file.size > 10 * 1024 * 1024) {
+                            alert('File size must be less than 10MB');
+                            fileInput.value = '';
+                            fileUploadText.textContent = 'Choose EHCP document or drag and drop';
+                            return;
+                        }
+                        
+                        // Update display text
+                        fileUploadText.textContent = `Selected: ${file.name}`;
+                    } else {
+                        fileUploadText.textContent = 'Choose EHCP document or drag and drop';
+                    }
+                });
+            }
         });
     </script>
 
@@ -2154,6 +2188,66 @@
             gap: 15px;
             justify-content: flex-end;
             margin-top: 30px;
+        }
+
+        /* File Upload Styles */
+        .file-upload-container {
+            position: relative;
+            margin-top: 8px;
+        }
+        
+        .file-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .file-upload-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 20px;
+            border: 2px dashed #d1d5db;
+            border-radius: 12px;
+            background: #f9fafb;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .file-upload-label:hover {
+            border-color: var(--primary-color);
+            background: #f3f4f6;
+        }
+        
+        .file-upload-label i {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .file-upload-text {
+            font-size: 1rem;
+            color: #374151;
+            font-weight: 500;
+        }
+        
+        .file-upload-info {
+            margin-top: 8px;
+            text-align: center;
+        }
+        
+        .file-upload-info small {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        
+        .file-input:focus + .file-upload-label {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 51, 153, 0.1);
         }
 
         /* Responsive Design for Modal */
