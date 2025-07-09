@@ -726,6 +726,114 @@
             position: relative;
         }
 
+        /* Highlight Modal Styles */
+        .highlight-content {
+            padding: 20px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+        
+        .highlight-section {
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+        }
+        
+        .highlight-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .highlight-section h3 {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .highlight-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 15px;
+            border-left: 4px solid;
+        }
+        
+        .highlight-item.positive {
+            background-color: rgba(40, 167, 69, 0.05);
+            border-left-color: var(--success-color);
+        }
+        
+        .highlight-item.attention {
+            background-color: rgba(220, 53, 69, 0.05);
+            border-left-color: var(--danger-color);
+        }
+        
+        .highlight-item.goal {
+            background-color: rgba(102, 51, 153, 0.05);
+            border-left-color: var(--primary-color);
+        }
+        
+        .highlight-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        
+        .highlight-item.positive .highlight-icon {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .highlight-item.attention .highlight-icon {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .highlight-item.goal .highlight-icon {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .highlight-text {
+            flex: 1;
+        }
+        
+        .highlight-text h4 {
+            margin: 0 0 8px 0;
+            font-size: 1rem;
+            color: var(--text-color);
+        }
+        
+        .highlight-text p {
+            margin: 0 0 8px 0;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+        
+        .highlight-date {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            font-style: italic;
+        }
+        
+        .modal-footer {
+            padding: 20px 30px;
+            background-color: #f8f9fa;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .sidebar {
@@ -941,8 +1049,8 @@
                             <td><span class="status-badge status-active">Active</span></td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="action-btn leave-request-btn" title="Leave Request">
-                                        <i class="fas fa-calendar-times"></i>
+                                    <button class="action-btn leave-request-btn" onclick="openStudentHighlight('John Doe')" title="View Weekly Highlights">
+                                        <i class="fas fa-star"></i>
                                     </button>
                                 </div>
                             </td>
@@ -964,8 +1072,8 @@
                             <td><span class="status-badge status-active">Active</span></td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="action-btn leave-request-btn" title="Leave Request">
-                                        <i class="fas fa-calendar-times"></i>
+                                    <button class="action-btn leave-request-btn" onclick="openStudentHighlight('Jane Smith')" title="View Weekly Highlights">
+                                        <i class="fas fa-star"></i>
                                     </button>
                                 </div>
                             </td>
@@ -987,8 +1095,8 @@
                             <td><span class="status-badge status-pending">Pending</span></td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="action-btn leave-request-btn" title="Leave Request">
-                                        <i class="fas fa-calendar-times"></i>
+                                    <button class="action-btn leave-request-btn" onclick="openStudentHighlight('Mike Johnson')" title="View Weekly Highlights">
+                                        <i class="fas fa-star"></i>
                                     </button>
                                 </div>
                             </td>
@@ -1010,8 +1118,8 @@
                             <td><span class="status-badge status-active">Active</span></td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="action-btn leave-request-btn" title="Leave Request">
-                                        <i class="fas fa-calendar-times"></i>
+                                    <button class="action-btn leave-request-btn" onclick="openStudentHighlight('Sarah Wilson')" title="View Weekly Highlights">
+                                        <i class="fas fa-star"></i>
                                     </button>
                                 </div>
                             </td>
@@ -1030,11 +1138,11 @@
                             <td>Mathematics</td>
                             <td>Advanced</td>
                             <td>3/25</td>
-                            <td><span class="status-badge status-concern">Need Attention</span></td>
+                            <td><span class="status-badge status-concern">NEEDS ATTENTION</span></td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="action-btn leave-request-btn" title="Leave Request">
-                                        <i class="fas fa-calendar-times"></i>
+                                    <button class="action-btn leave-request-btn" onclick="openStudentHighlight('Alex Brown')" title="View Weekly Highlights">
+                                        <i class="fas fa-star"></i>
                                     </button>
                                 </div>
                             </td>
@@ -1056,8 +1164,8 @@
                             <td><span class="status-badge status-active">Active</span></td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="action-btn leave-request-btn" title="Leave Request">
-                                        <i class="fas fa-calendar-times"></i>
+                                    <button class="action-btn leave-request-btn" onclick="openStudentHighlight('Lisa Davis')" title="View Weekly Highlights">
+                                        <i class="fas fa-star"></i>
                                     </button>
                                 </div>
                             </td>
@@ -1079,8 +1187,8 @@
                             <td><span class="status-badge status-pending">Pending</span></td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="action-btn leave-request-btn" title="Leave Request">
-                                        <i class="fas fa-calendar-times"></i>
+                                    <button class="action-btn leave-request-btn" onclick="openStudentHighlight('Tom Miller')" title="View Weekly Highlights">
+                                        <i class="fas fa-star"></i>
                                     </button>
                                 </div>
                             </td>
@@ -1102,8 +1210,8 @@
                             <td><span class="status-badge status-active">Active</span></td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="action-btn leave-request-btn" title="Leave Request">
-                                        <i class="fas fa-calendar-times"></i>
+                                    <button class="action-btn leave-request-btn" onclick="openStudentHighlight('Emma Garcia')" title="View Weekly Highlights">
+                                        <i class="fas fa-star"></i>
                                     </button>
                                 </div>
                             </td>
@@ -1236,6 +1344,93 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Highlight Modal -->
+    <div id="highlightModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="highlightStudentName">Student Weekly Highlights</h2>
+                <span class="close" onclick="closeHighlightModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="highlight-content">
+                    <div class="highlight-section">
+                        <h3><i class="fas fa-trophy"></i> Achievements This Week</h3>
+                        <div class="highlight-item positive">
+                            <div class="highlight-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="highlight-text">
+                                <h4>Improved Mathematics Performance</h4>
+                                <p>Showed significant improvement in algebra concepts, completing 85% of assignments correctly.</p>
+                                <span class="highlight-date">Monday, Dec 18</span>
+                            </div>
+                        </div>
+                        <div class="highlight-item positive">
+                            <div class="highlight-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="highlight-text">
+                                <h4>Excellent Collaboration</h4>
+                                <p>Demonstrated strong teamwork skills during group project presentations.</p>
+                                <span class="highlight-date">Wednesday, Dec 20</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="highlight-section">
+                        <h3><i class="fas fa-exclamation-triangle"></i> Areas Needing Attention</h3>
+                        <div class="highlight-item attention">
+                            <div class="highlight-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="highlight-text">
+                                <h4>Attendance Concerns</h4>
+                                <p>Missed 2 sessions this week. Follow-up with parent/guardian recommended.</p>
+                                <span class="highlight-date">This Week</span>
+                            </div>
+                        </div>
+                        <div class="highlight-item attention">
+                            <div class="highlight-icon">
+                                <i class="fas fa-book-open"></i>
+                            </div>
+                            <div class="highlight-text">
+                                <h4>Assignment Submission</h4>
+                                <p>Late submission of English essay. Additional support may be needed.</p>
+                                <span class="highlight-date">Friday, Dec 22</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="highlight-section">
+                        <h3><i class="fas fa-target"></i> Next Week Goals</h3>
+                        <div class="highlight-item goal">
+                            <div class="highlight-icon">
+                                <i class="fas fa-bullseye"></i>
+                            </div>
+                            <div class="highlight-text">
+                                <h4>Improve Attendance</h4>
+                                <p>Aim for 100% attendance next week with parent support.</p>
+                            </div>
+                        </div>
+                        <div class="highlight-item goal">
+                            <div class="highlight-icon">
+                                <i class="fas fa-pencil-alt"></i>
+                            </div>
+                            <div class="highlight-text">
+                                <h4>Complete Pending Assignments</h4>
+                                <p>Focus on catching up with English coursework and submit by Wednesday.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeHighlightModal()">Close</button>
+                <button class="btn btn-success" onclick="exportHighlights()">Export Report</button>
             </div>
         </div>
     </div>
@@ -1508,6 +1703,36 @@
         document.getElementById('statusFilter').addEventListener('change', filterStudents);
         document.getElementById('subjectFilter').addEventListener('change', filterStudents);
         document.getElementById('levelFilter').addEventListener('change', filterStudents);
+
+        // Student Highlight Modal Functions
+        function openStudentHighlight(studentName) {
+            const modal = document.getElementById('highlightModal');
+            const nameElement = document.getElementById('highlightStudentName');
+            nameElement.textContent = `${studentName} - Weekly Highlights`;
+            modal.style.display = 'block';
+        }
+        
+        function closeHighlightModal() {
+            const modal = document.getElementById('highlightModal');
+            modal.style.display = 'none';
+        }
+        
+        function exportHighlights() {
+            // In a real implementation, this would generate and download a report
+            alert('Highlight report exported successfully!');
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const highlightModal = document.getElementById('highlightModal');
+            const studentModal = document.getElementById('studentModal');
+            if (event.target === highlightModal) {
+                closeHighlightModal();
+            }
+            if (event.target === studentModal) {
+                closeStudentModal();
+            }
+        }
 
         // Close modal when clicking outside
         window.addEventListener('click', function(event) {
