@@ -106,6 +106,7 @@
   dateOfBirth: "date",
   enrollmentDate: "date", // 入学日期
   status: "string", // active, inactive, graduated, suspended
+  studentType: "string", // "alternative" (AP学生) 或 "tutoring" (普通辅导学生)
   grade: "string", // 年级
   school: "string", // 学校名称
   parentName: "string", // 家长姓名
@@ -118,12 +119,13 @@
   },
   medicalInfo: "text", // 医疗信息
   specialNeeds: "text", // 特殊需求
-  subjects: ["string"], // 学习科目
+  subject: "string", // 单个科目（普通学生）或课程分类（AP学生）
+  subjects: ["string"], // 学习科目列表（兼容性保留）
   currentMentor: "string", // 当前导师ID
   totalSessions: "number", // 总课程数
   attendanceRate: "number", // 出勤率
   averageGrade: "number", // 平均成绩
-  isAP: "boolean", // 是否AP学生
+  isAP: "boolean", // 是否AP学生（兼容性保留）
   _createdDate: "datetime",
   _updatedDate: "datetime"
 }
@@ -153,7 +155,7 @@
 ```
 
 ### APStudents 集合
-**使用页面**: 导师仪表盘（AP学生专用）  
+**使用页面**: 导师仪表盘（AP学生专用）、学生管理页面  
 **代码调用**: `wixData.query('APStudents')`
 
 ```javascript
@@ -172,6 +174,7 @@
   parentName: "string", // 家长姓名
   parentEmail: "string", // 家长邮箱
   parentPhone: "string", // 家长电话
+  curriculum: "string", // 课程分类: "Core Subjects", "Core Subjects + PSHE Careers + PE and Art", "All Subjects + Therapy", "Purple Ruler Blueprint"
   apCourses: ["string"], // AP课程列表
   apExamDates: [{
     subject: "string", // AP科目
@@ -189,6 +192,9 @@
   totalSessions: "number", // 总课程数
   attendanceRate: "number", // 出勤率
   averageGrade: "number", // 平均成绩
+  ehcpDocument: "string", // EHCP文档URL
+  medicalInfo: "text", // 医疗信息
+  specialNeeds: "text", // 特殊需求
   _createdDate: "datetime",
   _updatedDate: "datetime"
 }
@@ -362,14 +368,25 @@
   subjectId: "string", // 科目编号
   name: "string", // 科目名称
   description: "text", // 科目描述
-  category: "string", // 科目分类: STEM, Languages, Arts, Social_Studies
-  level: "string", // 级别: Elementary, Middle, High, University
+  category: "string", // 科目分类: STEM, Languages, Arts, Social_Studies, AP_Curriculum
+  level: "string", // 级别: Elementary, Middle, High, University, AP
+  studentType: "string", // 适用学生类型: "alternative", "tutoring", "both"
   isActive: "boolean", // 是否激活
   color: "string", // 显示颜色（用于日历等）
   icon: "string", // 图标URL
   _createdDate: "datetime",
   _updatedDate: "datetime"
 }
+
+// 预定义科目数据示例：
+// AP学生课程分类 (studentType: "alternative"):
+// - "Core Subjects"
+// - "Core Subjects + PSHE Careers + PE and Art"
+// - "All Subjects + Therapy"
+// - "Purple Ruler Blueprint"
+//
+// 普通辅导学生科目 (studentType: "tutoring"):
+// - "Mathematics", "English", "Science", "History", "Geography", "Art", "Physics", "Chemistry", "Biology"
 ```
 
 ---
@@ -881,6 +898,31 @@
 
 #### 特殊集合
 - ✅ `APStudents` - AP学生专用（已添加到配置）
+
+### UI分类展示建议
+
+基于用户反馈，建议在学生管理界面采用分类展示：
+
+#### 学生管理页面布局
+```
+学生管理
+├── 普通学生 (Students)
+│   ├── 学生列表
+│   ├── 添加学生
+│   └── 学生详情
+└── AP学生 (APStudents)
+    ├── AP学生列表
+    ├── 添加AP学生
+    ├── AP考试管理
+    ├── 升学指导
+    └── AP学生详情
+```
+
+#### 实现方式
+1. **标签页分离**: 使用Tab组件分别显示普通学生和AP学生
+2. **独立路由**: 为两种学生类型设置不同的页面路径
+3. **统一搜索**: 提供跨类型的全局学生搜索功能
+4. **数据统计**: 分别统计两种学生类型的数量和状态
 
 ### 命名一致性修正
 

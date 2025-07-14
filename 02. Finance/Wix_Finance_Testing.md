@@ -1,327 +1,326 @@
-# Wix Finance Dashboard Testing Guide
+# Purple Ruler Academy Finance Dashboard Testing Guide
 
 ## Table of Contents
 1. [Comprehensive Testing](#comprehensive-testing)
 2. [Common Issues and Solutions](#common-issues-and-solutions)
 3. [Performance Optimization](#performance-optimization)
+4. [Purple Ruler Specific Testing](#purple-ruler-specific-testing)
 
 ## Comprehensive Testing
 
 ### Database Testing
 
-#### Test Case 1: Payment Database Operations
-**Objective:** Verify payment data operations work correctly
+#### Test Case 1: Transaction Database Operations
+**Objective:** Verify transaction data operations work correctly
 **Steps:**
-1. Create new payment record
-2. Update payment status
-3. Delete payment record
-4. Test payment queries and filters
-5. Verify data integrity
+1. Create new transaction record
+2. Update transaction status (paid/pending/overdue)
+3. Delete transaction record
+4. Test transaction queries and filters
+5. Verify data integrity across curriculum types
 
-**Expected Result:** All payment operations successful, data consistent
+**Expected Result:** All transaction operations successful, data consistent
 **Pass/Fail:** ___
 
-#### Test Case 2: Invoice Management
-**Objective:** Test invoice creation and management
+#### Test Case 2: Curriculum Package Management
+**Objective:** Test curriculum package pricing and management
 **Steps:**
-1. Create new invoice with line items
-2. Update invoice status
-3. Generate invoice PDF
-4. Send invoice via email
-5. Mark invoice as paid
+1. Verify Core Subjects pricing (£135/week)
+2. Test Core Plus package (£162/week)
+3. Validate All Subjects + Therapy (£207/week)
+4. Check Purple Ruler Blueprint (£29.17/hour)
+5. Test package selection functionality
 
-**Expected Result:** Invoice lifecycle works correctly
+**Expected Result:** All curriculum packages function correctly with accurate pricing
 **Pass/Fail:** ___
 
-#### Test Case 3: Financial Calculations
-**Objective:** Verify accuracy of financial calculations
+#### Test Case 3: Financial Statistics Calculations
+**Objective:** Verify accuracy of financial statistics
 **Steps:**
-1. Test revenue calculations
-2. Verify expense totals
-3. Check profit margin calculations
-4. Test tax calculations
-5. Validate currency formatting
+1. Test total paid amount calculation (£12,450)
+2. Verify outstanding payments calculation (£2,340)
+3. Check overdue payments calculation (£890)
+4. Test active students count (45)
+5. Validate currency formatting (£ symbol)
 
-**Expected Result:** All calculations accurate and properly formatted
+**Expected Result:** All statistics accurate and properly formatted
 **Pass/Fail:** ___
 
-### Payment Processing Testing
+### Pricing Plan Testing
 
-#### Test Case 4: Payment Gateway Integration
-**Objective:** Test payment processing functionality
+#### Test Case 4: Plan Selection Functionality
+**Objective:** Test curriculum plan selection system
 **Steps:**
-1. Process test credit card payment
-2. Handle payment failures
-3. Test refund processing
-4. Verify payment confirmations
-5. Check transaction logging
+1. Click on Core Subjects plan card
+2. Verify visual selection feedback
+3. Test plan switching between different options
+4. Check notification system for plan selection
+5. Validate plan details display
 
-**Expected Result:** Payment processing works reliably
+**Expected Result:** Plan selection works smoothly with proper feedback
 **Pass/Fail:** ___
 
-#### Test Case 5: Payment Methods
-**Objective:** Test different payment methods
+#### Test Case 5: Payment Information Display
+**Objective:** Test payment methods information
 **Steps:**
-1. Test credit card payments
-2. Test bank transfer processing
-3. Test cash payment recording
-4. Test payment plan setup
-5. Verify payment method validation
+1. Verify bank transfer details display
+2. Test online payment options visibility
+3. Check payment information formatting
+4. Test responsive display on different devices
+5. Validate payment method descriptions
 
-**Expected Result:** All payment methods function correctly
+**Expected Result:** Payment information displays correctly
 **Pass/Fail:** ___
 
 ### Invoice Testing
 
 #### Test Case 6: Invoice Generation
-**Objective:** Test invoice creation and formatting
+**Objective:** Test invoice creation for curriculum packages
 **Steps:**
-1. Create invoice with multiple line items
-2. Apply discounts and taxes
-3. Generate PDF invoice
-4. Test invoice numbering sequence
-5. Verify invoice template formatting
+1. Select a curriculum plan
+2. Click "Generate Invoice" button
+3. Verify invoice data includes plan details
+4. Test invoice generation for different plans
+5. Check notification system feedback
 
-**Expected Result:** Invoices generate correctly with proper formatting
+**Expected Result:** Invoices generate correctly for selected plans
 **Pass/Fail:** ___
 
-#### Test Case 7: Invoice Delivery
-**Objective:** Test invoice sending functionality
+#### Test Case 7: Report Export Functionality
+**Objective:** Test financial report export
 **Steps:**
-1. Send invoice via email
-2. Test email template formatting
-3. Verify delivery confirmations
-4. Test reminder notifications
-5. Check bounce handling
+1. Click "Export Report" button
+2. Verify CSV file generation
+3. Check exported data accuracy
+4. Test file download functionality
+5. Validate CSV format and content
 
-**Expected Result:** Invoice delivery system works reliably
+**Expected Result:** Reports export correctly in CSV format
 **Pass/Fail:** ___
 
-### Financial Reporting Testing
+### Transaction Management Testing
 
-#### Test Case 8: Revenue Reports
-**Objective:** Test revenue reporting accuracy
+#### Test Case 8: Transaction Table Display
+**Objective:** Test transaction table functionality
 **Steps:**
-1. Generate monthly revenue report
-2. Test date range filtering
-3. Verify revenue categorization
-4. Check chart data accuracy
-5. Test report export functionality
+1. Verify transaction data display
+2. Test "View" button functionality
+3. Check transaction status indicators
+4. Test table responsiveness
+5. Validate transaction details popup
 
-**Expected Result:** Revenue reports are accurate and complete
+**Expected Result:** Transaction table displays and functions correctly
 **Pass/Fail:** ___
 
-#### Test Case 9: Expense Tracking
-**Objective:** Test expense management features
+#### Test Case 9: Student Type Classification
+**Objective:** Test student categorization features
 **Steps:**
-1. Record new expense
-2. Upload receipt attachment
-3. Categorize expenses
-4. Generate expense reports
-5. Test expense approval workflow
+1. Verify student type assignments
+2. Test filtering by student type
+3. Check curriculum package associations
+4. Test student data consistency
+5. Validate student management integration
 
-**Expected Result:** Expense tracking works correctly
+**Expected Result:** Student classification works correctly
 **Pass/Fail:** ___
 
 ### UI Testing
 
-#### Test Case 10: Financial Dashboard
-**Objective:** Test dashboard functionality
+#### Test Case 10: Financial Dashboard Layout
+**Objective:** Test dashboard visual elements
 **Steps:**
 1. Verify statistics cards display correctly
-2. Test chart interactions
-3. Check data table sorting and filtering
-4. Test responsive layout
-5. Verify real-time data updates
+2. Test pricing plan grid layout
+3. Check transaction table formatting
+4. Test responsive design on mobile/tablet
+5. Verify color scheme and branding
 
-**Expected Result:** Dashboard displays accurate financial data
+**Expected Result:** Dashboard displays with proper Purple Ruler branding
 **Pass/Fail:** ___
 
-#### Test Case 11: Form Validation
-**Objective:** Test financial form validation
+#### Test Case 11: Interactive Elements
+**Objective:** Test user interaction features
 **Steps:**
-1. Test payment amount validation
-2. Verify date field validation
-3. Test required field enforcement
-4. Check currency format validation
-5. Test file upload restrictions
+1. Test pricing card hover effects
+2. Verify button click responses
+3. Test notification system display
+4. Check modal/popup functionality
+5. Test keyboard navigation
 
-**Expected Result:** Form validation prevents invalid data entry
+**Expected Result:** All interactive elements respond correctly
 **Pass/Fail:** ___
 
 ### Security Testing
 
 #### Test Case 12: Access Control
-**Objective:** Test financial data security
+**Objective:** Test mentor and admin access permissions
 **Steps:**
-1. Test role-based access permissions
-2. Verify sensitive data encryption
-3. Test audit trail logging
-4. Check payment data protection
-5. Test session security
+1. Test mentor access to student financial data
+2. Test admin access to all financial reports
+3. Verify unauthorized access prevention
+4. Test session timeout handling
+5. Check audit trail for financial operations
 
-**Expected Result:** Financial data is properly secured
+**Expected Result:** Access control works as designed for Purple Ruler roles
 **Pass/Fail:** ___
 
-#### Test Case 13: Data Privacy
-**Objective:** Test privacy compliance
+#### Test Case 13: Student Data Privacy
+**Objective:** Test student financial data protection
 **Steps:**
-1. Verify PCI compliance for payments
-2. Test data anonymization
-3. Check data retention policies
-4. Test data export controls
-5. Verify consent management
+1. Verify student payment information security
+2. Test data encryption for transactions
+3. Check compliance with education data protection
+4. Test student data anonymization
+5. Verify parent/guardian access controls
 
-**Expected Result:** Privacy requirements are met
+**Expected Result:** Student financial data is properly protected
 **Pass/Fail:** ___
 
 ### Integration Testing
 
-#### Test Case 14: Accounting Software Integration
-**Objective:** Test external system integration
+#### Test Case 14: Student Management Integration
+**Objective:** Test integration with student management system
 **Steps:**
-1. Export data to accounting software
-2. Test data synchronization
-3. Verify data format compatibility
-4. Test error handling
-5. Check integration logs
+1. Test student data synchronization
+2. Verify curriculum package assignments
+3. Test session booking integration
+4. Check mentor assignment updates
+5. Verify student status changes
 
-**Expected Result:** Integration works seamlessly
+**Expected Result:** Student management integration works correctly
 **Pass/Fail:** ___
 
-#### Test Case 15: Bank Reconciliation
-**Objective:** Test bank reconciliation features
+#### Test Case 15: Mentor Dashboard Integration
+**Objective:** Test integration with mentor dashboard
 **Steps:**
-1. Import bank statements
-2. Match transactions automatically
-3. Handle unmatched transactions
-4. Generate reconciliation reports
-5. Test discrepancy resolution
+1. Test financial data visibility for mentors
+2. Verify session pricing updates
+3. Test student payment status display
+4. Check curriculum package information
+5. Verify mentor-specific financial views
 
-**Expected Result:** Bank reconciliation is accurate
+**Expected Result:** Mentor dashboard integration functions properly
 **Pass/Fail:** ___
 
 ## Common Issues and Solutions
 
-### Payment Processing Issues
+### Pricing Plan Issues
 
-#### Issue: Payment Gateway Connection Failed
-**Symptoms:** Payment processing errors, timeout messages
+#### Issue: Plan Selection Not Responding
+**Symptoms:** Pricing plan cards not responding to clicks
 **Possible Causes:**
-- Invalid API credentials
-- Network connectivity issues
-- Gateway service downtime
+- JavaScript event listeners not attached
+- CSS pointer-events disabled
+- Missing selectPlan() function
 
 **Solutions:**
-1. Verify API keys and credentials
-2. Check network connectivity
-3. Test with gateway sandbox environment
-4. Implement retry mechanisms
-5. Set up monitoring alerts
+1. Check JavaScript event listeners are properly attached
+2. Verify CSS pointer-events are not disabled
+3. Ensure selectPlan() function is defined
+4. Check for JavaScript errors in console
+5. Test plan selection functionality
 
-#### Issue: Payment Validation Errors
-**Symptoms:** Valid payments being rejected
+#### Issue: Incorrect Pricing Display
+**Symptoms:** Curriculum package prices showing incorrectly
 **Possible Causes:**
-- Incorrect validation rules
-- Currency format issues
-- Amount limit restrictions
+- Incorrect pricing data
+- Currency formatting issues
+- Data binding problems
 
 **Solutions:**
-1. Review validation logic
-2. Check currency formatting
-3. Verify amount limits
-4. Test with various payment amounts
-5. Update validation rules as needed
+1. Verify pricing data in curriculumPackages object
+2. Check currency formatting function
+3. Ensure proper data binding to UI elements
+4. Validate pricing calculation logic
+5. Test with different curriculum packages
 
-### Invoice Generation Issues
-
-#### Issue: Invoice PDF Generation Failed
-**Symptoms:** Blank or corrupted PDF files
+#### Issue: Transaction Status Updates
+**Symptoms:** Transaction status not updating properly
 **Possible Causes:**
-- Template formatting errors
-- Missing data fields
-- PDF library issues
+- Database connection issues
+- Incorrect update queries
+- Permission restrictions
 
 **Solutions:**
-1. Check invoice template syntax
-2. Verify all data fields are populated
-3. Test with minimal invoice data
-4. Update PDF generation library
-5. Implement error logging
+1. Check updateTransactionStatus() function
+2. Verify database connection and queries
+3. Ensure proper error handling
+4. Validate status change permissions
+5. Test transaction status workflows
 
-#### Issue: Invoice Numbering Conflicts
-**Symptoms:** Duplicate invoice numbers
+### Financial Statistics Issues
+
+#### Issue: Incorrect Statistics Display
+**Symptoms:** Financial statistics showing wrong values
 **Possible Causes:**
-- Concurrent invoice creation
-- Database transaction issues
-- Numbering sequence errors
+- Calculation function errors
+- Data source inaccuracy
+- Date range filtering issues
 
 **Solutions:**
-1. Implement atomic numbering operations
-2. Use database sequences
-3. Add unique constraints
-4. Test concurrent invoice creation
-5. Implement conflict resolution
+1. Verify calculation functions in JavaScript
+2. Check data source accuracy
+3. Ensure proper date range filtering
+4. Validate currency conversion logic
+5. Test with known data sets
 
-### Financial Calculation Issues
-
-#### Issue: Incorrect Revenue Calculations
-**Symptoms:** Revenue totals don't match individual payments
+#### Issue: Data Synchronization Problems
+**Symptoms:** Financial data not syncing with other systems
 **Possible Causes:**
-- Missing payment records
-- Incorrect date filtering
-- Currency conversion errors
+- API endpoint issues
+- Authentication failures
+- Data format incompatibility
 
 **Solutions:**
-1. Audit payment data completeness
-2. Verify date range calculations
-3. Check currency conversion rates
-4. Implement calculation validation
-5. Add reconciliation reports
+1. Check API endpoints and authentication
+2. Verify data format compatibility
+3. Implement proper error handling
+4. Add data validation before sync
+5. Test integration workflows
 
-#### Issue: Tax Calculation Errors
-**Symptoms:** Incorrect tax amounts on invoices
+#### Issue: Notification System Problems
+**Symptoms:** Notifications not displaying properly
 **Possible Causes:**
-- Outdated tax rates
-- Incorrect tax rules
-- Rounding errors
+- Missing notification function
+- CSS styling issues
+- Timing problems
 
 **Solutions:**
-1. Update tax rate tables
-2. Review tax calculation logic
-3. Implement proper rounding
-4. Test with various scenarios
-5. Add tax validation checks
+1. Check showNotification() function implementation
+2. Verify CSS styles for notification elements
+3. Ensure proper timing for notification display
+4. Add error handling for notification failures
+5. Test notification system thoroughly
 
-### Reporting Issues
+### Responsive Design Issues
 
-#### Issue: Report Data Inconsistency
-**Symptoms:** Different reports showing conflicting data
+#### Issue: Mobile Display Problems
+**Symptoms:** Dashboard not displaying correctly on mobile devices
 **Possible Causes:**
-- Different data sources
-- Timing differences
-- Caching issues
+- Missing media queries
+- Fixed width layouts
+- Touch interaction issues
 
 **Solutions:**
-1. Standardize data sources
-2. Implement consistent timestamps
-3. Clear report caches
-4. Add data validation checks
-5. Create master data reconciliation
+1. Check CSS media queries
+2. Verify responsive grid layouts
+3. Test on various screen sizes
+4. Implement proper touch interactions
+5. Optimize for mobile performance
 
-#### Issue: Slow Report Generation
-**Symptoms:** Reports take too long to generate
+#### Issue: Data Export Failures
+**Symptoms:** CSV export not working correctly
 **Possible Causes:**
-- Large datasets
-- Complex calculations
-- Inefficient queries
+- Export function errors
+- Data formatting issues
+- File download problems
 
 **Solutions:**
-1. Implement data pagination
-2. Optimize database queries
-3. Add report caching
-4. Use background processing
-5. Implement progress indicators
+1. Verify exportReport() function
+2. Check data formatting for CSV
+3. Ensure proper file download handling
+4. Add error handling for export failures
+5. Test export functionality across browsers
 
 ### Security Issues
 
@@ -355,86 +354,160 @@
 
 ## Performance Optimization
 
-### Database Optimization
+### Dashboard Performance
 
-#### Financial Data Indexing
-1. **Payment Indexes:** paymentDate, status, studentId
-2. **Invoice Indexes:** dueDate, status, studentId
-3. **Expense Indexes:** date, category
-4. **Composite Indexes:** For complex queries
+#### Loading Optimization
+- Implement lazy loading for transaction tables
+- Optimize pricing plan rendering
+- Cache curriculum package data
+- Minimize initial page load time
+- Use efficient DOM manipulation
 
-#### Query Optimization
-1. **Use Date Ranges:** Limit queries to specific periods
-2. **Implement Pagination:** For large financial datasets
-3. **Cache Calculations:** Store computed totals
-4. **Optimize Joins:** Minimize complex table joins
+#### Data Management
+- Optimize financial statistics calculations
+- Implement client-side caching
+- Efficient transaction filtering
+- Optimize student data queries
+- Monitor dashboard response times
 
 ### Frontend Optimization
 
-#### Chart Performance
-1. **Data Sampling:** Use representative data samples
-2. **Lazy Loading:** Load charts on demand
-3. **Caching:** Cache chart data
-4. **Optimization:** Use efficient chart libraries
+#### JavaScript Performance
+- Optimize selectPlan() function execution
+- Efficient notification system
+- Minimize DOM reflows
+- Optimize event listeners
+- Use efficient data structures
 
-#### Table Performance
-1. **Virtual Scrolling:** For large financial datasets
-2. **Server-side Filtering:** Reduce client-side processing
-3. **Pagination:** Limit rows per page
-4. **Sorting:** Implement efficient sorting algorithms
+#### User Experience
+- Fast plan selection feedback
+- Smooth hover animations
+- Quick notification display
+- Responsive table interactions
+- Efficient mobile performance
 
 ### Security Optimization
 
-#### Data Protection
-1. **Encryption:** Encrypt sensitive financial data
-2. **Access Control:** Implement fine-grained permissions
-3. **Audit Logging:** Track all financial operations
-4. **Compliance:** Maintain PCI DSS compliance
+#### Student Data Protection
+- Implement secure student financial data handling
+- Regular security audits for education compliance
+- Monitor mentor access patterns
+- Secure session management
+- Parent/guardian access controls
 
-#### Performance Monitoring
-1. **Payment Processing:** Monitor transaction times
-2. **Report Generation:** Track report performance
-3. **Database Queries:** Monitor query execution times
-4. **User Experience:** Track page load times
+#### Financial Data Security
+- Encrypt transaction data
+- Secure curriculum package pricing
+- Protected payment information
+- Secure API communications
+- Regular security updates
 
-### Testing Checklist
+## Purple Ruler Specific Testing
 
-#### Financial Operations
-- [ ] Payment processing works correctly
-- [ ] Invoice generation is accurate
-- [ ] Financial calculations are correct
-- [ ] Reporting data is consistent
-- [ ] Security controls are effective
-- [ ] Integration points function properly
-- [ ] Performance meets requirements
-- [ ] Error handling is robust
+### Curriculum Package Testing
+- [ ] Core Subjects pricing (£135/week) displays correctly
+- [ ] Core Plus package (£162/week) functions properly
+- [ ] All Subjects + Therapy (£207/week) works correctly
+- [ ] Purple Ruler Blueprint (£29.17/hour) calculates accurately
+- [ ] Plan selection system responds properly
+- [ ] Package descriptions display correctly
+- [ ] School-specific features work (badges, capacity, integration)
+- [ ] Hourly vs weekly billing calculations are accurate
 
-#### Compliance and Security
-- [ ] PCI DSS compliance maintained
-- [ ] Data privacy requirements met
-- [ ] Access controls properly configured
-- [ ] Audit trails are complete
-- [ ] Encryption is properly implemented
-- [ ] Security testing completed
+### Student Management Integration
+- [ ] Student data synchronization works
+- [ ] Curriculum assignments update correctly
+- [ ] Session booking integration functions
+- [ ] Mentor assignments reflect in finance
+- [ ] Student status changes update pricing
+
+### Financial Operations Testing
+- [ ] Transaction status updates work correctly
+- [ ] Payment information displays properly
+- [ ] Invoice generation functions for all plans
+- [ ] Report export works (CSV format)
+- [ ] Financial statistics calculate accurately
+- [ ] Currency formatting (£) displays correctly
+- [ ] Notification system works properly
+- [ ] Transaction table functions correctly
+- [ ] Payment methods information displays
+- [ ] Outstanding payments tracking works
+
+### Compliance and Security
+- [ ] Mentor access controls work properly
+- [ ] Student data protection is effective
+- [ ] Education data compliance met
+- [ ] Parent/guardian access controls function
+- [ ] Audit logs for financial operations complete
+- [ ] Session security works correctly
+- [ ] Data encryption functions properly
+- [ ] Privacy controls are effective
+- [ ] Backup procedures work
+- [ ] Security monitoring is active
 
 ### Automated Testing
 
 #### Unit Tests
-1. **Financial Calculations:** Test all calculation functions
-2. **Payment Processing:** Test payment workflows
-3. **Invoice Generation:** Test invoice creation logic
-4. **Data Validation:** Test input validation
+```javascript
+// Example unit tests for Purple Ruler finance
+describe('Curriculum Package Calculations', () => {
+  test('should calculate Core Subjects weekly rate', () => {
+    const rate = calculateWeeklyRate('core-subjects');
+    expect(rate).toBe(135);
+  });
+  
+  test('should calculate Purple Ruler Blueprint hourly rate', () => {
+    const rate = calculateHourlyRate('purple-ruler-blueprint');
+    expect(rate).toBe(29.17);
+  });
+});
+
+describe('Financial Statistics', () => {
+  test('should calculate total paid amount correctly', () => {
+    const total = calculateTotalPaid(sampleTransactions);
+    expect(total).toBe(12450);
+  });
+});
+```
 
 #### Integration Tests
-1. **Payment Gateway:** Test external payment processing
-2. **Accounting Software:** Test data synchronization
-3. **Email Delivery:** Test invoice sending
-4. **Report Generation:** Test end-to-end reporting
+```javascript
+// Example integration tests
+describe('Student Management Integration', () => {
+  test('should sync student data with finance', async () => {
+    const result = await syncWithStudentManagement();
+    expect(result.success).toBe(true);
+    expect(result.studentsUpdated).toBeGreaterThan(0);
+  });
+});
+
+describe('Plan Selection System', () => {
+  test('should select curriculum plan correctly', () => {
+    selectPlan('core-plus');
+    expect(selectedPlan).toBe('core-plus');
+    expect(document.querySelector('.selected')).toBeTruthy();
+  });
+});
+```
 
 #### Performance Tests
-1. **Load Testing:** Test with high transaction volumes
-2. **Stress Testing:** Test system limits
-3. **Endurance Testing:** Test long-running operations
-4. **Spike Testing:** Test sudden load increases
+```javascript
+// Example performance tests
+describe('Dashboard Performance', () => {
+  test('should load financial dashboard within 2 seconds', async () => {
+    const startTime = Date.now();
+    await loadFinancialData();
+    const loadTime = Date.now() - startTime;
+    expect(loadTime).toBeLessThan(2000);
+  });
+  
+  test('should update statistics quickly', () => {
+    const startTime = Date.now();
+    updateStatisticsCards();
+    const updateTime = Date.now() - startTime;
+    expect(updateTime).toBeLessThan(100);
+  });
+});
+```
 
 This comprehensive testing guide ensures the financial management system is reliable, secure, and performs well under various conditions.

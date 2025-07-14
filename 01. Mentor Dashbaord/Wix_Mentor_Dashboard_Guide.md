@@ -10,12 +10,13 @@
 ## Project Overview
 
 This guide will help you create a comprehensive mentor dashboard in Wix with the following features:
-- Student management system
-- Course management
-- AP student registration
-- Statistics display
-- Pricing plans
-- Lark integration notifications
+- **Course Management**: Course enrollment, extension, and cancellation
+- **Tutoring Student Management**: Add and remove tutoring students
+- **Alternative Provision (AP) Student Management**: Specialized AP student enrollment with curriculum selection
+- **Ticket Management**: Support ticket submission and tracking
+- **Statistics Display**: Real-time student counts and metrics
+- **Pricing Plans**: Four-tier curriculum selection for AP students
+- **Lark Integration**: External form integration for course enrollment and tickets
 
 **Important Note:** The original HTML file (`mentor-dashboard.html`) uses traditional HTML modals and CSS/JavaScript. In Wix, these popups will be implemented using **Wix Lightbox components** instead of custom HTML modals. This provides better integration with Wix's responsive design system and built-in functionality.
 
@@ -144,37 +145,39 @@ This guide will help you create a comprehensive mentor dashboard in Wix with the
    - Hover: `#f8f9fa`
    - Active: `#007bff` (white text)
 
-### Phase 4: Statistics Cards (30 minutes)
+### Phase 4: Student Type Toggle (20 minutes)
 
-#### Step 4.1: Create Statistics Grid
-1. **At top of main column add:** Add Elements → Layout → Grid
-2. **Grid Name:** `statisticsGrid`
-3. **Columns:** 4
-4. **Spacing:** 20px
-5. **Height:** 120px
+#### Step 4.1: Add Student Type Toggle
+1. **At top of main column add:** Student type toggle buttons
+2. **Tutoring Students Button:** `tutoringStudentsBtn`
+   - Text: "Tutoring Students"
+   - Background: #17a2b8 (info color)
+3. **Alternative Provision Students Button:** `apStudentsBtn`
+   - Text: "Alternative Provision Students"
+   - Background: #663399 (primary color)
 
 #### Step 4.2: Add Statistics Cards
-Create cards for each statistic:
+Create dynamic statistics cards that update based on student type:
 
 1. **Total Students Card:**
    - Container: `totalStudentsCard`
-   - Value Text: `totalStudentsValue` (Font: 24px, bold, color: #007bff)
+   - Value Text: `totalStudentsValue` (Font: 48px, bold)
    - Label Text: `totalStudentsLabel` ("Total Students")
 
 2. **Active Students Card:**
    - Container: `activeStudentsCard`
-   - Value Text: `activeStudentsValue` (Font: 24px, bold, color: #28a745)
+   - Value Text: `activeStudentsValue` (Font: 48px, bold)
    - Label Text: `activeStudentsLabel` ("Active Students")
 
-3. **Security Alerts Card:**
-   - Container: `securityAlertsCard`
-   - Value Text: `securityAlertsValue` (Font: 24px, bold, color: #dc3545)
-   - Label Text: `securityAlertsLabel` ("Security Alerts")
+3. **Pending Approval Card:**
+   - Container: `pendingApprovalCard`
+   - Value Text: `pendingApprovalValue` (Font: 48px, bold)
+   - Label Text: `pendingApprovalLabel` ("Pending Approval")
 
-4. **Pending Invoices Card:**
-   - Container: `pendingInvoicesCard`
-   - Value Text: `pendingInvoicesValue` (Font: 24px, bold, color: #ffc107)
-   - Label Text: `pendingInvoicesLabel` ("Pending Invoices")
+4. **Need Attention Card:**
+   - Container: `needAttentionCard`
+   - Value Text: `needAttentionValue` (Font: 48px, bold)
+   - Label Text: `needAttentionLabel` ("Need Attention")
 
 ### Phase 5: Action Cards (45 minutes)
 
@@ -190,14 +193,36 @@ Create cards for each statistic:
 1. **Course Management Card:**
    - Container: `courseManagementCard`
    - Title: "Course Management"
-   - Description: "Register, extend, or cancel courses"
-   - Button: `manageCourseBtn` ("Manage Courses")
+   - Description: "Manage course extensions, cancellations and new courses"
+   - Buttons:
+     - `courseEnrollmentBtn` ("Course Enrolment") - Links to Lark form
+     - `courseExtensionBtn` ("Course Extension")
+     - `cancelCourseBtn` ("Cancel Course")
 
-2. **Student Management Card:**
-   - Container: `studentManagementCard`
-   - Title: "Student Management"
-   - Description: "Add or remove students"
-   - Button Group:
+2. **Tutoring Student Management Card:**
+   - Container: `tutoringStudentCard`
+   - Title: "Tutoring Student"
+   - Description: "Manage tutoring student enrollment and sessions"
+   - Buttons:
+     - `addTutoringStudentBtn` ("Add Tutoring Student")
+     - `removeTutoringStudentBtn` ("Remove Student")
+
+3. **Alternative Provision Card:**
+   - Container: `apStudentCard`
+   - Title: "Alternative Provision"
+   - Description: "Manage AP students and specialized educational provision"
+   - AP Student Counter: `apStudentCount`
+   - Buttons:
+     - `addAPStudentBtn` ("Add AP Student")
+     - `removeAPStudentBtn` ("Remove Student")
+
+4. **Ticket Management Card:**
+   - Container: `ticketManagementCard`
+   - Title: "Ticket Management"
+   - Description: "Submit support tickets and check status"
+   - Buttons:
+     - `submitTicketBtn` ("Submit Ticket") - Links to Lark form
+     - `checkTicketStatusBtn` ("Check Status")
      - `addStudentBtn` ("Add Student")
      - `removeStudentBtn` ("Remove Student")
 

@@ -1,41 +1,148 @@
 /**
- * Wix Finance Dashboard - Complete Code Implementation
+ * Purple Ruler Academy Finance Dashboard - Complete Code Implementation
  * 
- * This file contains all the Velo code needed to implement the Finance Dashboard
- * including payment processing, invoice management, financial reporting, and integrations.
+ * This file contains all the JavaScript code needed to implement the Finance Dashboard
+ * for Purple Ruler Academy, including curriculum pricing management, student payment tracking,
+ * and transaction status monitoring.
  * 
  * USAGE INSTRUCTIONS:
- * 1. Copy the frontend code to your Wix page's code panel
- * 2. Copy the backend code to appropriate backend files
- * 3. Configure database collections as specified
- * 4. Set up payment gateway credentials
- * 5. Test all functionality before going live
+ * 1. Copy this code to your finance page's JavaScript section
+ * 2. Configure database collections as specified in the guide
+ * 3. Set up payment gateway credentials
+ * 4. Test all functionality before going live
  */
 
 // ==========================================
-// FRONTEND CODE (Page Code)
+// GLOBAL VARIABLES
 // ==========================================
 
-import wixData from 'wix-data';
-import wixLocation from 'wix-location';
-import { local } from 'wix-storage';
-import wixWindow from 'wix-window';
-
-// Global variables
-let currentUser = null;
 let financialData = {
-    payments: [],
-    invoices: [],
-    expenses: [],
-    statistics: {}
+    transactions: [],
+    students: [],
+    curriculumPackages: [],
+    statistics: {
+        totalPaid: 12450,
+        outstandingPayments: 2340,
+        overduePayments: 890,
+        activeStudents: 45
+    }
 };
+
+let selectedPlan = null;
+
+// Curriculum packages configuration
+const curriculumPackages = {
+    'core-subjects': {
+        name: 'Core Subjects',
+        weeklyRate: 135,
+        features: [
+            'Purple Ruler Academy online school',
+            'Individual tutoring sessions',
+            'Core subjects support',
+            'Personalized learning plans',
+            'Progress tracking',
+            'Regular assessments'
+        ],
+        curriculumProvider: 'Purple Ruler'
+    },
+    'core-plus': {
+        name: 'Core Subjects + PSHE Careers + PE and Art',
+        weeklyRate: 162,
+        features: [
+            'Purple Ruler Academy online school',
+            'Comprehensive tutoring program',
+            'All core subjects',
+            'PSHE and Careers guidance',
+            'Physical Education support',
+            'Art tutoring sessions'
+        ],
+        curriculumProvider: 'Purple Ruler'
+    },
+    'all-subjects': {
+        name: 'All Subjects + Therapy',
+        weeklyRate: 207,
+        features: [
+            'Purple Ruler Academy online school',
+            'Complete tutoring package',
+            'All academic subjects',
+            'Therapeutic support sessions',
+            'Mental health resources',
+            'Specialized interventions'
+        ],
+        curriculumProvider: 'Purple Ruler'
+    },
+    'blueprint': {
+        name: 'Purple Ruler Blueprint',
+        hourlyRate: 29.17,
+        studentCapacity: '1-6 students per session',
+        features: [
+            'Uses your school\'s curriculum',
+            'Student reintegration support',
+            'Curriculum alignment support',
+            'Teacher training resources',
+            'Progress monitoring tools',
+            'Flexible group sessions'
+        ],
+        curriculumProvider: 'School Curriculum',
+        targetAudience: 'Schools'
+    }
+};
+
+// Sample transaction data
+const sampleTransactions = [
+    {
+        id: 'TXN001',
+        date: '2024-01-15',
+        studentName: 'Emma Johnson',
+        description: 'Biology Tutoring - January',
+        amount: 280,
+        status: 'paid',
+        curriculumType: 'Core Subjects'
+    },
+    {
+        id: 'TXN002',
+        date: '2024-01-12',
+        studentName: 'James Smith',
+        description: 'English & Maths - January',
+        amount: 420,
+        status: 'pending',
+        curriculumType: 'Core Plus'
+    },
+    {
+        id: 'TXN003',
+        date: '2024-01-08',
+        studentName: 'Sophie Chen',
+        description: 'French Tutoring - December',
+        amount: 210,
+        status: 'overdue',
+        curriculumType: 'Core Subjects'
+    },
+    {
+        id: 'TXN004',
+        date: '2024-01-05',
+        studentName: 'Michael Brown',
+        description: 'Physics & Science - January',
+        amount: 350,
+        status: 'paid',
+        curriculumType: 'All Subjects'
+    },
+    {
+        id: 'TXN005',
+        date: '2024-01-03',
+        studentName: 'Isabella Davis',
+        description: 'Mental Health Reading Program',
+        amount: 149,
+        status: 'paid',
+        curriculumType: 'All Subjects + Therapy'
+    }
+];
 
 // ==========================================
 // PAGE INITIALIZATION
 // ==========================================
 
-$w.onReady(function () {
-    console.log('Finance Dashboard initializing...');
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Purple Ruler Academy Finance Dashboard initializing...');
     
     // Initialize page
     initializePage();
@@ -57,56 +164,54 @@ $w.onReady(function () {
 // ==========================================
 
 function initializePage() {
-    // Set page title
-    $w('#pageTitle').text = 'Financial Management';
+    // Load sample data
+    financialData.transactions = sampleTransactions;
     
-    // Initialize date filters
-    const today = new Date();
-    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    // Update statistics
+    updateStatisticsCards();
     
-    $w('#startDatePicker').value = firstDayOfMonth;
-    $w('#endDatePicker').value = today;
+    // Update transactions table
+    updateTransactionsTable();
     
-    // Hide loading indicators
-    $w('#loadingSpinner').hide();
+    // Initialize pricing plans
+    initializePricingPlans();
     
-    // Set initial tab
-    switchTab('payments');
+    console.log('Page initialized with sample data');
 }
 
 function setupEventHandlers() {
-    // Navigation buttons
-    $w('#paymentsTabBtn').onClick(() => switchTab('payments'));
-    $w('#invoicesTabBtn').onClick(() => switchTab('invoices'));
-    $w('#expensesTabBtn').onClick(() => switchTab('expenses'));
-    $w('#reportsTabBtn').onClick(() => switchTab('reports'));
+    // Header action buttons
+    const generateInvoiceBtn = document.querySelector('.btn-primary');
+    const exportReportBtn = document.querySelector('.btn-secondary');
     
-    // Action buttons
-    $w('#recordPaymentBtn').onClick(() => openPaymentModal());
-    $w('#createInvoiceBtn').onClick(() => openInvoiceModal());
-    $w('#addExpenseBtn').onClick(() => openExpenseModal());
-    $w('#generateReportBtn').onClick(() => generateFinancialReport());
+    if (generateInvoiceBtn) {
+        generateInvoiceBtn.addEventListener('click', generateInvoice);
+    }
     
-    // Filter controls
-    $w('#startDatePicker').onChange(() => applyDateFilter());
-    $w('#endDatePicker').onChange(() => applyDateFilter());
-    $w('#statusFilter').onChange(() => applyStatusFilter());
-    $w('#searchInput').onInput(() => applySearchFilter());
+    if (exportReportBtn) {
+        exportReportBtn.addEventListener('click', exportReport);
+    }
     
-    // Modal close buttons
-    $w('#closePaymentModal').onClick(() => hideAllModals());
-    $w('#closeInvoiceModal').onClick(() => hideAllModals());
-    $w('#closeExpenseModal').onClick(() => hideAllModals());
+    // Transaction table view buttons
+    const viewButtons = document.querySelectorAll('.table .btn-info');
+    viewButtons.forEach((btn, index) => {
+        btn.addEventListener('click', () => viewTransactionDetails(index));
+    });
     
-    // Form submit buttons
-    $w('#submitPaymentBtn').onClick(() => submitPayment());
-    $w('#submitInvoiceBtn').onClick(() => submitInvoice());
-    $w('#submitExpenseBtn').onClick(() => submitExpense());
-    
-    // Table action buttons
-    $w('#paymentsTable').onRowSelect(() => handlePaymentSelection());
-    $w('#invoicesTable').onRowSelect(() => handleInvoiceSelection());
-    $w('#expensesTable').onRowSelect(() => handleExpenseSelection());
+    console.log('Event handlers set up successfully');
+}
+
+function initializePricingPlans() {
+    // Add click handlers to pricing cards
+    const pricingCards = document.querySelectorAll('.pricing-card');
+    pricingCards.forEach(card => {
+        card.addEventListener('click', function() {
+            const planType = this.getAttribute('onclick')?.match(/selectPlan\('([^']+)'\)/)?.[1];
+            if (planType) {
+                selectPlan(planType);
+            }
+        });
+    });
 }
 
 // ==========================================
@@ -114,108 +219,34 @@ function setupEventHandlers() {
 // ==========================================
 
 function loadFinancialData() {
-    $w('#loadingSpinner').show();
+    // In a real implementation, this would fetch data from the backend
+    // For now, we'll use the sample data
     
-    Promise.all([
-        loadPayments(),
-        loadInvoices(),
-        loadExpenses(),
-        calculateStatistics()
-    ])
-    .then(() => {
-        updateDashboard();
-        $w('#loadingSpinner').hide();
-    })
-    .catch((error) => {
-        console.error('Error loading financial data:', error);
-        showMessage('Error loading financial data', 'error');
-        $w('#loadingSpinner').hide();
-    });
-}
-
-function loadPayments() {
-    const startDate = $w('#startDatePicker').value;
-    const endDate = $w('#endDatePicker').value;
-    
-    return wixData.query('Payments')
-        .ge('paymentDate', startDate)
-        .le('paymentDate', endDate)
-        .descending('paymentDate')
-        .find()
-        .then((results) => {
-            financialData.payments = results.items;
-            updatePaymentsTable();
-            return results.items;
+    Promise.resolve()
+        .then(() => {
+            updateDashboard();
+            console.log('Financial data loaded successfully');
+        })
+        .catch((error) => {
+            console.error('Error loading financial data:', error);
+            showNotification('Error loading financial data', 'error');
         });
 }
 
-function loadInvoices() {
-    const startDate = $w('#startDatePicker').value;
-    const endDate = $w('#endDatePicker').value;
-    
-    return wixData.query('Invoices')
-        .ge('issueDate', startDate)
-        .le('issueDate', endDate)
-        .descending('issueDate')
-        .find()
-        .then((results) => {
-            financialData.invoices = results.items;
-            updateInvoicesTable();
-            return results.items;
-        });
+function loadStudents() {
+    // Mock function to load students data
+    return Promise.resolve([
+        { id: 'STU001', name: 'Emma Johnson', email: 'emma@example.com', studentType: 'Full Time' },
+        { id: 'STU002', name: 'James Smith', email: 'james@example.com', studentType: 'Part Time' },
+        { id: 'STU003', name: 'Sophie Chen', email: 'sophie@example.com', studentType: 'Full Time' },
+        { id: 'STU004', name: 'Michael Brown', email: 'michael@example.com', studentType: 'Part Time' },
+        { id: 'STU005', name: 'Isabella Davis', email: 'isabella@example.com', studentType: 'Full Time' }
+    ]);
 }
 
-function loadExpenses() {
-    const startDate = $w('#startDatePicker').value;
-    const endDate = $w('#endDatePicker').value;
-    
-    return wixData.query('Expenses')
-        .ge('date', startDate)
-        .le('date', endDate)
-        .descending('date')
-        .find()
-        .then((results) => {
-            financialData.expenses = results.items;
-            updateExpensesTable();
-            return results.items;
-        });
-}
-
-function calculateStatistics() {
-    const payments = financialData.payments || [];
-    const invoices = financialData.invoices || [];
-    const expenses = financialData.expenses || [];
-    
-    // Calculate revenue
-    const totalRevenue = payments
-        .filter(p => p.status === 'completed')
-        .reduce((sum, p) => sum + (p.amount || 0), 0);
-    
-    // Calculate expenses
-    const totalExpenses = expenses
-        .reduce((sum, e) => sum + (e.amount || 0), 0);
-    
-    // Calculate outstanding invoices
-    const outstandingInvoices = invoices
-        .filter(i => i.status === 'pending' || i.status === 'overdue')
-        .reduce((sum, i) => sum + (i.amount || 0), 0);
-    
-    // Calculate profit
-    const profit = totalRevenue - totalExpenses;
-    const profitMargin = totalRevenue > 0 ? (profit / totalRevenue) * 100 : 0;
-    
-    financialData.statistics = {
-        totalRevenue,
-        totalExpenses,
-        profit,
-        profitMargin,
-        outstandingInvoices,
-        paymentsCount: payments.length,
-        invoicesCount: invoices.length,
-        expensesCount: expenses.length
-    };
-    
-    updateStatisticsCards();
+function loadCurriculumPackages() {
+    // Return the predefined curriculum packages
+    return Promise.resolve(curriculumPackages);
 }
 
 // ==========================================
@@ -224,408 +255,398 @@ function calculateStatistics() {
 
 function updateDashboard() {
     updateStatisticsCards();
-    updatePaymentsTable();
-    updateInvoicesTable();
-    updateExpensesTable();
-    updateCharts();
+    updateTransactionsTable();
+    updatePricingPlans();
 }
 
 function updateStatisticsCards() {
     const stats = financialData.statistics;
     
-    // Update revenue card
-    $w('#totalRevenueValue').text = formatCurrency(stats.totalRevenue || 0);
-    
-    // Update expenses card
-    $w('#totalExpensesValue').text = formatCurrency(stats.totalExpenses || 0);
-    
-    // Update profit card
-    $w('#profitValue').text = formatCurrency(stats.profit || 0);
-    $w('#profitMarginValue').text = `${(stats.profitMargin || 0).toFixed(1)}%`;
-    
-    // Update outstanding invoices
-    $w('#outstandingInvoicesValue').text = formatCurrency(stats.outstandingInvoices || 0);
-    
-    // Update counts
-    $w('#paymentsCountValue').text = (stats.paymentsCount || 0).toString();
-    $w('#invoicesCountValue').text = (stats.invoicesCount || 0).toString();
-    $w('#expensesCountValue').text = (stats.expensesCount || 0).toString();
-}
-
-function updatePaymentsTable() {
-    const tableData = financialData.payments.map(payment => ({
-        _id: payment._id,
-        studentName: payment.studentName || 'N/A',
-        amount: formatCurrency(payment.amount || 0),
-        paymentDate: formatDate(payment.paymentDate),
-        paymentMethod: payment.paymentMethod || 'N/A',
-        status: payment.status || 'pending',
-        description: payment.description || ''
-    }));
-    
-    $w('#paymentsTable').rows = tableData;
-}
-
-function updateInvoicesTable() {
-    const tableData = financialData.invoices.map(invoice => ({
-        _id: invoice._id,
-        invoiceNumber: invoice.invoiceNumber || 'N/A',
-        studentName: invoice.studentName || 'N/A',
-        amount: formatCurrency(invoice.amount || 0),
-        issueDate: formatDate(invoice.issueDate),
-        dueDate: formatDate(invoice.dueDate),
-        status: invoice.status || 'pending'
-    }));
-    
-    $w('#invoicesTable').rows = tableData;
-}
-
-function updateExpensesTable() {
-    const tableData = financialData.expenses.map(expense => ({
-        _id: expense._id,
-        date: formatDate(expense.date),
-        category: expense.category || 'N/A',
-        amount: formatCurrency(expense.amount || 0),
-        description: expense.description || '',
-        receipt: expense.receipt ? 'Yes' : 'No'
-    }));
-    
-    $w('#expensesTable').rows = tableData;
-}
-
-function updateCharts() {
-    updateRevenueChart();
-    updateExpenseChart();
-}
-
-function updateRevenueChart() {
-    // Prepare revenue chart data
-    const revenueData = prepareRevenueChartData();
-    
-    // Update chart (implementation depends on chart component used)
-    if ($w('#revenueChart').data) {
-        $w('#revenueChart').data = revenueData;
+    // Update statistics cards with current data
+    const statNumbers = document.querySelectorAll('.stat-number');
+    if (statNumbers.length >= 4) {
+        statNumbers[0].textContent = `£${stats.totalPaid.toLocaleString()}`;
+        statNumbers[1].textContent = `£${stats.outstandingPayments.toLocaleString()}`;
+        statNumbers[2].textContent = `£${stats.overduePayments.toLocaleString()}`;
+        statNumbers[3].textContent = stats.activeStudents.toString();
     }
 }
 
-function updateExpenseChart() {
-    // Prepare expense chart data
-    const expenseData = prepareExpenseChartData();
+function updateTransactionsTable() {
+    // In a real implementation, this would update the table with dynamic data
+    // For now, the table is static in HTML
+    console.log('Transactions table updated with', financialData.transactions.length, 'transactions');
+}
+
+function updatePricingPlans() {
+    // Update pricing plan displays if needed
+    console.log('Pricing plans updated');
+}
+
+// ==========================================
+// PLAN SELECTION FUNCTIONS
+// ==========================================
+
+function selectPlan(planType) {
+    // Remove selected class from all cards
+    document.querySelectorAll('.pricing-card').forEach(card => {
+        card.classList.remove('selected');
+    });
     
-    // Update chart (implementation depends on chart component used)
-    if ($w('#expenseChart').data) {
-        $w('#expenseChart').data = expenseData;
+    // Add selected class to clicked card
+    const clickedCard = document.querySelector(`[onclick*="${planType}"]`);
+    if (clickedCard) {
+        clickedCard.classList.add('selected');
+    }
+    
+    // Update selected plan
+    selectedPlan = planType;
+    
+    // Get plan details
+    const planDetails = curriculumPackages[planType];
+    if (planDetails) {
+        const message = `${planDetails.name} plan selected!`;
+        showNotification(message, 'success');
+        
+        // Log selection for analytics
+        console.log('Plan selected:', planType, planDetails);
+        
+        // In a real implementation, you might want to:
+        // - Save the selection to the database
+        // - Update the student's curriculum package
+        // - Trigger billing calculations
+        // - Send confirmation email
     }
 }
 
-// ==========================================
-// MODAL FUNCTIONS
-// ==========================================
-
-function openPaymentModal() {
-    clearPaymentForm();
-    $w('#paymentModal').show();
+function getPlanDetails(planType) {
+    return curriculumPackages[planType] || null;
 }
 
-function openInvoiceModal() {
-    clearInvoiceForm();
-    loadStudentsForInvoice();
-    $w('#invoiceModal').show();
-}
-
-function openExpenseModal() {
-    clearExpenseForm();
-    $w('#expenseModal').show();
-}
-
-function hideAllModals() {
-    $w('#paymentModal').hide();
-    $w('#invoiceModal').hide();
-    $w('#expenseModal').hide();
+function calculateWeeklyRate(planType, studentCount = 1) {
+    const plan = curriculumPackages[planType];
+    if (!plan) return 0;
+    
+    if (plan.weeklyRate) {
+        return plan.weeklyRate * studentCount;
+    } else if (plan.hourlyRate) {
+        // Assume 5 hours per week for hourly plans
+        return plan.hourlyRate * 5 * studentCount;
+    }
+    
+    return 0;
 }
 
 // ==========================================
-// FORM HANDLING FUNCTIONS
+// TRANSACTION MANAGEMENT
 // ==========================================
 
-function submitPayment() {
-    const paymentData = {
-        studentId: $w('#paymentStudentSelect').value,
-        amount: parseFloat($w('#paymentAmountInput').value),
-        paymentDate: $w('#paymentDateInput').value,
-        paymentMethod: $w('#paymentMethodSelect').value,
-        status: 'completed',
-        description: $w('#paymentDescriptionInput').value,
-        recordedDate: new Date()
+function viewTransactionDetails(transactionIndex) {
+    const transaction = financialData.transactions[transactionIndex];
+    if (transaction) {
+        const details = `
+            Transaction Details:
+            ID: ${transaction.id}
+            Student: ${transaction.studentName}
+            Description: ${transaction.description}
+            Amount: £${transaction.amount}
+            Status: ${transaction.status.toUpperCase()}
+            Date: ${transaction.date}
+            Curriculum: ${transaction.curriculumType}
+        `;
+        
+        alert(details);
+        console.log('Transaction details viewed:', transaction);
+    }
+}
+
+function updateTransactionStatus(transactionId, newStatus) {
+    const transaction = financialData.transactions.find(t => t.id === transactionId);
+    if (transaction) {
+        transaction.status = newStatus;
+        updateDashboard();
+        showNotification(`Transaction ${transactionId} status updated to ${newStatus}`, 'success');
+    }
+}
+
+function addTransaction(transactionData) {
+    const newTransaction = {
+        id: generateTransactionId(),
+        date: new Date().toISOString().split('T')[0],
+        ...transactionData
     };
     
-    if (validatePaymentData(paymentData)) {
-        wixData.insert('Payments', paymentData)
-            .then((result) => {
-                showMessage('Payment recorded successfully', 'success');
-                hideAllModals();
-                loadFinancialData();
-            })
-            .catch((error) => {
-                console.error('Error recording payment:', error);
-                showMessage('Error recording payment', 'error');
-            });
-    }
+    financialData.transactions.unshift(newTransaction);
+    updateDashboard();
+    showNotification('New transaction added successfully', 'success');
+    
+    return newTransaction;
 }
 
-function submitInvoice() {
+// ==========================================
+// FINANCIAL CALCULATIONS
+// ==========================================
+
+function calculateMonthlyRevenue(studentType = null, curriculumType = null) {
+    let transactions = financialData.transactions.filter(t => t.status === 'paid');
+    
+    if (curriculumType) {
+        transactions = transactions.filter(t => t.curriculumType === curriculumType);
+    }
+    
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+    
+    return transactions
+        .filter(t => {
+            const transactionDate = new Date(t.date);
+            return transactionDate.getMonth() === currentMonth && 
+                   transactionDate.getFullYear() === currentYear;
+        })
+        .reduce((sum, t) => sum + t.amount, 0);
+}
+
+function calculateOutstandingByPlan(planType) {
+    return financialData.transactions
+        .filter(t => t.status === 'pending' && t.curriculumType.includes(planType))
+        .reduce((sum, t) => sum + t.amount, 0);
+}
+
+function generateFinancialSummary() {
+    const summary = {
+        totalRevenue: financialData.transactions
+            .filter(t => t.status === 'paid')
+            .reduce((sum, t) => sum + t.amount, 0),
+        
+        pendingPayments: financialData.transactions
+            .filter(t => t.status === 'pending')
+            .reduce((sum, t) => sum + t.amount, 0),
+        
+        overduePayments: financialData.transactions
+            .filter(t => t.status === 'overdue')
+            .reduce((sum, t) => sum + t.amount, 0),
+        
+        transactionsByPlan: {},
+        
+        monthlyTrend: calculateMonthlyTrend()
+    };
+    
+    // Calculate revenue by curriculum plan
+    Object.keys(curriculumPackages).forEach(planType => {
+        const planName = curriculumPackages[planType].name;
+        summary.transactionsByPlan[planName] = financialData.transactions
+            .filter(t => t.curriculumType.includes(planName))
+            .reduce((sum, t) => sum + t.amount, 0);
+    });
+    
+    return summary;
+}
+
+function calculateMonthlyTrend() {
+    // Calculate last 6 months trend
+    const months = [];
+    const currentDate = new Date();
+    
+    for (let i = 5; i >= 0; i--) {
+        const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+        const monthName = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+        
+        const monthlyRevenue = financialData.transactions
+            .filter(t => {
+                const transactionDate = new Date(t.date);
+                return transactionDate.getMonth() === date.getMonth() && 
+                       transactionDate.getFullYear() === date.getFullYear() &&
+                       t.status === 'paid';
+            })
+            .reduce((sum, t) => sum + t.amount, 0);
+        
+        months.push({ month: monthName, revenue: monthlyRevenue });
+    }
+    
+    return months;
+}
+
+// ==========================================
+// ACTION FUNCTIONS
+// ==========================================
+
+function generateInvoice() {
+    if (!selectedPlan) {
+        showNotification('Please select a curriculum plan first', 'warning');
+        return;
+    }
+    
+    const planDetails = curriculumPackages[selectedPlan];
     const invoiceData = {
-        studentId: $w('#invoiceStudentSelect').value,
-        amount: parseFloat($w('#invoiceAmountInput').value),
-        issueDate: $w('#invoiceIssueDateInput').value,
-        dueDate: $w('#invoiceDueDateInput').value,
-        status: 'pending',
-        items: $w('#invoiceItemsInput').value,
-        notes: $w('#invoiceNotesInput').value,
-        invoiceNumber: generateInvoiceNumber()
+        planType: selectedPlan,
+        planName: planDetails.name,
+        amount: planDetails.weeklyRate || planDetails.hourlyRate,
+        generatedDate: new Date().toISOString(),
+        status: 'draft'
     };
     
-    if (validateInvoiceData(invoiceData)) {
-        wixData.insert('Invoices', invoiceData)
-            .then((result) => {
-                showMessage('Invoice created successfully', 'success');
-                hideAllModals();
-                loadFinancialData();
-                
-                // Optionally send invoice email
-                if ($w('#sendInvoiceEmailCheckbox').checked) {
-                    sendInvoiceEmail(result);
-                }
-            })
-            .catch((error) => {
-                console.error('Error creating invoice:', error);
-                showMessage('Error creating invoice', 'error');
-            });
-    }
+    console.log('Generating invoice for:', invoiceData);
+    showNotification(`Invoice generated for ${planDetails.name}`, 'success');
+    
+    // In a real implementation, this would:
+    // - Create invoice record in database
+    // - Generate PDF invoice
+    // - Send email to student/parent
+    // - Update financial records
 }
 
-function submitExpense() {
-    const expenseData = {
-        category: $w('#expenseCategorySelect').value,
-        amount: parseFloat($w('#expenseAmountInput').value),
-        date: $w('#expenseDateInput').value,
-        description: $w('#expenseDescriptionInput').value,
-        receipt: $w('#expenseReceiptUpload').value,
-        recordedDate: new Date()
+function exportReport() {
+    const summary = generateFinancialSummary();
+    const reportData = {
+        generatedDate: new Date().toISOString(),
+        summary: summary,
+        transactions: financialData.transactions,
+        curriculumPackages: curriculumPackages
     };
     
-    if (validateExpenseData(expenseData)) {
-        wixData.insert('Expenses', expenseData)
-            .then((result) => {
-                showMessage('Expense recorded successfully', 'success');
-                hideAllModals();
-                loadFinancialData();
-            })
-            .catch((error) => {
-                console.error('Error recording expense:', error);
-                showMessage('Error recording expense', 'error');
-            });
-    }
-}
-
-// ==========================================
-// VALIDATION FUNCTIONS
-// ==========================================
-
-function validatePaymentData(data) {
-    if (!data.studentId) {
-        showMessage('Please select a student', 'error');
-        return false;
-    }
+    // Convert to CSV format
+    const csvContent = convertToCSV(financialData.transactions);
+    downloadCSV(csvContent, 'financial-report.csv');
     
-    if (!data.amount || data.amount <= 0) {
-        showMessage('Please enter a valid payment amount', 'error');
-        return false;
-    }
-    
-    if (!data.paymentDate) {
-        showMessage('Please select a payment date', 'error');
-        return false;
-    }
-    
-    if (!data.paymentMethod) {
-        showMessage('Please select a payment method', 'error');
-        return false;
-    }
-    
-    return true;
-}
-
-function validateInvoiceData(data) {
-    if (!data.studentId) {
-        showMessage('Please select a student', 'error');
-        return false;
-    }
-    
-    if (!data.amount || data.amount <= 0) {
-        showMessage('Please enter a valid invoice amount', 'error');
-        return false;
-    }
-    
-    if (!data.issueDate) {
-        showMessage('Please select an issue date', 'error');
-        return false;
-    }
-    
-    if (!data.dueDate) {
-        showMessage('Please select a due date', 'error');
-        return false;
-    }
-    
-    if (data.dueDate < data.issueDate) {
-        showMessage('Due date cannot be before issue date', 'error');
-        return false;
-    }
-    
-    return true;
-}
-
-function validateExpenseData(data) {
-    if (!data.category) {
-        showMessage('Please select an expense category', 'error');
-        return false;
-    }
-    
-    if (!data.amount || data.amount <= 0) {
-        showMessage('Please enter a valid expense amount', 'error');
-        return false;
-    }
-    
-    if (!data.date) {
-        showMessage('Please select an expense date', 'error');
-        return false;
-    }
-    
-    return true;
+    showNotification('Financial report exported successfully', 'success');
+    console.log('Report exported:', reportData);
 }
 
 // ==========================================
 // UTILITY FUNCTIONS
 // ==========================================
 
+function generateTransactionId() {
+    const timestamp = Date.now();
+    const random = Math.floor(Math.random() * 1000);
+    return `TXN${timestamp}${random}`;
+}
+
 function formatCurrency(amount) {
-    return new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD'
-    }).format(amount);
+    return `£${amount.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
-function formatDate(date) {
-    if (!date) return 'N/A';
-    return new Date(date).toLocaleDateString();
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-GB');
 }
 
-function generateInvoiceNumber() {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const timestamp = now.getTime().toString().slice(-6);
-    return `INV-${year}${month}-${timestamp}`;
-}
-
-function showMessage(message, type = 'info') {
-    $w('#messageText').text = message;
-    $w('#messageBar').show();
+function convertToCSV(transactions) {
+    const headers = ['Date', 'Student', 'Description', 'Amount', 'Status', 'Curriculum Type'];
+    const csvRows = [headers.join(',')];
     
-    // Auto-hide after 3 seconds
+    transactions.forEach(transaction => {
+        const row = [
+            transaction.date,
+            `"${transaction.studentName}"`,
+            `"${transaction.description}"`,
+            transaction.amount,
+            transaction.status,
+            `"${transaction.curriculumType}"`
+        ];
+        csvRows.push(row.join(','));
+    });
+    
+    return csvRows.join('\n');
+}
+
+function downloadCSV(csvContent, filename) {
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    
+    if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+}
+
+// ==========================================
+// NOTIFICATION SYSTEM
+// ==========================================
+
+function showNotification(message, type = 'info') {
+    // Remove existing notifications
+    const existingNotification = document.querySelector('.notification');
+    if (existingNotification) {
+        existingNotification.remove();
+    }
+    
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <i class="fas fa-${getNotificationIcon(type)}"></i>
+        <span>${message}</span>
+        <button onclick="this.parentElement.remove()" style="background: none; border: none; color: white; margin-left: 10px; cursor: pointer;">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    
+    // Add notification styles
+    const bgColor = getNotificationColor(type);
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${bgColor};
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        animation: slideIn 0.3s ease;
+        max-width: 400px;
+    `;
+    
+    // Add animation keyframes if not already present
+    if (!document.querySelector('#notification-styles')) {
+        const style = document.createElement('style');
+        style.id = 'notification-styles';
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    document.body.appendChild(notification);
+    
+    // Auto remove after 3 seconds
     setTimeout(() => {
-        $w('#messageBar').hide();
+        if (notification.parentElement) {
+            notification.remove();
+        }
     }, 3000);
 }
 
-function switchTab(tabName) {
-    // Hide all tab content
-    $w('#paymentsTab').hide();
-    $w('#invoicesTab').hide();
-    $w('#expensesTab').hide();
-    $w('#reportsTab').hide();
-    
-    // Reset all tab buttons
-    $w('#paymentsTabBtn').style.backgroundColor = '#f0f0f0';
-    $w('#invoicesTabBtn').style.backgroundColor = '#f0f0f0';
-    $w('#expensesTabBtn').style.backgroundColor = '#f0f0f0';
-    $w('#reportsTabBtn').style.backgroundColor = '#f0f0f0';
-    
-    // Show selected tab and highlight button
-    switch (tabName) {
-        case 'payments':
-            $w('#paymentsTab').show();
-            $w('#paymentsTabBtn').style.backgroundColor = '#007bff';
-            break;
-        case 'invoices':
-            $w('#invoicesTab').show();
-            $w('#invoicesTabBtn').style.backgroundColor = '#007bff';
-            break;
-        case 'expenses':
-            $w('#expensesTab').show();
-            $w('#expensesTabBtn').style.backgroundColor = '#007bff';
-            break;
-        case 'reports':
-            $w('#reportsTab').show();
-            $w('#reportsTabBtn').style.backgroundColor = '#007bff';
-            break;
-    }
+function getNotificationIcon(type) {
+    const icons = {
+        success: 'check-circle',
+        error: 'exclamation-circle',
+        warning: 'exclamation-triangle',
+        info: 'info-circle'
+    };
+    return icons[type] || 'info-circle';
 }
 
-function clearPaymentForm() {
-    $w('#paymentStudentSelect').value = '';
-    $w('#paymentAmountInput').value = '';
-    $w('#paymentDateInput').value = new Date();
-    $w('#paymentMethodSelect').value = '';
-    $w('#paymentDescriptionInput').value = '';
-}
-
-function clearInvoiceForm() {
-    $w('#invoiceStudentSelect').value = '';
-    $w('#invoiceAmountInput').value = '';
-    $w('#invoiceIssueDateInput').value = new Date();
-    $w('#invoiceDueDateInput').value = new Date();
-    $w('#invoiceItemsInput').value = '';
-    $w('#invoiceNotesInput').value = '';
-    $w('#sendInvoiceEmailCheckbox').checked = false;
-}
-
-function clearExpenseForm() {
-    $w('#expenseCategorySelect').value = '';
-    $w('#expenseAmountInput').value = '';
-    $w('#expenseDateInput').value = new Date();
-    $w('#expenseDescriptionInput').value = '';
-    $w('#expenseReceiptUpload').value = '';
-}
-
-// ==========================================
-// FILTER FUNCTIONS
-// ==========================================
-
-function applyDateFilter() {
-    loadFinancialData();
-}
-
-function applyStatusFilter() {
-    const selectedStatus = $w('#statusFilter').value;
-    
-    if (selectedStatus === 'all') {
-        loadFinancialData();
-    } else {
-        // Filter current data by status
-        filterDataByStatus(selectedStatus);
-    }
-}
-
-function applySearchFilter() {
-    const searchTerm = $w('#searchInput').value.toLowerCase();
-    
-    if (searchTerm === '') {
-        loadFinancialData();
-    } else {
-        // Filter current data by search term
-        filterDataBySearch(searchTerm);
-    }
+function getNotificationColor(type) {
+    const colors = {
+        success: '#28a745',
+        error: '#dc3545',
+        warning: '#ffc107',
+        info: '#17a2b8'
+    };
+    return colors[type] || '#17a2b8';
 }
 
 // ==========================================
@@ -633,318 +654,76 @@ function applySearchFilter() {
 // ==========================================
 
 function setupResponsiveDesign() {
-    wixWindow.viewportEnter('mobile', () => {
+    // Handle window resize
+    window.addEventListener('resize', handleResize);
+    
+    // Initial responsive setup
+    handleResize();
+}
+
+function handleResize() {
+    const width = window.innerWidth;
+    
+    if (width < 768) {
+        // Mobile layout adjustments
         adjustForMobile();
-    });
-    
-    wixWindow.viewportEnter('tablet', () => {
+    } else if (width < 1200) {
+        // Tablet layout adjustments
         adjustForTablet();
-    });
-    
-    wixWindow.viewportEnter('desktop', () => {
+    } else {
+        // Desktop layout adjustments
         adjustForDesktop();
-    });
+    }
 }
 
 function adjustForMobile() {
-    // Adjust layout for mobile
-    $w('#statisticsGrid').layout = 'singleColumn';
-    $w('#actionButtonsContainer').layout = 'vertical';
+    // Mobile-specific adjustments
+    console.log('Adjusting for mobile layout');
 }
 
 function adjustForTablet() {
-    // Adjust layout for tablet
-    $w('#statisticsGrid').layout = 'twoColumns';
-    $w('#actionButtonsContainer').layout = 'horizontal';
+    // Tablet-specific adjustments
+    console.log('Adjusting for tablet layout');
 }
 
 function adjustForDesktop() {
-    // Adjust layout for desktop
-    $w('#statisticsGrid').layout = 'fourColumns';
-    $w('#actionButtonsContainer').layout = 'horizontal';
+    // Desktop-specific adjustments
+    console.log('Adjusting for desktop layout');
 }
 
 // ==========================================
-// CHART DATA PREPARATION
+// INTEGRATION FUNCTIONS
 // ==========================================
 
-function prepareRevenueChartData() {
-    // Group payments by month
-    const monthlyRevenue = {};
-    
-    financialData.payments.forEach(payment => {
-        if (payment.status === 'completed') {
-            const month = new Date(payment.paymentDate).toISOString().slice(0, 7);
-            monthlyRevenue[month] = (monthlyRevenue[month] || 0) + payment.amount;
-        }
-    });
-    
-    // Convert to chart format
-    return Object.entries(monthlyRevenue).map(([month, amount]) => ({
-        label: month,
-        value: amount
-    }));
+function syncWithStudentManagement() {
+    // Sync financial data with student management system
+    console.log('Syncing with student management system');
 }
 
-function prepareExpenseChartData() {
-    // Group expenses by category
-    const categoryExpenses = {};
-    
-    financialData.expenses.forEach(expense => {
-        const category = expense.category || 'Other';
-        categoryExpenses[category] = (categoryExpenses[category] || 0) + expense.amount;
-    });
-    
-    // Convert to chart format
-    return Object.entries(categoryExpenses).map(([category, amount]) => ({
-        label: category,
-        value: amount
-    }));
+function syncWithMentorDashboard() {
+    // Sync financial data with mentor dashboard
+    console.log('Syncing with mentor dashboard');
+}
+
+function updateSessionBookingPricing() {
+    // Update session booking system with current pricing
+    console.log('Updating session booking pricing');
 }
 
 // ==========================================
-// REPORT GENERATION
+// EXPORT FOR TESTING
 // ==========================================
 
-function generateFinancialReport() {
-    const reportType = $w('#reportTypeSelect').value;
-    const startDate = $w('#startDatePicker').value;
-    const endDate = $w('#endDatePicker').value;
-    
-    const reportData = {
-        reportType,
-        period: `${formatDate(startDate)} - ${formatDate(endDate)}`,
-        data: JSON.stringify({
-            statistics: financialData.statistics,
-            payments: financialData.payments,
-            invoices: financialData.invoices,
-            expenses: financialData.expenses
-        }),
-        generatedDate: new Date()
-    };
-    
-    wixData.insert('FinancialReports', reportData)
-        .then((result) => {
-            showMessage('Financial report generated successfully', 'success');
-            // Optionally download or email the report
-        })
-        .catch((error) => {
-            console.error('Error generating report:', error);
-            showMessage('Error generating financial report', 'error');
-        });
-}
-
-// ==========================================
-// BACKEND CODE (Backend Files)
-// ==========================================
-
-/**
- * Backend file: backend/payments.jsw
- * Handles payment processing and validation
- */
-
-/*
-import { ok, badRequest, serverError } from 'wix-http-functions';
-import wixData from 'wix-data';
-
-export function processPayment(request) {
-    const { paymentData } = request.body;
-    
-    return validatePayment(paymentData)
-        .then(() => {
-            return wixData.insert('Payments', paymentData);
-        })
-        .then((result) => {
-            return ok({ payment: result });
-        })
-        .catch((error) => {
-            console.error('Payment processing error:', error);
-            return serverError({ error: 'Payment processing failed' });
-        });
-}
-
-function validatePayment(paymentData) {
-    return new Promise((resolve, reject) => {
-        if (!paymentData.amount || paymentData.amount <= 0) {
-            reject(new Error('Invalid payment amount'));
-        }
-        
-        if (!paymentData.studentId) {
-            reject(new Error('Student ID required'));
-        }
-        
-        resolve();
-    });
-}
-*/
-
-/**
- * Backend file: backend/invoices.jsw
- * Handles invoice generation and email sending
- */
-
-/*
-import { ok, badRequest, serverError } from 'wix-http-functions';
-import wixData from 'wix-data';
-import { sendEmail } from 'backend/email-service';
-
-export function createInvoice(request) {
-    const { invoiceData } = request.body;
-    
-    return wixData.insert('Invoices', invoiceData)
-        .then((result) => {
-            return ok({ invoice: result });
-        })
-        .catch((error) => {
-            console.error('Invoice creation error:', error);
-            return serverError({ error: 'Invoice creation failed' });
-        });
-}
-
-export function sendInvoiceEmail(request) {
-    const { invoiceId } = request.body;
-    
-    return wixData.get('Invoices', invoiceId)
-        .then((invoice) => {
-            return sendEmail({
-                to: invoice.studentEmail,
-                subject: `Invoice ${invoice.invoiceNumber}`,
-                body: generateInvoiceEmailBody(invoice)
-            });
-        })
-        .then(() => {
-            return ok({ message: 'Invoice email sent successfully' });
-        })
-        .catch((error) => {
-            console.error('Invoice email error:', error);
-            return serverError({ error: 'Failed to send invoice email' });
-        });
-}
-
-function generateInvoiceEmailBody(invoice) {
-    return `
-        <h2>Invoice ${invoice.invoiceNumber}</h2>
-        <p>Amount: ${invoice.amount}</p>
-        <p>Due Date: ${invoice.dueDate}</p>
-        <p>Please pay by the due date to avoid late fees.</p>
-    `;
-}
-*/
-
-/**
- * Backend file: backend/financial-reports.jsw
- * Handles financial report generation
- */
-
-/*
-import { ok, serverError } from 'wix-http-functions';
-import wixData from 'wix-data';
-
-export function generateReport(request) {
-    const { reportType, startDate, endDate } = request.body;
-    
-    return Promise.all([
-        getPaymentsData(startDate, endDate),
-        getInvoicesData(startDate, endDate),
-        getExpensesData(startDate, endDate)
-    ])
-    .then(([payments, invoices, expenses]) => {
-        const reportData = {
-            reportType,
-            period: `${startDate} - ${endDate}`,
-            data: JSON.stringify({
-                payments,
-                invoices,
-                expenses,
-                summary: calculateSummary(payments, invoices, expenses)
-            }),
-            generatedDate: new Date()
-        };
-        
-        return wixData.insert('FinancialReports', reportData);
-    })
-    .then((result) => {
-        return ok({ report: result });
-    })
-    .catch((error) => {
-        console.error('Report generation error:', error);
-        return serverError({ error: 'Report generation failed' });
-    });
-}
-
-function getPaymentsData(startDate, endDate) {
-    return wixData.query('Payments')
-        .ge('paymentDate', startDate)
-        .le('paymentDate', endDate)
-        .find();
-}
-
-function getInvoicesData(startDate, endDate) {
-    return wixData.query('Invoices')
-        .ge('issueDate', startDate)
-        .le('issueDate', endDate)
-        .find();
-}
-
-function getExpensesData(startDate, endDate) {
-    return wixData.query('Expenses')
-        .ge('date', startDate)
-        .le('date', endDate)
-        .find();
-}
-
-function calculateSummary(payments, invoices, expenses) {
-    const totalRevenue = payments.items
-        .filter(p => p.status === 'completed')
-        .reduce((sum, p) => sum + p.amount, 0);
-    
-    const totalExpenses = expenses.items
-        .reduce((sum, e) => sum + e.amount, 0);
-    
-    const profit = totalRevenue - totalExpenses;
-    
-    return {
-        totalRevenue,
-        totalExpenses,
-        profit,
-        profitMargin: totalRevenue > 0 ? (profit / totalRevenue) * 100 : 0
+// Export functions for testing (if in development environment)
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        selectPlan,
+        calculateWeeklyRate,
+        generateFinancialSummary,
+        formatCurrency,
+        convertToCSV,
+        curriculumPackages
     };
 }
-*/
 
-console.log('Wix Finance Dashboard code loaded successfully');
-
-/**
- * IMPLEMENTATION NOTES:
- * 
- * 1. Database Collections Required:
- *    - Payments: paymentId, studentId, amount, paymentDate, paymentMethod, status, description
- *    - Invoices: invoiceId, studentId, amount, issueDate, dueDate, status, items, invoiceNumber
- *    - Expenses: expenseId, category, amount, date, description, receipt
- *    - FinancialReports: reportId, reportType, period, data, generatedDate
- * 
- * 2. Required Wix Elements:
- *    - Statistics cards with IDs: totalRevenueValue, totalExpensesValue, profitValue, etc.
- *    - Tables with IDs: paymentsTable, invoicesTable, expensesTable
- *    - Modals with IDs: paymentModal, invoiceModal, expenseModal
- *    - Form inputs with appropriate IDs
- *    - Action buttons with appropriate IDs
- * 
- * 3. Payment Gateway Integration:
- *    - Configure payment processor (Stripe, PayPal, etc.)
- *    - Set up webhook endpoints for payment confirmations
- *    - Implement secure payment processing
- * 
- * 4. Security Considerations:
- *    - Implement proper user authentication
- *    - Set database permissions to Admin only
- *    - Validate all financial data
- *    - Use HTTPS for all transactions
- * 
- * 5. Testing:
- *    - Test all payment scenarios
- *    - Verify financial calculations
- *    - Test invoice generation and sending
- *    - Validate expense tracking
- *    - Test report generation
- */
+console.log('Purple Ruler Academy Finance Dashboard code loaded successfully');

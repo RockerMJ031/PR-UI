@@ -24,6 +24,7 @@ import wixUsers from 'wix-users';
 
 // Global variables
 let currentUser = null;
+let currentStudentType = 'alternative'; // 'alternative' or 'tutoring'
 let studentsData = {
     students: [],
     courses: [],
@@ -33,8 +34,30 @@ let studentsData = {
         search: '',
         status: 'all',
         course: 'all',
-        dateRange: null
+        dateRange: null,
+        studentType: 'alternative'
     }
+};
+
+// Subject/Curriculum options
+const subjectOptions = {
+    tutoring: [
+        "Mathematics",
+        "English", 
+        "Science",
+        "History",
+        "Geography",
+        "Art",
+        "Physics",
+        "Chemistry",
+        "Biology"
+    ],
+    alternative: [
+        "Core Subjects",
+        "Core Subjects + PSHE Careers + PE and Art",
+        "All Subjects + Therapy",
+        "Purple Ruler Blueprint"
+    ]
 };
 
 // ==========================================
@@ -99,6 +122,9 @@ function initializePage() {
     // Set page title
     $w('#pageTitle').text = 'Students Management';
     
+    // Initialize student type toggle
+    switchStudentType('alternative');
+    
     // Initialize date filters
     const today = new Date();
     const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -112,17 +138,25 @@ function initializePage() {
     // Initialize filter dropdowns
     initializeFilters();
     
+    // Initialize subject/curriculum options
+    updateFormSubjectOptions();
+    
     // Set initial view
-    switchView('grid');
+    switchView('table');
 }
 
 function setupEventHandlers() {
+    // Student type toggle buttons
+    $w('#tutoringStudentsBtn').onClick(() => switchStudentType('tutoring'));
+    $w('#apStudentsBtn').onClick(() => switchStudentType('alternative'));
+    
     // Navigation and view controls
     $w('#gridViewBtn').onClick(() => switchView('grid'));
     $w('#tableViewBtn').onClick(() => switchView('table'));
     $w('#refreshBtn').onClick(() => refreshData());
     
     // Action buttons
+    $w('#addStudentBtn').onClick(() => openAddStudentForm());
     $w('#importStudentsBtn').onClick(() => openImportDialog());
     $w('#exportDataBtn').onClick(() => exportStudentsData());
     $w('#bulkActionsBtn').onClick(() => openBulkActionsMenu());
@@ -193,10 +227,94 @@ function loadStudentsData() {
     });
 }
 
+// ==========================================
+// STUDENT TYPE MANAGEMENT
+// ==========================================
+
+function switchStudentType(type) {
+    currentStudentType = type;
+    studentsData.filters.studentType = type;
+    
+    // Update button states
+    if (type === 'tutoring') {
+        $w('#tutoringStudentsBtn').style.backgroundColor = '#17a2b8';
+        $w('#tutoringStudentsBtn').style.color = '#ffffff';
+        $w('#apStudentsBtn').style.backgroundColor = '#ffffff';
+        $w('#apStudentsBtn').style.color = '#17a2b8';
+        
+        // Update table header
+        $w('#subjectColumnHeader').text = 'Subject';
+    } else {
+        $w('#apStudentsBtn').style.backgroundColor = '#663399';
+        $w('#apStudentsBtn').style.color = '#ffffff';
+        $w('#tutoringStudentsBtn').style.backgroundColor = '#ffffff';
+        $w('#tutoringStudentsBtn').style.color = '#663399';
+        
+        // Update table header
+        $w('#subjectColumnHeader').text = 'Curriculum';
+    }
+    
+    // Update form subject options
+    updateFormSubjectOptions();
+    
+    // Reload data with new filter
+    loadStudentsData();
+    
+    // Update statistics
+    updateStatistics();
+}
+
+function updateFormSubjectOptions() {
+    const options = subjectOptions[currentStudentType];
+    
+    // Clear existing options
+    $w('#subjectDropdown').options = [];
+    
+    // Add new options
+    const dropdownOptions = options.map(option => ({
+        label: option,
+        value: option
+    }));
+    
+    $w('#subjectDropdown').options = dropdownOptions;
+    
+    // Update form labels
+    if (currentStudentType === 'alternative') {
+        $w('#subjectLabel').text = 'Curriculum';
+        $w('#subjectDescription').text = 'Select the curriculum package for this AP student';
+    } else {
+        $w('#subjectLabel').text = 'Subject';
+        $w('#subjectDescription').text = 'Select the primary subject for tutoring';
+    }
+}
+
+function updateStatistics() {
+    const filteredStudents = studentsData.students.filter(student => 
+        student.studentType === currentStudentType
+    );
+    
+    const totalStudents = filteredStudents.length;
+    const activeStudents = filteredStudents.filter(s => s.status === 'active').length;
+    const pendingApproval = filteredStudents.filter(s => s.status === 'pending').length;
+    const needAttention = filteredStudents.filter(s => s.status === 'attention').length;
+    
+    // Update statistics cards
+    $w('#totalStudentsValue').text = totalStudents.toString();
+    $w('#activeStudentsValue').text = activeStudents.toString();
+    $w('#pendingApprovalValue').text = pendingApproval.toString();
+    $w('#needAttentionValue').text = needAttention.toString();
+    
+    // Update student list count
+    const studentTypeLabel = currentStudentType === 'alternative' ? 
+        'alternative provision students' : 'tutoring students';
+    $w('#studentListCount').text = `${totalStudents} ${studentTypeLabel} total`;
+}
+
 function loadStudents() {
     const filters = buildQueryFilters();
     
     return wixData.query('Students')
+        .eq('studentType', currentStudentType)
         .limit(50)
         .descending('enrollmentDate')
         .find()
@@ -324,11 +442,10 @@ function updateStudentsTable() {
         photo: student.profilePhoto || '/default-avatar.png',
         name: `${student.firstName} ${student.lastName}`,
         email: student.email,
-        course: getCourseNameById(student.courseId),
-        mentor: getMentorNameById(student.mentorId),
+        subject: student.subject || student.curriculum || 'Not assigned',
+        sessions: getStudentSessionCount(student._id),
         status: student.status,
-        enrollmentDate: formatDate(student.enrollmentDate),
-        progress: getStudentProgress(student._id)
+        actions: 'view-edit-delete'
     }));
     
     $w('#studentsTable').rows = tableData;
@@ -374,6 +491,20 @@ function setupRepeaterItem($item, itemData) {
 // STUDENT FORM FUNCTIONS
 // ==========================================
 
+function openAddStudentForm() {
+    // Clear form and set for add mode
+    clearStudentForm();
+    $w('#studentFormTitle').text = `Add New ${currentStudentType === 'alternative' ? 'AP' : 'Tutoring'} Student`;
+    $w('#submitStudentBtn').show();
+    $w('#updateStudentBtn').hide();
+    
+    // Update form subject options based on current type
+    updateFormSubjectOptions();
+    
+    // Show modal
+    $w('#studentFormLightbox').show();
+}
+
 function openStudentForm(studentId = null) {
     if (studentId) {
         // Edit mode
@@ -382,11 +513,8 @@ function openStudentForm(studentId = null) {
         $w('#submitStudentBtn').hide();
         $w('#updateStudentBtn').show();
     } else {
-        // Add mode
-        clearStudentForm();
-        $w('#studentFormTitle').text = 'Add New Student';
-        $w('#submitStudentBtn').show();
-        $w('#updateStudentBtn').hide();
+        openAddStudentForm();
+        return;
     }
     
     // Load form dependencies
@@ -430,9 +558,6 @@ function loadStudentForEdit(studentId) {
         $w('#emailInput').value = student.email || '';
         $w('#phoneInput').value = student.phone || '';
         $w('#dateOfBirthInput').value = student.dateOfBirth || null;
-        $w('#enrollmentDateInput').value = student.enrollmentDate || null;
-        $w('#courseSelect').value = student.courseId || '';
-        $w('#mentorSelect').value = student.mentorId || '';
         $w('#statusSelect').value = student.status || 'active';
         $w('#parentEmailInput').value = student.parentEmail || '';
         $w('#parentPhoneInput').value = student.parentPhone || '';
@@ -441,6 +566,23 @@ function loadStudentForEdit(studentId) {
         $w('#academicLevelInput').value = student.academicLevel || '';
         $w('#specialNeedsInput').value = student.specialNeeds || '';
         $w('#notesInput').value = student.notes || '';
+        
+        // Set subject/curriculum based on student type
+        if (student.studentType === 'alternative') {
+            $w('#subjectDropdown').value = student.subject || student.curriculum || '';
+        } else {
+            $w('#subjectDropdown').value = student.subject || '';
+        }
+        
+        // Update form options for this student's type
+        const studentType = student.studentType || currentStudentType;
+        if (studentType !== currentStudentType) {
+            // Temporarily switch to student's type for form
+            const tempType = currentStudentType;
+            currentStudentType = studentType;
+            updateFormSubjectOptions();
+            currentStudentType = tempType;
+        }
         
         // Set profile photo if exists
         if (student.profilePhoto) {
@@ -460,9 +602,6 @@ function clearStudentForm() {
     $w('#emailInput').value = '';
     $w('#phoneInput').value = '';
     $w('#dateOfBirthInput').value = null;
-    $w('#enrollmentDateInput').value = new Date();
-    $w('#courseSelect').value = '';
-    $w('#mentorSelect').value = '';
     $w('#statusSelect').value = 'active';
     $w('#parentEmailInput').value = '';
     $w('#parentPhoneInput').value = '';
@@ -471,6 +610,7 @@ function clearStudentForm() {
     $w('#academicLevelInput').value = '';
     $w('#specialNeedsInput').value = '';
     $w('#notesInput').value = '';
+    $w('#subjectDropdown').value = '';
     
     // Clear profile photo
     $w('#profilePhotoUpload').value = '';
@@ -478,6 +618,131 @@ function clearStudentForm() {
     
     // Clear stored data
     $w('#studentFormLightbox').data = null;
+}
+
+// ==========================================
+// STUDENT FORM SUBMISSION
+// ==========================================
+
+function submitStudentForm() {
+    if (!validateStudentForm()) {
+        return;
+    }
+    
+    const studentData = collectFormData();
+    
+    $w('#submitStudentBtn').disable();
+    $w('#submitStudentBtn').label = 'Adding...';
+    
+    wixData.save('Students', studentData)
+        .then((result) => {
+            showMessage('Student added successfully', 'success');
+            $w('#studentFormLightbox').hide();
+            loadStudentsData();
+        })
+        .catch((error) => {
+            console.error('Error adding student:', error);
+            showMessage('Error adding student', 'error');
+        })
+        .finally(() => {
+            $w('#submitStudentBtn').enable();
+            $w('#submitStudentBtn').label = 'Add Student';
+        });
+}
+
+function updateStudentForm() {
+    if (!validateStudentForm()) {
+        return;
+    }
+    
+    const formData = $w('#studentFormLightbox').data;
+    if (!formData || !formData.studentId) {
+        showMessage('Error: Student ID not found', 'error');
+        return;
+    }
+    
+    const studentData = collectFormData();
+    studentData._id = formData.studentId;
+    
+    $w('#updateStudentBtn').disable();
+    $w('#updateStudentBtn').label = 'Updating...';
+    
+    wixData.update('Students', studentData)
+        .then((result) => {
+            showMessage('Student updated successfully', 'success');
+            $w('#studentFormLightbox').hide();
+            loadStudentsData();
+        })
+        .catch((error) => {
+            console.error('Error updating student:', error);
+            showMessage('Error updating student', 'error');
+        })
+        .finally(() => {
+            $w('#updateStudentBtn').enable();
+            $w('#updateStudentBtn').label = 'Update Student';
+        });
+}
+
+function collectFormData() {
+    return {
+        firstName: $w('#firstNameInput').value,
+        lastName: $w('#lastNameInput').value,
+        email: $w('#emailInput').value,
+        phone: $w('#phoneInput').value,
+        dateOfBirth: $w('#dateOfBirthInput').value,
+        status: $w('#statusSelect').value,
+        parentEmail: $w('#parentEmailInput').value,
+        parentPhone: $w('#parentPhoneInput').value,
+        address: $w('#addressInput').value,
+        emergencyContact: $w('#emergencyContactInput').value,
+        academicLevel: $w('#academicLevelInput').value,
+        specialNeeds: $w('#specialNeedsInput').value,
+        notes: $w('#notesInput').value,
+        subject: $w('#subjectDropdown').value,
+        studentType: currentStudentType,
+        enrollmentDate: new Date(),
+        lastUpdated: new Date()
+    };
+}
+
+function validateStudentForm() {
+    const firstName = $w('#firstNameInput').value;
+    const lastName = $w('#lastNameInput').value;
+    const email = $w('#emailInput').value;
+    const subject = $w('#subjectDropdown').value;
+    
+    if (!firstName.trim()) {
+        showMessage('First name is required', 'error');
+        $w('#firstNameInput').focus();
+        return false;
+    }
+    
+    if (!lastName.trim()) {
+        showMessage('Last name is required', 'error');
+        $w('#lastNameInput').focus();
+        return false;
+    }
+    
+    if (!email.trim()) {
+        showMessage('Email is required', 'error');
+        $w('#emailInput').focus();
+        return false;
+    }
+    
+    if (!isValidEmail(email)) {
+        showMessage('Please enter a valid email address', 'error');
+        $w('#emailInput').focus();
+        return false;
+    }
+    
+    if (!subject) {
+        const fieldName = currentStudentType === 'alternative' ? 'Curriculum' : 'Subject';
+        showMessage(`${fieldName} is required`, 'error');
+        $w('#subjectDropdown').focus();
+        return false;
+    }
+    
+    return true;
 }
 
 function submitStudentForm() {
@@ -1135,6 +1400,232 @@ function generateStudentId() {
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const timestamp = now.getTime().toString().slice(-6);
     return `STU-${year}${month}-${timestamp}`;
+}
+
+// ==========================================
+// ADDITIONAL UTILITY FUNCTIONS
+// ==========================================
+
+function getStudentSessionCount(studentId) {
+    // This would typically query SessionAttendance collection
+    // For now, return a random count
+    return Math.floor(Math.random() * 20) + 1;
+}
+
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+function buildQueryFilters() {
+    const filters = studentsData.filters;
+    let query = wixData.query('Students');
+    
+    // Apply student type filter
+    query = query.eq('studentType', currentStudentType);
+    
+    // Apply status filter
+    if (filters.status && filters.status !== 'all') {
+        query = query.eq('status', filters.status);
+    }
+    
+    // Apply search filter
+    if (filters.search) {
+        query = query.or(
+            wixData.query('Students').contains('firstName', filters.search),
+            wixData.query('Students').contains('lastName', filters.search),
+            wixData.query('Students').contains('email', filters.search)
+        );
+    }
+    
+    return query;
+}
+
+function initializeFilters() {
+    // Set up status filter
+    $w('#statusFilter').options = [
+        { label: 'All Status', value: 'all' },
+        { label: 'Active', value: 'active' },
+        { label: 'Pending', value: 'pending' },
+        { label: 'Attention', value: 'attention' },
+        { label: 'Inactive', value: 'inactive' }
+    ];
+    
+    // Set up subject filter based on current student type
+    updateSubjectFilter();
+    
+    // Set up search functionality
+    $w('#searchInput').onInput(() => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            studentsData.filters.search = $w('#searchInput').value;
+            loadStudentsData();
+        }, 500);
+    });
+    
+    // Set up filter change handlers
+    $w('#statusFilter').onChange(() => {
+        studentsData.filters.status = $w('#statusFilter').value;
+        loadStudentsData();
+    });
+}
+
+function updateSubjectFilter() {
+    const options = [{ label: 'All Subjects', value: 'all' }];
+    const subjectList = subjectOptions[currentStudentType];
+    
+    subjectList.forEach(subject => {
+        options.push({ label: subject, value: subject });
+    });
+    
+    if ($w('#subjectFilter')) {
+        $w('#subjectFilter').options = options;
+    }
+}
+
+let searchTimeout;
+
+// Form event handlers
+function setupFormEventHandlers() {
+    $w('#submitStudentBtn').onClick(() => submitStudentForm());
+    $w('#updateStudentBtn').onClick(() => updateStudentForm());
+    $w('#cancelFormBtn').onClick(() => $w('#studentFormLightbox').hide());
+    
+    // Profile photo upload
+    if ($w('#profilePhotoUpload')) {
+        $w('#profilePhotoUpload').onChange(() => {
+            const file = $w('#profilePhotoUpload').value[0];
+            if (file) {
+                $w('#profilePhotoPreview').src = file.url;
+                $w('#profilePhotoPreview').show();
+            }
+        });
+    }
+}
+
+// Student actions
+function openStudentDetails(studentId) {
+    const student = studentsData.students.find(s => s._id === studentId);
+    if (student) {
+        // Populate student details modal
+        $w('#detailsStudentName').text = `${student.firstName} ${student.lastName}`;
+        $w('#detailsStudentEmail').text = student.email;
+        $w('#detailsStudentPhone').text = student.phone || 'N/A';
+        $w('#detailsStudentStatus').text = student.status;
+        $w('#detailsStudentSubject').text = student.subject || 'N/A';
+        $w('#detailsEnrollmentDate').text = formatDate(student.enrollmentDate);
+        
+        // Show modal
+        $w('#studentDetailsLightbox').show();
+    }
+}
+
+function editStudent(studentId) {
+    openStudentForm(studentId);
+}
+
+function confirmDeleteStudent(studentId) {
+    const student = studentsData.students.find(s => s._id === studentId);
+    if (student) {
+        const confirmMessage = `Are you sure you want to delete ${student.firstName} ${student.lastName}?`;
+        
+        if (confirm(confirmMessage)) {
+            deleteStudent(studentId);
+        }
+    }
+}
+
+function deleteStudent(studentId) {
+    wixData.remove('Students', studentId)
+        .then(() => {
+            showMessage('Student deleted successfully', 'success');
+            loadStudentsData();
+        })
+        .catch((error) => {
+            console.error('Error deleting student:', error);
+            showMessage('Error deleting student', 'error');
+        });
+}
+
+function openMessageDialog(studentId) {
+    const student = studentsData.students.find(s => s._id === studentId);
+    if (student) {
+        $w('#messageStudentName').text = `${student.firstName} ${student.lastName}`;
+        $w('#messageStudentEmail').text = student.email;
+        $w('#messageSubject').value = '';
+        $w('#messageContent').value = '';
+        
+        $w('#messageDialog').data = { studentId: studentId };
+        $w('#messageDialog').show();
+    }
+}
+
+// Import/Export functions
+function openImportDialog() {
+    $w('#importDialog').show();
+}
+
+function exportStudentsData() {
+    const csvData = convertToCSV(studentsData.students);
+    downloadCSV(csvData, `students_${currentStudentType}_${new Date().toISOString().split('T')[0]}.csv`);
+}
+
+function convertToCSV(data) {
+    if (!data || data.length === 0) return '';
+    
+    const headers = ['First Name', 'Last Name', 'Email', 'Phone', 'Subject/Curriculum', 'Status', 'Enrollment Date'];
+    const csvContent = [headers.join(',')];
+    
+    data.forEach(student => {
+        const row = [
+            student.firstName || '',
+            student.lastName || '',
+            student.email || '',
+            student.phone || '',
+            student.subject || '',
+            student.status || '',
+            formatDate(student.enrollmentDate)
+        ];
+        csvContent.push(row.join(','));
+    });
+    
+    return csvContent.join('\n');
+}
+
+function downloadCSV(csvContent, filename) {
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    
+    if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+}
+
+// Bulk actions
+function openBulkActionsMenu() {
+    $w('#bulkActionsLightbox').show();
+}
+
+// Pagination
+function navigatePage(direction) {
+    // Implementation for pagination
+    console.log(`Navigate ${direction}`);
+}
+
+function changePageSize() {
+    // Implementation for changing page size
+    console.log('Change page size');
+}
+
+// Update filters
+function updateFilters() {
+    updateSubjectFilter();
 }
 
 function getCourseNameById(courseId) {

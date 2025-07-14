@@ -6,7 +6,10 @@
 The Students Management Dashboard is a comprehensive system for managing student information, enrollment, academic progress, and communication within the Wix platform. This dashboard provides administrators and mentors with tools to efficiently track and manage student data.
 
 ### Key Features
-- **Student Registration & Enrollment**: Complete student onboarding process
+- **Dual Student Type Management**: Handle both Tutoring Students and Alternative Provision (AP) Students
+- **Dynamic Student Type Toggle**: Switch between student types with real-time statistics updates
+- **Student Registration & Enrollment**: Complete student onboarding process with type-specific forms
+- **Subject/Curriculum Management**: Traditional subjects for tutoring students, curriculum categories for AP students
 - **Academic Progress Tracking**: Monitor student performance and milestones
 - **Communication Management**: Handle student inquiries and notifications
 - **Document Management**: Store and manage student documents and certificates
@@ -55,6 +58,7 @@ The Students Management Dashboard is a comprehensive system for managing student
   dateOfBirth: "date",
   enrollmentDate: "date",
   status: "text", // active, inactive, graduated, suspended
+  studentType: "text", // "alternative" (AP学生) 或 "tutoring" (普通辅导学生)
   courseId: "text", // Reference to Courses collection
   mentorId: "text", // Reference to Mentors collection
   parentEmail: "text",
@@ -65,6 +69,8 @@ The Students Management Dashboard is a comprehensive system for managing student
   documents: "text", // JSON array of document URLs
   academicLevel: "text",
   specialNeeds: "text",
+  subject: "text", // 单个科目（普通学生）或课程分类（AP学生）
+  subjects: "text", // JSON array - 兼容性保留
   notes: "text",
   createdDate: "date",
   lastModified: "date"
@@ -134,12 +140,18 @@ The Students Management Dashboard is a comprehensive system for managing student
    - Logout button
    ```
 
-2. **Statistics Section**
+2. **Student Type Toggle Section**
    ```
-   - Total Students card
-   - Active Students card
-   - New Enrollments card
-   - Graduation Rate card
+   - Tutoring Students toggle button
+   - Alternative Provision Students toggle button
+   ```
+
+3. **Statistics Section**
+   ```
+   - Total Students card (dynamic based on student type)
+   - Active Students card (dynamic based on student type)
+   - Pending Approval card
+   - Need Attention card
    ```
 
 3. **Action Bar**
@@ -162,9 +174,9 @@ The Students Management Dashboard is a comprehensive system for managing student
    - Student photo column
    - Name column
    - Email column
-   - Course column
+   - Subject/Curriculum column (dynamic header based on student type)
+   - Sessions column
    - Status column
-   - Enrollment date column
    - Actions column
    ```
 
@@ -196,6 +208,55 @@ The Students Management Dashboard is a comprehensive system for managing student
    - Element ID: `activeStudentsCard`
    - Display active count
    - Show status breakdown
+
+3. **Pending Approval Card**
+   - Element ID: `pendingApprovalCard`
+   - Display pending count
+   - Show approval status
+
+4. **Need Attention Card**
+   - Element ID: `needAttentionCard`
+   - Display attention count
+   - Show priority items
+
+### Step 5: Student Type Toggle
+
+1. **Tutoring Students Toggle**
+   - Element ID: `tutoringStudentsBtn`
+   - Background: #17a2b8 (info color)
+   - Active state management
+
+2. **Alternative Provision Toggle**
+   - Element ID: `apStudentsBtn`
+   - Background: #663399 (primary color)
+   - Active state management
+
+### Step 6: Dynamic Subject/Curriculum Management
+
+1. **Subject Options for Tutoring Students**
+   ```javascript
+   const tutoringSubjects = [
+     "Mathematics",
+     "English", 
+     "Science",
+     "History",
+     "Geography",
+     "Art",
+     "Physics",
+     "Chemistry",
+     "Biology"
+   ];
+   ```
+
+2. **Curriculum Options for AP Students**
+   ```javascript
+   const apCurriculum = [
+     "Core Subjects",
+     "Core Subjects + PSHE Careers + PE and Art",
+     "All Subjects + Therapy",
+     "Purple Ruler Blueprint"
+   ];
+   ```
 
 3. **New Enrollments Card**
    - Element ID: `newEnrollmentsCard`
