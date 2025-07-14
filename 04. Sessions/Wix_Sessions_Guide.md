@@ -129,60 +129,7 @@ The Sessions Management Dashboard provides comprehensive session scheduling, tra
 }
 ```
 
-## Database Setup
 
-### Creating Collections
-1. **Navigate to Database Manager**
-   - Go to your Wix Editor
-   - Click on "Database" in the left panel
-   - Select "Manage Collections"
-
-2. **Create Sessions Collection**
-   - Click "Add Collection"
-   - Name: "Sessions"
-   - Set permissions: Admin/Editor write, Member read
-   - Add all fields as specified above
-
-3. **Create Related Collections**
-   - SessionAttendance
-   - SessionMaterials
-   - SessionFeedback
-   - Subjects (if not exists)
-
-### Setting Up Relationships
-1. **Sessions to Students**: Reference field
-2. **Sessions to Mentors**: Reference field
-3. **Sessions to Subjects**: Reference field
-4. **SessionAttendance to Sessions**: Reference field
-5. **SessionMaterials to Sessions**: Reference field
-
-### Sample Data
-```javascript
-// Sample Sessions data
-[
-  {
-    sessionId: "SES-2024-001",
-    title: "Mathematics Tutoring",
-    description: "Algebra and geometry review",
-    mentorId: "mentor123",
-    studentId: "student456",
-    subjectId: "math001",
-    sessionType: "individual",
-    status: "scheduled",
-    scheduledDate: "2024-01-15",
-    startTime: "2024-01-15T14:00:00Z",
-    endTime: "2024-01-15T15:00:00Z",
-    duration: 60,
-    location: "Room 101",
-    maxParticipants: 1,
-    currentParticipants: 1,
-    isRecurring: true,
-    recurrencePattern: "weekly",
-    cost: 50,
-    paymentStatus: "paid"
-  }
-]
-```
 
 ## Step-by-Step Implementation Guide
 

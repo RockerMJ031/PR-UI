@@ -765,8 +765,8 @@ function formatLarkMessage(data) {
    - 替换 LARK_WEBHOOK_URL 为您的实际 Lark webhook URL
    - 测试 Lark 集成是否正常工作
 
-3. 数据库设置：
-   - 确保所有数据库集合已按照指南创建
+3. 数据连接：
+   - 确保所有数据连接已正确配置
    - 验证字段名称和类型匹配
    - 设置正确的权限
 

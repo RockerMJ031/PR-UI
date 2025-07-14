@@ -3,7 +3,7 @@
 ## Table of Contents
 1. [Project Overview](#project-overview)
 2. [Required Wix Elements](#required-wix-elements)
-3. [Database Setup](#database-setup)
+
 4. [Step-by-Step Implementation](#step-by-step-implementation)
 5. [Deployment and Maintenance](#deployment-and-maintenance)
 
@@ -80,24 +80,7 @@ The Wix Finance Dashboard is designed to manage financial operations, track paym
    - data (Text)
    - generatedDate (Date)
 
-## Database Setup
 
-### Step 1: Create Collections
-1. Go to **Database** → **Collections**
-2. Create the four collections listed above
-3. Set appropriate field types and validation rules
-4. Configure permissions (Admin only for sensitive data)
-
-### Step 2: Set Up Relationships
-- Link Payments to Students collection
-- Link Invoices to Students collection
-- Set up proper reference fields
-
-### Step 3: Sample Data
-Add sample financial data for testing:
-- Sample payments with different statuses
-- Sample invoices (paid, pending, overdue)
-- Sample expenses across categories
 
 ## Step-by-Step Implementation
 

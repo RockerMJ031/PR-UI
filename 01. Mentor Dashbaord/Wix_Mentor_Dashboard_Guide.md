@@ -3,7 +3,7 @@
 ## Table of Contents
 1. [Project Overview](#project-overview)
 2. [Required Wix Elements](#required-wix-elements)
-3. [Database Setup](#database-setup)
+
 4. [Step-by-Step Implementation Guide](#step-by-step-implementation-guide)
 5. [Deployment and Maintenance](#deployment-and-maintenance)
 
@@ -69,98 +69,7 @@ This guide will help you create a comprehensive mentor dashboard in Wix with the
 
 **Total Element Count: Approximately 84 elements**
 
-## Database Setup
 
-### Step 1: Create Database Collections
-
-1. **Go to:** Wix Editor → Database → Create Collection
-2. **Create the following collections:**
-
-#### Collection 1: "Students"
-**Collection Name:** `Students`
-**Permissions:** Admin Only
-
-| Field Name | Field Type | Required | Description |
-|------------|------------|----------|-------------|
-| name | Text | Yes | Student full name |
-| email | Text | Yes | Student email address |
-| phone | Text | Yes | Student phone number |
-| age | Number | No | Student age |
-| status | Text | Yes | active/inactive/pending |
-| isAP | Boolean | No | Whether AP student |
-| courses | Reference | No | Associated courses |
-| guardianName | Text | No | Guardian full name |
-| guardianPhone | Text | No | Guardian phone |
-| guardianEmail | Text | No | Guardian email |
-| medicalInfo | Rich Text | No | Medical information |
-| educationBackground | Rich Text | No | Education background |
-| sendStatus | Text | No | SEND status |
-| educationPlan | Text | No | Selected education plan |
-| ehcpFile | Media | No | EHCP document |
-| dateAdded | Date | Yes | Registration date |
-| lastActive | Date | No | Last activity date |
-
-#### Collection 2: "Courses"
-**Collection Name:** `Courses`
-**Permissions:** Admin Only
-
-| Field Name | Field Type | Required | Description |
-|------------|------------|----------|-------------|
-| title | Text | Yes | Course title |
-| subject | Text | Yes | Course subject |
-| level | Text | Yes | Course level |
-| duration | Text | Yes | Course duration |
-| schedule | Text | No | Course schedule |
-| price | Number | Yes | Course price |
-| maxStudents | Number | Yes | Maximum students |
-| currentStudents | Number | Yes | Current enrollment |
-| status | Text | Yes | active/cancelled/extended |
-| description | Rich Text | No | Course description |
-| startDate | Date | Yes | Course start date |
-| endDate | Date | Yes | Course end date |
-| createdDate | Date | Yes | Creation date |
-
-#### Collection 3: "Statistics"
-**Collection Name:** `Statistics`
-**Permissions:** Admin Only
-
-| Field Name | Field Type | Required | Description |
-|------------|------------|----------|-------------|
-| totalStudents | Number | Yes | Total students |
-| activeStudents | Number | Yes | Active students |
-| securityAlerts | Number | Yes | Security alerts |
-| pendingInvoices | Number | Yes | Pending invoices |
-| lastUpdated | Date | Yes | Last update time |
-
-#### Collection 4: "PricingPlans"
-**Collection Name:** `PricingPlans`
-**Permissions:** Site Members
-
-| Field Name | Field Type | Required | Description |
-|------------|------------|----------|-------------|
-| planName | Text | Yes | Plan name |
-| price | Number | Yes | Plan price |
-| duration | Text | Yes | Plan duration |
-| features | Text | Yes | Plan features (comma-separated) |
-| isPopular | Boolean | No | Whether popular plan |
-| description | Rich Text | No | Plan description |
-| displayOrder | Number | Yes | Display order |
-
-#### Collection 5: "Tickets"
-**Collection Name:** `Tickets`
-**Permissions:** Admin Only
-
-| Field Name | Field Type | Required | Description |
-|------------|------------|----------|-------------|
-| title | Text | Yes | Ticket title |
-| description | Rich Text | Yes | Ticket description |
-| status | Text | Yes | open/in-progress/closed |
-| priority | Text | Yes | low/medium/high |
-| submittedBy | Text | Yes | Submitter name |
-| assignedTo | Text | No | Assigned staff |
-| createdDate | Date | Yes | Creation date |
-| updatedDate | Date | No | Last update date |
-| resolution | Rich Text | No | Resolution notes |
 
 ## Step-by-Step Implementation Guide
 

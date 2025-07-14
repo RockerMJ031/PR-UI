@@ -103,62 +103,7 @@ The Students Management Dashboard is a comprehensive system for managing student
 }
 ```
 
-## Database Setup
 
-### Creating Collections
-
-1. **Navigate to Database**
-   - Go to your Wix site dashboard
-   - Click on "Database" in the left sidebar
-   - Click "+ New Collection"
-
-2. **Create Students Collection**
-   - Name: "Students"
-   - Set permissions: Admin (Read & Write)
-   - Add fields as specified above
-   - Set studentId as the primary key
-
-3. **Create StudentProgress Collection**
-   - Name: "StudentProgress"
-   - Set permissions: Admin (Read & Write)
-   - Add fields as specified above
-   - Create reference field to Students collection
-
-4. **Create StudentCommunication Collection**
-   - Name: "StudentCommunication"
-   - Set permissions: Admin (Read & Write)
-   - Add fields as specified above
-   - Create reference field to Students collection
-
-### Setting Up Relationships
-
-1. **Students to Courses**: One-to-Many relationship
-2. **Students to Mentors**: Many-to-One relationship
-3. **Students to Progress**: One-to-Many relationship
-4. **Students to Communication**: One-to-Many relationship
-
-### Sample Data
-
-```javascript
-// Sample Students data
-[
-  {
-    studentId: "STU001",
-    firstName: "John",
-    lastName: "Smith",
-    email: "john.smith@email.com",
-    phone: "+1-555-0123",
-    dateOfBirth: "2005-03-15",
-    enrollmentDate: "2024-01-15",
-    status: "active",
-    courseId: "COURSE001",
-    mentorId: "MENTOR001",
-    parentEmail: "parent.smith@email.com",
-    academicLevel: "Grade 10",
-    profilePhoto: "student-photos/john-smith.jpg"
-  }
-]
-```
 
 ## Step-by-Step Implementation Guide
 
@@ -199,7 +144,6 @@ The Students Management Dashboard is a comprehensive system for managing student
 
 3. **Action Bar**
    ```
-   - Add Student button
    - Import Students button
    - Export Data button
    - Bulk Actions dropdown
@@ -237,7 +181,6 @@ The Students Management Dashboard is a comprehensive system for managing student
    - Home > Students Management
 
 3. **Action Navigation**
-   - Add Student
    - Student Details
    - Edit Student
    - Student Progress
@@ -266,22 +209,17 @@ The Students Management Dashboard is a comprehensive system for managing student
 
 ### Step 5: Action Cards
 
-1. **Add Student Card**
-   - Element ID: `addStudentBtn`
-   - Opens student registration form
-   - Icon: Plus symbol
-
-2. **Import Students Card**
+1. **Import Students Card**
    - Element ID: `importStudentsBtn`
    - Opens file upload dialog
    - Icon: Upload symbol
 
-3. **Export Data Card**
+2. **Export Data Card**
    - Element ID: `exportDataBtn`
    - Downloads student data
    - Icon: Download symbol
 
-4. **Bulk Actions Card**
+3. **Bulk Actions Card**
    - Element ID: `bulkActionsBtn`
    - Shows bulk operation menu
    - Icon: Menu symbol

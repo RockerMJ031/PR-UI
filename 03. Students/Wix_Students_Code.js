@@ -123,7 +123,6 @@ function setupEventHandlers() {
     $w('#refreshBtn').onClick(() => refreshData());
     
     // Action buttons
-    $w('#addStudentBtn').onClick(() => openStudentForm());
     $w('#importStudentsBtn').onClick(() => openImportDialog());
     $w('#exportDataBtn').onClick(() => exportStudentsData());
     $w('#bulkActionsBtn').onClick(() => openBulkActionsMenu());
