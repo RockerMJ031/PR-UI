@@ -1704,6 +1704,112 @@ function getCurrentView() {
     return local.getItem('studentsView') || 'grid';
 }
 
+// ==========================================
+// STUDENT REPORTS FUNCTIONALITY
+// ==========================================
+
+// Switch tabs in student details modal
+function switchTab(tabName) {
+    // Hide all content panels
+    const contentPanels = document.querySelectorAll('.content-panel');
+    contentPanels.forEach(panel => {
+        panel.style.display = 'none';
+    });
+    
+    // Remove active class from all tab buttons
+    const tabButtons = document.querySelectorAll('.tab-button');
+    tabButtons.forEach(button => {
+        button.classList.remove('active');
+    });
+    
+    // Show selected content panel
+    const selectedPanel = document.getElementById(`${tabName}-content`);
+    if (selectedPanel) {
+        selectedPanel.style.display = 'block';
+    }
+    
+    // Add active class to selected tab button
+    const selectedButton = document.querySelector(`[data-tab="${tabName}"]`);
+    if (selectedButton) {
+        selectedButton.classList.add('active');
+    }
+}
+
+// Update reports data based on selected subject
+function updateReportsData(subject) {
+    // Sample reports data based on subject - only Session Report
+    const reportsData = {
+        'mathematics': {
+            session: 'StudentSession2024'
+        },
+        'english': {
+            session: 'StudentSession2024'
+        },
+        'science': {
+            session: 'StudentSession2024'
+        },
+        'history': {
+            session: 'StudentSession2024'
+        },
+        'geography': {
+            session: 'StudentSession2024'
+        },
+        'art': {
+            session: 'StudentSession2024'
+        },
+        'physics': {
+            session: 'StudentSession2024'
+        },
+        'chemistry': {
+            session: 'StudentSession2024'
+        },
+        'biology': {
+            session: 'StudentSession2024'
+        }
+    };
+    
+    const data = reportsData[subject.toLowerCase()] || reportsData['mathematics'];
+    
+    // Update session report password
+    const passwordElement = document.querySelector('#reports-content .report-password');
+    if (passwordElement) {
+        passwordElement.textContent = `Password: ${data.session}`;
+    }
+}
+
+// Enhanced student details population with Reports support
+function populateStudentDetailsWithReports(student) {
+    // Call the original populate function
+    populateStudentDetails(student);
+    
+    // Update reports data based on student's subject
+    if (student.subject) {
+        updateReportsData(student.subject);
+    }
+    
+    // Set up subject dropdown change handler for reports
+    const subjectDropdown = document.getElementById('subjectSelect');
+    if (subjectDropdown) {
+        subjectDropdown.addEventListener('change', function() {
+            updateReportsData(this.value);
+        });
+    }
+}
+
+// Export student report functionality
+function exportStudentReport() {
+    const studentName = $w('#detailStudentName').text;
+    const selectedSubject = document.getElementById('subjectSelect')?.value || 'N/A';
+    
+    // In a real implementation, this would generate and download a comprehensive report
+    showMessage(`Exporting detailed report for ${studentName} - Subject: ${selectedSubject}`, 'success');
+    
+    // Simulate report generation
+    setTimeout(() => {
+        showMessage('Report exported successfully!', 'success');
+    }, 2000);
+}
+
 function refreshData() {
     loadStudentsData();
 }

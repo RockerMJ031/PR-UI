@@ -335,11 +335,56 @@ This document provides a complete testing strategy for the Wix Students Manageme
   - Check performance metrics
   - Test data visualization
 
+- **TC-REP-005**: Student Details Reports Tab
+  - Open student details modal
+  - Click on Reports tab
+  - Verify tab switching functionality
+  - Check reports content display
+  - Test tab navigation between Attendance, Internal Notes, Lesson Content, and Reports
+
+- **TC-REP-006**: Subject-based Report Updates
+  - Select different subjects from dropdown
+  - Verify reports update automatically
+  - Check password generation for each subject
+  - Test report data accuracy per subject
+  - Verify Session Report password format (StudentSession2024)
+
+- **TC-REP-007**: Report Access Control
+  - Verify password protection on reports
+  - Test password display format
+  - Check report security measures
+  - Verify access restrictions
+
+- **TC-REP-008**: Report Export from Student Details
+  - Test export functionality from Reports tab
+  - Verify export includes student name and subject
+  - Check export success messages
+  - Test export file generation
+
+- **TC-REP-009**: Reports Tab UI Elements
+  - Verify "Student Reports" section display
+  - Check "Session Report" card functionality
+  - Test "View Report" button behavior
+  - Verify password display format
+  - Check responsive design of reports section
+
+- **TC-REP-010**: Dynamic Report Data
+  - Test updateReportsData() function
+  - Verify subject-specific data loading
+  - Check default data fallback (mathematics)
+  - Test report data synchronization with student enrollment
+
 **Expected Results**:
 - Reports generate correctly
 - Data exports are accurate
 - Analytics provide meaningful insights
 - Visualizations are clear and helpful
+- Reports tab functions seamlessly within student details
+- Subject-based reports update dynamically
+- Password protection works correctly
+- Export functionality operates from student details
+- UI elements display properly across devices
+- Report data synchronizes with student information
 
 ### 10. Security and Access Control Testing
 

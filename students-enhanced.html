@@ -285,11 +285,17 @@
         .students-table th {
             text-align: left;
             padding: 18px 20px;
-            background-color: #f8f9fa;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             border-bottom: 2px solid var(--border-color);
             color: var(--text-color);
             font-weight: 600;
             font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .students-table th:last-child {
+            text-align: center;
         }
 
         .students-table td {
@@ -298,8 +304,18 @@
             vertical-align: middle;
         }
 
+        .students-table td:last-child {
+            text-align: center;
+        }
+
         .students-table tr:hover {
-            background-color: rgba(102, 51, 153, 0.05);
+            background: linear-gradient(135deg, rgba(102, 51, 153, 0.03) 0%, rgba(102, 51, 153, 0.08) 100%);
+            transform: translateX(2px);
+            transition: all 0.3s ease;
+        }
+
+        .students-table tbody tr {
+            transition: all 0.3s ease;
         }
 
         .student-info {
@@ -367,24 +383,41 @@
         .action-buttons {
             display: flex;
             gap: 8px;
+            justify-content: center;
         }
 
         .action-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: var(--border-radius);
+            padding: 10px 16px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
+            gap: 8px;
             border: none;
             cursor: pointer;
-            color: white;
-            font-size: 14px;
+            font-size: 13px;
+            font-weight: 600;
             transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            min-width: 80px;
         }
 
         .action-btn:hover {
-            transform: scale(1.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .student-details-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .student-details-btn:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+        }
+
+        .student-details-btn i {
+            font-size: 14px;
         }
 
         .leave-request-btn {
@@ -825,6 +858,456 @@
             font-style: italic;
         }
         
+        /* Student Details Modal Styles */
+        .student-details-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .student-details-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 51, 153, 0.3);
+        }
+        
+        .subject-selector-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(102, 51, 153, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(102, 51, 153, 0.1);
+        }
+        
+        .subject-selector-section label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .subject-selector {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            transition: border-color 0.3s ease;
+        }
+        
+        .subject-selector:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 51, 153, 0.1);
+        }
+        
+        .content-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0;
+        }
+        
+        .tab-button {
+            background: none;
+            border: none;
+            padding: 12px 20px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-light);
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+        }
+        
+        .tab-button:hover {
+            background: rgba(102, 51, 153, 0.05);
+            color: var(--primary-color);
+        }
+        
+        .tab-button.active {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary-color);
+        }
+        
+        .content-panel {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .content-panel.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Attendance Styles */
+        .attendance-summary {
+            margin-bottom: 25px;
+        }
+        
+        .attendance-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .stat-number {
+            display: block;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+        
+        .attendance-calendar h4 {
+            margin-bottom: 15px;
+            color: var(--text-dark);
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+        }
+        
+        .calendar-item {
+            padding: 10px;
+            text-align: center;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .calendar-item.present {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--success-color);
+            border: 1px solid rgba(40, 167, 69, 0.2);
+        }
+        
+        .calendar-item.absent {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--danger-color);
+            border: 1px solid rgba(220, 53, 69, 0.2);
+        }
+        
+        /* Notes Styles */
+        .notes-section h4 {
+            margin-bottom: 20px;
+            color: var(--text-dark);
+        }
+        
+        .note-item {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .note-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .note-date {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+        
+        .note-author {
+            font-size: 0.85rem;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .note-content {
+            color: var(--text-dark);
+            line-height: 1.5;
+        }
+        
+        .note-section {
+            margin-bottom: 15px;
+        }
+        
+        .note-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .note-section h5 {
+            color: var(--text-dark);
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .note-section h5 i {
+            font-size: 12px;
+        }
+        
+        .note-section h5 .fa-star {
+            color: var(--success-color);
+        }
+        
+        .note-section h5 .fa-exclamation-circle {
+            color: var(--warning-color);
+        }
+        
+        .note-section p {
+            margin: 0;
+            color: var(--text-dark);
+            line-height: 1.5;
+            padding-left: 20px;
+        }
+        
+        .note-section ol {
+            margin: 0;
+            padding-left: 40px;
+            color: var(--text-dark);
+            line-height: 1.5;
+        }
+        
+        .note-section ol li {
+            margin-bottom: 8px;
+        }
+        
+        .note-section ol li:last-child {
+            margin-bottom: 0;
+        }
+        
+        .add-note-section {
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(102, 51, 153, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(102, 51, 153, 0.1);
+        }
+        
+        .add-note-section textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            resize: vertical;
+            margin-bottom: 15px;
+        }
+        
+        .add-note-section textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 51, 153, 0.1);
+        }
+        
+        /* Lesson Content Styles */
+        .lesson-content-section h4 {
+            margin-bottom: 20px;
+            color: var(--text-dark);
+        }
+        
+        .content-modules {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .module-item {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease;
+        }
+        
+        .module-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .module-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .module-header i {
+            font-size: 1.2rem;
+        }
+        
+        .module-item.completed .module-header i {
+            color: var(--success-color);
+        }
+        
+        .module-item.in-progress .module-header i {
+            color: var(--warning-color);
+        }
+        
+        .module-item.pending .module-header i {
+            color: var(--text-light);
+        }
+        
+        .module-title {
+            font-weight: 600;
+            color: var(--text-dark);
+            flex: 1;
+        }
+        
+        .module-status {
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+        
+        .module-item.completed .module-status {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--success-color);
+        }
+        
+        .module-item.in-progress .module-status {
+            background: rgba(255, 193, 7, 0.1);
+            color: var(--warning-color);
+        }
+        
+        .module-item.pending .module-status {
+            background: rgba(108, 117, 125, 0.1);
+            color: var(--text-light);
+        }
+        
+        .module-progress {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .progress-bar {
+            flex: 1;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            min-width: 40px;
+        }
+        
+        /* Lesson Content List Styles */
+        .lesson-content-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .lesson-item {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .lesson-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .lesson-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .lesson-header i {
+            font-size: 1.1rem;
+            color: var(--primary-color);
+        }
+        
+        .lesson-date {
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+        
+        .lesson-description {
+            margin: 0;
+        }
+        
+        .lesson-description p {
+            margin: 0;
+            line-height: 1.6;
+            color: var(--text-color);
+            font-size: 0.95rem;
+        }
+        
         .modal-footer {
             padding: 20px 30px;
             background-color: #f8f9fa;
@@ -832,6 +1315,121 @@
             display: flex;
             justify-content: flex-end;
             gap: 10px;
+        }
+
+        /* Student Reports Styles */
+        .reports-section {
+            padding: 20px 0;
+        }
+        
+        .reports-description {
+            color: var(--text-light);
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+        
+        .student-reports-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-top: 20px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .student-report-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+        
+        .student-report-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        .student-report-header {
+            padding: 20px;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+        
+        .student-report-card.session .student-report-header {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+        
+        .student-report-card.attendance .student-report-header {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+        
+        .student-report-card.behaviour .student-report-header {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        }
+        
+        .student-report-card.termly .student-report-header {
+            background: linear-gradient(135deg, #27ae60, #229954);
+        }
+        
+        .report-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+        
+        .student-report-header h5 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0 0 5px 0;
+        }
+        
+        .student-report-header p {
+            font-size: 0.85rem;
+            margin: 0;
+            opacity: 0.9;
+        }
+        
+        .student-report-body {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .student-report-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: var(--primary-color);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .student-report-link:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 51, 153, 0.3);
+        }
+        
+        .report-password {
+            background: #f8f9fa;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: var(--text-color);
+            text-align: center;
         }
 
         /* Student Type Tabs */
@@ -1111,8 +1709,9 @@
                             <td><span class="status-badge status-active">Active</span></td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="action-btn leave-request-btn" onclick="openStudentHighlight('John Doe')" title="View Weekly Highlights">
-                                        <i class="fas fa-star"></i>
+                                    <button class="action-btn student-details-btn" onclick="openStudentDetails('John Doe')" title="View Student Details">
+                                        <i class="fas fa-user-circle"></i>
+                                        Details
                                     </button>
                                 </div>
                             </td>
@@ -1133,8 +1732,9 @@
                             <td><span class="status-badge status-active">Active</span></td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="action-btn leave-request-btn" onclick="openStudentHighlight('Jane Smith')" title="View Weekly Highlights">
-                                        <i class="fas fa-star"></i>
+                                    <button class="action-btn student-details-btn" onclick="openStudentDetails('Jane Smith')" title="View Student Details">
+                                        <i class="fas fa-user-circle"></i>
+                                        Details
                                     </button>
                                 </div>
                             </td>
@@ -1155,8 +1755,9 @@
                             <td><span class="status-badge status-pending">Pending</span></td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="action-btn leave-request-btn" onclick="openStudentHighlight('Mike Johnson')" title="View Weekly Highlights">
-                                        <i class="fas fa-star"></i>
+                                    <button class="action-btn student-details-btn" onclick="openStudentDetails('Mike Johnson')" title="View Student Details">
+                                        <i class="fas fa-user-circle"></i>
+                                        Details
                                     </button>
                                 </div>
                             </td>
@@ -1177,8 +1778,9 @@
                             <td><span class="status-badge status-active">Active</span></td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="action-btn leave-request-btn" onclick="openStudentHighlight('Sarah Wilson')" title="View Weekly Highlights">
-                                        <i class="fas fa-star"></i>
+                                    <button class="action-btn student-details-btn" onclick="openStudentDetails('Sarah Wilson')" title="View Student Details">
+                                        <i class="fas fa-user-circle"></i>
+                                        Details
                                     </button>
                                 </div>
                             </td>
@@ -1199,8 +1801,9 @@
                             <td><span class="status-badge status-concern">NEEDS ATTENTION</span></td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="action-btn leave-request-btn" onclick="openStudentHighlight('Alex Brown')" title="View Weekly Highlights">
-                                        <i class="fas fa-star"></i>
+                                    <button class="action-btn student-details-btn" onclick="openStudentDetails('Alex Brown')" title="View Student Details">
+                                        <i class="fas fa-user-circle"></i>
+                                        Details
                                     </button>
                                 </div>
                             </td>
@@ -1221,8 +1824,9 @@
                             <td><span class="status-badge status-active">Active</span></td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="action-btn leave-request-btn" onclick="openStudentHighlight('Lisa Davis')" title="View Weekly Highlights">
-                                        <i class="fas fa-star"></i>
+                                    <button class="action-btn student-details-btn" onclick="openStudentDetails('Lisa Davis')" title="View Student Details">
+                                        <i class="fas fa-user-circle"></i>
+                                        Details
                                     </button>
                                 </div>
                             </td>
@@ -1243,8 +1847,9 @@
                             <td><span class="status-badge status-pending">Pending</span></td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="action-btn leave-request-btn" onclick="openStudentHighlight('Tom Miller')" title="View Weekly Highlights">
-                                        <i class="fas fa-star"></i>
+                                    <button class="action-btn student-details-btn" onclick="openStudentDetails('Tom Miller')" title="View Student Details">
+                                        <i class="fas fa-user-circle"></i>
+                                        Details
                                     </button>
                                 </div>
                             </td>
@@ -1265,8 +1870,9 @@
                             <td><span class="status-badge status-active">Active</span></td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="action-btn leave-request-btn" onclick="openStudentHighlight('Emma Garcia')" title="View Weekly Highlights">
-                                        <i class="fas fa-star"></i>
+                                    <button class="action-btn student-details-btn" onclick="openStudentDetails('Emma Garcia')" title="View Student Details">
+                                        <i class="fas fa-user-circle"></i>
+                                        Details
                                     </button>
                                 </div>
                             </td>
@@ -1288,8 +1894,9 @@
                             <td><span class="status-badge status-active">Active</span></td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="action-btn leave-request-btn" onclick="openStudentHighlight('Ryan Jones')" title="View Weekly Highlights">
-                                        <i class="fas fa-star"></i>
+                                    <button class="action-btn student-details-btn" onclick="openStudentDetails('Ryan Jones')" title="View Student Details">
+                                        <i class="fas fa-user-circle"></i>
+                                        Details
                                     </button>
                                 </div>
                             </td>
@@ -1310,8 +1917,9 @@
                             <td><span class="status-badge status-pending">Pending</span></td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="action-btn leave-request-btn" onclick="openStudentHighlight('Katie Thompson')" title="View Weekly Highlights">
-                                        <i class="fas fa-star"></i>
+                                    <button class="action-btn student-details-btn" onclick="openStudentDetails('Katie Thompson')" title="View Student Details">
+                                        <i class="fas fa-user-circle"></i>
+                                        Details
                                     </button>
                                 </div>
                             </td>
@@ -1332,8 +1940,9 @@
                             <td><span class="status-badge status-active">Active</span></td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="action-btn leave-request-btn" onclick="openStudentHighlight('Daniel White')" title="View Weekly Highlights">
-                                        <i class="fas fa-star"></i>
+                                    <button class="action-btn student-details-btn" onclick="openStudentDetails('Daniel White')" title="View Student Details">
+                                        <i class="fas fa-user-circle"></i>
+                                        Details
                                     </button>
                                 </div>
                             </td>
@@ -1354,8 +1963,9 @@
                             <td><span class="status-badge status-concern">NEEDS ATTENTION</span></td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="action-btn leave-request-btn" onclick="openStudentHighlight('Maya Roberts')" title="View Weekly Highlights">
-                                        <i class="fas fa-star"></i>
+                                    <button class="action-btn student-details-btn" onclick="openStudentDetails('Maya Roberts')" title="View Student Details">
+                                        <i class="fas fa-user-circle"></i>
+                                        Details
                                     </button>
                                 </div>
                             </td>
@@ -1485,6 +2095,180 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Details Modal -->
+    <div id="studentDetailsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="detailsStudentName">Student Details</h2>
+                <span class="close" onclick="closeStudentDetailsModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="details-content">
+                    <!-- Subject Selector -->
+                    <div class="subject-selector-section">
+                        <label for="subjectSelector">Select Subject:</label>
+                        <select id="subjectSelector" class="subject-selector" onchange="switchSubjectContent()">
+                            <option value="">Choose a subject...</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Content Tabs -->
+                    <div class="content-tabs">
+                        <button class="tab-button active" onclick="switchTab('attendance')" data-tab="attendance">
+                            <i class="fas fa-calendar-check"></i>
+                            Attendance
+                        </button>
+                        <button class="tab-button" onclick="switchTab('notes')" data-tab="notes">
+                            <i class="fas fa-sticky-note"></i>
+                            Internal Notes
+                        </button>
+                        <button class="tab-button" onclick="switchTab('content')" data-tab="content">
+                            <i class="fas fa-book-open"></i>
+                            Lesson Content
+                        </button>
+                        <button class="tab-button" onclick="switchTab('reports')" data-tab="reports">
+                            <i class="fas fa-chart-bar"></i>
+                            Reports
+                        </button>
+                    </div>
+                    
+                    <!-- Content Areas -->
+                    <div class="tab-content">
+                        <!-- Attendance Tab -->
+                        <div id="attendance-content" class="content-panel active">
+                            <div class="attendance-summary">
+                                <div class="attendance-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-number">良好</span>
+                                        <span class="stat-label">Attendance Rate</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-number">12</span>
+                                        <span class="stat-label">Sessions Attended</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-number">2</span>
+                                        <span class="stat-label">Missed Sessions</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="attendance-calendar">
+                                <h4>Recent Attendance</h4>
+                                <div class="calendar-grid">
+                                    <div class="calendar-item present">Mon 18/12</div>
+                                    <div class="calendar-item present">Wed 20/12</div>
+                                    <div class="calendar-item absent">Fri 22/12</div>
+                                    <div class="calendar-item present">Mon 25/12</div>
+                                    <div class="calendar-item present">Wed 27/12</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Internal Notes Tab -->
+                        <div id="notes-content" class="content-panel">
+                            <div class="notes-section">
+                                <h4>Internal Notes</h4>
+                                <div class="note-item">
+                                    <div class="note-header">
+                                        <span class="note-date">Dec 20, 2023</span>
+                                        <span class="note-author">Purple Ruler Teacher</span>
+                                    </div>
+                                    <div class="note-content">
+                                        <div class="note-section">
+                                            <h5><i class="fas fa-star"></i> Strengths:</h5>
+                                            <ol>
+                                                <li>Strong understanding of place value and accurate execution of calculations involving addition, subtraction, multiplication, and division.</li>
+                                                <li>Confident with basic algebraic calculations and able to apply methods correctly.</li>
+                                                <li>Good conceptual grasp of place value, supporting logical problem-solving.</li>
+                                            </ol>
+                                        </div>
+                                        <div class="note-section">
+                                            <h5><i class="fas fa-exclamation-circle"></i> Areas for Improvement:</h5>
+                                            <ol>
+                                                <li>Plotting</li>
+                                                <li>Makes occasional errors in fraction operations</li>
+                                                <li>Coordinates</li>
+                                            </ol>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Lesson Content Tab -->
+                        <div id="content-content" class="content-panel">
+                            <div class="lesson-content-section">
+                                <h4>Lesson Content</h4>
+                                <div class="lesson-content-list">
+                                    <div class="lesson-item">
+                                        <div class="lesson-header">
+                                            <i class="fas fa-calendar-alt"></i>
+                                            <span class="lesson-date">Dec 20, 2024</span>
+                                        </div>
+                                        <div class="lesson-description">
+                                            <p>The aims of the session were to cover revision on rounding off (to the nearest whole number and decimal place), fractions and ratios. Due to time constraints we were unable to cover a portion of the fraction revision and ratio.</p>
+                                        </div>
+                                    </div>
+                                    <div class="lesson-item">
+                                        <div class="lesson-header">
+                                            <i class="fas fa-calendar-alt"></i>
+                                            <span class="lesson-date">Dec 18, 2024</span>
+                                        </div>
+                                        <div class="lesson-description">
+                                            <p>Focused on quadratic equations and their applications. Students practiced solving equations using factoring, completing the square, and the quadratic formula. Homework assigned on mixed practice problems.</p>
+                                        </div>
+                                    </div>
+                                    <div class="lesson-item">
+                                        <div class="lesson-header">
+                                            <i class="fas fa-calendar-alt"></i>
+                                            <span class="lesson-date">Dec 15, 2024</span>
+                                        </div>
+                                        <div class="lesson-description">
+                                            <p>Introduction to algebraic expressions and basic operations. Covered simplifying expressions, combining like terms, and distributive property. Students showed good understanding of fundamental concepts.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Reports Tab -->
+                        <div id="reports-content" class="content-panel">
+                            <div class="reports-section">
+                                <h4>Student Reports</h4>
+                                <p class="reports-description">Access detailed reports for this student's progress and performance.</p>
+                                
+                                <div class="student-reports-grid">
+                                    <!-- Student Session Report -->
+                                    <div class="student-report-card session">
+                                        <div class="student-report-header">
+                                            <div class="report-icon">
+                                                <i class="fas fa-user-graduate"></i>
+                                            </div>
+                                            <h5>Session Report</h5>
+                                            <p>Individual session progress and outcomes</p>
+                                        </div>
+                                        <div class="student-report-body">
+                                            <a href="https://example-lark-document-link.com/student-session" class="student-report-link" target="_blank">
+                                                <i class="fas fa-external-link-alt"></i>
+                                                View Report
+                                            </a>
+                                            <div class="report-password">
+                                                Password: StudentSession2024
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeStudentDetailsModal()">Close</button>
             </div>
         </div>
     </div>
@@ -1863,15 +2647,325 @@
             alert('Highlight report exported successfully!');
         }
         
+        // Student Details Modal Functions
+        function openStudentDetails(studentName = 'Selected Student') {
+            const modal = document.getElementById('studentDetailsModal');
+            const studentNameElement = document.getElementById('detailsStudentName');
+            
+            // Set student name
+            studentNameElement.textContent = `${studentName} - Details`;
+            
+            // Show modal
+            modal.style.display = 'block';
+            
+            // Initialize subject selector with student's subjects
+            initializeSubjectSelector(studentName);
+            
+            // Initialize with first tab active
+            switchTab('attendance');
+            
+            // Load student data
+            loadStudentData();
+        }
+        
+        function closeStudentDetailsModal() {
+            document.getElementById('studentDetailsModal').style.display = 'none';
+        }
+        
+        function initializeSubjectSelector(studentName) {
+            const subjectSelector = document.getElementById('subjectSelector');
+            
+            // Sample subjects based on student - in real implementation, this would come from your database
+            const studentSubjects = {
+                'John Doe': ['Mathematics', 'Physics', 'Chemistry'],
+                'Jane Smith': ['English Literature', 'Creative Writing', 'History'],
+                'Mike Johnson': ['Biology', 'Chemistry', 'Environmental Science'],
+                'Sarah Wilson': ['World History', 'Geography', 'Social Studies'],
+                'Alex Brown': ['Advanced Mathematics', 'Statistics', 'Computer Science']
+            };
+            
+            const subjects = studentSubjects[studentName] || ['Mathematics', 'English', 'Science'];
+            
+            // Clear and populate subject selector
+            subjectSelector.innerHTML = '<option value="">Choose a subject...</option>';
+            subjects.forEach(subject => {
+                const option = document.createElement('option');
+                option.value = subject.toLowerCase().replace(/\s+/g, '-');
+                option.textContent = subject;
+                subjectSelector.appendChild(option);
+            });
+            
+            // Select first subject by default
+            if (subjects.length > 0) {
+                subjectSelector.value = subjects[0].toLowerCase().replace(/\s+/g, '-');
+                switchSubjectContent();
+            }
+        }
+        
+        function switchTab(tabName) {
+            // Remove active class from all tabs and panels
+            document.querySelectorAll('.tab-button').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.content-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            
+            // Add active class to selected tab and panel
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            document.getElementById(`${tabName}-content`).classList.add('active');
+        }
+        
+        function switchSubjectContent() {
+            const selectedSubject = document.getElementById('subjectSelector').value;
+            console.log('Subject changed to:', selectedSubject);
+            
+            // Load data for the selected subject
+            loadStudentData(selectedSubject);
+        }
+        
+        function loadStudentData(subject = 'mathematics') {
+            // This function would typically fetch data from your backend
+            // For now, we'll use sample data
+            
+            updateAttendanceData(subject);
+            updateNotesData(subject);
+            updateLessonContentData(subject);
+            updateReportsData(subject);
+        }
+        
+        function updateAttendanceData(subject) {
+            // Sample attendance data - in real implementation, this would come from your database
+            const attendanceData = {
+                'mathematics': { rate: 92, attended: 22, missed: 2 },
+                'english-literature': { rate: 88, attended: 18, missed: 3 },
+                'biology': { rate: 95, attended: 19, missed: 1 },
+                'world-history': { rate: 85, attended: 17, missed: 3 },
+                'advanced-mathematics': { rate: 78, attended: 14, missed: 4 }
+            };
+            
+            const data = attendanceData[subject] || attendanceData['mathematics'];
+            
+            // Update attendance statistics
+            const statItems = document.querySelectorAll('#attendance-content .stat-item');
+            if (statItems.length >= 3) {
+                statItems[0].querySelector('.stat-number').textContent = data.rate + '%';
+                statItems[1].querySelector('.stat-number').textContent = data.attended;
+                statItems[2].querySelector('.stat-number').textContent = data.missed;
+            }
+        }
+        
+        function updateNotesData(subject) {
+            // Sample notes data
+            const notesData = {
+                'mathematics': [
+                    {
+                        date: 'Dec 20, 2023',
+                        author: 'Purple Ruler Teacher',
+                        content: `<div class="note-section">
+                            <h5><i class="fas fa-star"></i> Strengths:</h5>
+                            <ol>
+                                <li>Strong understanding of place value and accurate execution of calculations involving addition, subtraction, multiplication, and division.</li>
+                                <li>Confident with basic algebraic calculations and able to apply methods correctly.</li>
+                                <li>Good conceptual grasp of place value, supporting logical problem-solving.</li>
+                            </ol>
+                        </div>
+                        <div class="note-section">
+                            <h5><i class="fas fa-exclamation-circle"></i> Areas for Improvement:</h5>
+                            <ol>
+                                <li>Plotting</li>
+                                <li>Makes occasional errors in fraction operations</li>
+                                <li>Coordinates</li>
+                            </ol>
+                        </div>`
+                    }
+                ],
+                'english-literature': [
+                    {
+                        date: 'Dec 18, 2023',
+                        author: 'Purple Ruler Teacher',
+                        content: `<div class="note-section">
+                            <h5><i class="fas fa-star"></i> Strengths:</h5>
+                            <ol>
+                                <li>Excellent reading comprehension and analytical skills.</li>
+                                <li>Strong vocabulary and creative writing abilities.</li>
+                                <li>Active participation in class discussions and debates.</li>
+                            </ol>
+                        </div>
+                        <div class="note-section">
+                            <h5><i class="fas fa-exclamation-circle"></i> Areas for Improvement:</h5>
+                            <ol>
+                                <li>Essay structure and organization</li>
+                                <li>Grammar and punctuation accuracy</li>
+                                <li>Time management during writing tasks</li>
+                            </ol>
+                        </div>`
+                    }
+                ],
+                'biology': [
+                    {
+                        date: 'Dec 15, 2023',
+                        author: 'Purple Ruler Teacher',
+                        content: `<div class="note-section">
+                            <h5><i class="fas fa-star"></i> Strengths:</h5>
+                            <ol>
+                                <li>Excellent understanding of cellular biology and molecular processes.</li>
+                                <li>Outstanding laboratory skills and attention to detail.</li>
+                                <li>Strong ability to connect theoretical concepts with practical applications.</li>
+                            </ol>
+                        </div>
+                        <div class="note-section">
+                            <h5><i class="fas fa-exclamation-circle"></i> Areas for Improvement:</h5>
+                            <ol>
+                                <li>Scientific report writing and data analysis</li>
+                                <li>Memorization of complex biological terminology</li>
+                                <li>Speed in completing practical assessments</li>
+                            </ol>
+                        </div>`
+                    }
+                ]
+            };
+            
+            const notes = notesData[subject] || notesData['mathematics'];
+            const notesSection = document.querySelector('#notes-content .notes-section');
+            
+            // Clear existing notes (except the add note section)
+            const existingNotes = notesSection.querySelectorAll('.note-item');
+            existingNotes.forEach(note => note.remove());
+            
+            // Add new notes
+            const addNoteSection = notesSection.querySelector('.add-note-section');
+            notes.forEach(note => {
+                const noteElement = document.createElement('div');
+                noteElement.className = 'note-item';
+                noteElement.innerHTML = `
+                    <div class="note-header">
+                        <span class="note-date">${note.date}</span>
+                        <span class="note-author">${note.author}</span>
+                    </div>
+                    <div class="note-content">${note.content}</div>
+                `;
+                notesSection.insertBefore(noteElement, addNoteSection);
+            });
+        }
+        
+        function updateLessonContentData(subject) {
+            // Sample lesson content data
+            const lessonData = {
+                'mathematics': [
+                    { title: 'Algebra Fundamentals', status: 'completed', progress: 100 },
+                    { title: 'Geometry Basics', status: 'in-progress', progress: 75 },
+                    { title: 'Trigonometry', status: 'pending', progress: 0 }
+                ],
+                'english-literature': [
+                    { title: 'Shakespeare Studies', status: 'completed', progress: 100 },
+                    { title: 'Modern Poetry', status: 'in-progress', progress: 60 }
+                ],
+                'biology': [
+                    { title: 'Cell Biology', status: 'completed', progress: 100 },
+                    { title: 'Genetics', status: 'in-progress', progress: 45 }
+                ]
+            };
+            
+            const modules = lessonData[subject] || lessonData['mathematics'];
+            const modulesContainer = document.querySelector('#content-content .content-modules');
+            
+            // Clear existing modules
+            modulesContainer.innerHTML = '';
+            
+            // Add new modules
+            modules.forEach(module => {
+                const moduleElement = document.createElement('div');
+                moduleElement.className = `module-item ${module.status}`;
+                moduleElement.innerHTML = `
+                    <div class="module-header">
+                        <i class="fas ${module.status === 'completed' ? 'fa-check-circle' : module.status === 'in-progress' ? 'fa-play-circle' : 'fa-clock'}"></i>
+                        <span class="module-title">${module.title}</span>
+                        <span class="module-status">${module.status.replace('-', ' ').toUpperCase()}</span>
+                    </div>
+                    <div class="module-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${module.progress}%"></div>
+                        </div>
+                        <span class="progress-text">${module.progress}%</span>
+                    </div>
+                `;
+                modulesContainer.appendChild(moduleElement);
+            });
+        }
+        
+        function updateReportsData(subject) {
+            // Sample reports data based on subject
+            const reportsData = {
+                'mathematics': {
+                    session: { password: 'StudentSession2024' }
+                },
+                'english-literature': {
+                    session: { password: 'StudentSession2024' }
+                },
+                'biology': {
+                    session: { password: 'StudentSession2024' }
+                }
+            };
+            
+            const data = reportsData[subject] || reportsData['mathematics'];
+            
+            // Update session report password
+            const passwordElement = document.querySelector('#reports-content .report-password');
+            if (passwordElement) {
+                passwordElement.textContent = data.session?.password || 'StudentSession2024';
+            }
+        }
+        
+        function addNote() {
+            const textarea = document.querySelector('#notes-content .add-note-section textarea');
+            const noteContent = textarea.value.trim();
+            
+            if (noteContent) {
+                const notesSection = document.querySelector('#notes-content .notes-section');
+                const addNoteSection = notesSection.querySelector('.add-note-section');
+                
+                const noteElement = document.createElement('div');
+                noteElement.className = 'note-item';
+                noteElement.innerHTML = `
+                    <div class="note-header">
+                        <span class="note-date">${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                        <span class="note-author">Current User</span>
+                    </div>
+                    <div class="note-content">${noteContent}</div>
+                `;
+                
+                notesSection.insertBefore(noteElement, addNoteSection);
+                textarea.value = '';
+                
+                alert('Note added successfully!');
+            } else {
+                alert('Please enter a note before adding.');
+            }
+        }
+        
+        function exportStudentReport() {
+            const studentName = document.getElementById('detailsStudentName').textContent;
+            const selectedSubject = document.getElementById('subjectSelector').value;
+            
+            // In a real implementation, this would generate and download a comprehensive report
+            alert(`Exporting detailed report for ${studentName} - Subject: ${selectedSubject}`);
+        }
+        
         // Close modal when clicking outside
         window.onclick = function(event) {
             const highlightModal = document.getElementById('highlightModal');
             const studentModal = document.getElementById('studentModal');
+            const studentDetailsModal = document.getElementById('studentDetailsModal');
+            
             if (event.target === highlightModal) {
                 closeHighlightModal();
             }
             if (event.target === studentModal) {
                 closeStudentModal();
+            }
+            if (event.target === studentDetailsModal) {
+                closeStudentDetailsModal();
             }
         }
 

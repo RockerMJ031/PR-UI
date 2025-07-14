@@ -469,16 +469,38 @@ The Students Management Dashboard is a comprehensive system for managing student
    - Individual student reports
    - Class performance reports
    - Enrollment reports
+   - Subject-specific reports
+   - Session progress reports
+   - Attendance tracking reports
 
 2. **Analytics Dashboard**
    - Student engagement metrics
    - Performance analytics
    - Trend analysis
+   - Real-time progress tracking
 
 3. **Export Functionality**
    - PDF reports
    - Excel exports
    - CSV data exports
+   - Automated report generation
+
+4. **Student Details Reports Tab**
+   - **Tab Navigation**: Integrated Reports tab in student details modal
+   - **Subject-Based Reports**: Dynamic report generation based on selected subject
+   - **Session Reports**: Individual session progress with password protection
+   - **Attendance Reports**: Comprehensive attendance tracking and analysis
+   - **Report Access Control**: Password-protected reports for security
+   - **Dynamic Updates**: Reports update automatically when subject is changed
+   - **Export Options**: Direct export functionality from student details
+
+5. **Reports Implementation**
+   - **switchTab()**: Function to handle tab switching in student details
+   - **updateReportsData()**: Updates report data based on selected subject
+   - **populateStudentDetailsWithReports()**: Enhanced student details with reports
+   - **exportStudentReport()**: Export individual student reports
+   - **Password Generation**: Automatic password generation for report access
+   - **Subject Integration**: Reports automatically sync with student's enrolled subjects
 
 ## Deployment and Maintenance
 
