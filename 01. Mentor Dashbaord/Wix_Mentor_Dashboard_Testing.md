@@ -1,5 +1,16 @@
 # Wix Mentor Dashboard Testing Guide
 
+## Overview
+This document outlines the comprehensive testing strategy for the Wix Mentor Dashboard, with special focus on EHCP file upload functionality, ensuring all features work correctly and provide a smooth user experience.
+
+## Testing Environment
+- **Platform**: Wix Editor/Studio
+- **Browsers**: Chrome, Firefox, Safari, Edge
+- **Devices**: Desktop, Tablet, Mobile
+- **Data**: Test database with sample records
+- **File Storage**: Wix Media Manager with test files
+- **Security**: Backend file verification enabled
+
 ## Table of Contents
 1. [Comprehensive Testing](#comprehensive-testing)
 2. [Common Issues and Solutions](#common-issues-and-solutions)
@@ -163,15 +174,45 @@
 **Expected Result:** Notifications sent successfully, content accurate
 **Pass/Fail:** ___
 
-#### Test Case 14: File Upload
-**Objective:** Test file upload functionality
+#### Test Case 14: EHCP File Upload
+**Objective:** Test EHCP file upload functionality comprehensively
 **Steps:**
-1. Upload EHCP file
-2. Verify file is stored correctly
-3. Test file size limits
-4. Test file type restrictions
+1. Test valid file upload (PDF, DOC, DOCX)
+2. Test file size limits (max 10MB) - 统一文件大小限制
+3. Test invalid file types (TXT, EXE, JPG, PNG 等非文档格式)
+4. Test file name validation
+5. Verify file is stored in Wix Media Manager
+6. Test file association with student record
+7. Test file download/preview functionality
+8. Test file replacement functionality
+9. Test upload progress indicator
+10. Test error handling for upload failures
 
-**Expected Result:** Files upload successfully, restrictions enforced
+**Expected Result:** Valid files upload successfully, invalid files rejected with clear error messages, files properly associated with student records
+**Pass/Fail:** ___
+
+#### Test Case 14a: EHCP File Security
+**Objective:** Test file upload security measures
+**Steps:**
+1. Test file content scanning
+2. Test malicious file rejection
+3. Test file access permissions
+4. Test file URL security
+5. Verify only authorized users can access files
+
+**Expected Result:** Security measures prevent malicious uploads, files are properly protected
+**Pass/Fail:** ___
+
+#### Test Case 14b: EHCP File Management
+**Objective:** Test file management operations
+**Steps:**
+1. Test file listing for each student
+2. Test file deletion functionality
+3. Test file update/replacement
+4. Test bulk file operations
+5. Test file search and filtering
+
+**Expected Result:** All file management operations work correctly
 **Pass/Fail:** ___
 
 #### Test Case 15: Data Export
@@ -563,6 +604,199 @@
 2. **Stress Testing:** Test system limits
 3. **Spike Testing:** Test sudden load increases
 4. **Volume Testing:** Test with large data volumes
+5. **File Upload Load Testing:** Test concurrent file uploads (10+ simultaneous)
+6. **Large File Performance:** Monitor file upload performance with large files
+
+## EHCP File Upload Specific Testing
+
+### File Upload Functional Testing
+
+#### Test Case F1: Valid File Upload
+**Objective:** Verify successful upload of valid EHCP files
+**Test Data:** 
+- PDF file (2MB) - EHCP 文档示例
+- DOC file (1.5MB) - EHCP 文档示例
+- DOCX file (3MB) - EHCP 文档示例
+- 注意：仅支持 PDF、DOC、DOCX 格式，不再支持图片格式
+
+**Steps:**
+1. Navigate to AP Student Registration form
+2. Fill in required student information
+3. Click on EHCP file upload button
+4. Select valid file from test data
+5. Wait for upload completion
+6. Verify file upload status indicator
+7. Submit the form
+8. Check database for file URL storage
+9. Verify file accessibility
+
+**Expected Result:** 
+- File uploads successfully
+- Upload progress shown
+- File URL saved to database
+- File associated with student record
+- Submit button enabled after upload
+
+**Pass/Fail:** ___
+
+#### Test Case F2: Invalid File Type Rejection
+**Objective:** Verify rejection of invalid file types
+**Test Data:**
+- TXT file (text/plain)
+- EXE file renamed to .pdf
+- ZIP file with .doc extension
+- MP4 file with .pdf extension
+- Unknown extension file
+- Image files (JPG, PNG, GIF)
+- File with dangerous name (virus.pdf)
+- File with invalid MIME type
+
+**Steps:**
+1. Attempt to upload each invalid file type
+2. Verify backend security checks trigger
+3. Check error messages displayed
+4. Ensure upload button remains disabled
+5. Verify no data is saved to database
+6. Check security logs are created
+7. Test file content validation
+8. Verify MIME type checking
+
+**Expected Result:**
+- Invalid files rejected with specific error messages
+- Security checks prevent malicious uploads
+- Clear error messages shown to user
+- No database entries created
+- Security events logged
+- Form submission prevented
+- Content validation works correctly
+
+**Pass/Fail:** ___
+
+#### Test Case F3: File Size Limit Testing
+**Objective:** Test file size validation (统一为 10MB)
+**Test Data:**
+- 1MB PDF file (should pass)
+- 5MB DOCX file (should pass)
+- 9.9MB DOC file (should pass)
+- File exactly at limit (10MB)
+- File slightly over limit (10.1MB)
+- Very large file (50MB)
+- Empty file (0KB)
+- Very small file (50 bytes)
+
+**Steps:**
+1. Test each file size scenario
+2. Verify size validation triggers at 10MB
+3. Check minimum size validation (100 bytes)
+4. Verify error messages are clear
+5. Test boundary conditions (exactly 10MB)
+6. Check file size display in UI
+
+**Expected Result:**
+- Files ≤10MB and ≥100 bytes accepted
+- Oversized files rejected with clear message
+- Undersized files rejected as potentially corrupted
+- Boundary cases handled correctly
+- File size displayed in human-readable format
+
+**Pass/Fail:** ___
+
+### File Upload Security Testing
+
+#### Test Case S1: Malicious File Detection
+**Objective:** Verify security against malicious files
+**Test Data:**
+- Normal PDF file (valid EHCP document)
+- DOC file with macros (test document)
+- Suspicious filenames (containing virus, malware keywords)
+- Renamed executable file (.exe renamed to .pdf)
+- Empty or corrupted files
+- PDF with embedded JavaScript
+- DOC with external links
+
+**Steps:**
+1. Attempt to upload each test file
+2. Verify backend security scanning triggers
+3. Check file content analysis
+4. Test rejection mechanisms
+5. Verify security logging
+6. Check quarantine procedures
+
+**Expected Result:**
+- Malicious files detected and rejected
+- Content scanning identifies threats
+- Security events logged with details
+- User notified with appropriate security message
+- Suspicious files quarantined
+- Admin notifications sent for security events
+
+**Pass/Fail:** ___
+
+#### Test Case S2: File Access Control
+**Objective:** Test file access permissions
+**Test Data:**
+- Valid user account
+- Unauthorized user account
+- Anonymous access attempt
+
+**Steps:**
+1. Upload file as authorized user
+2. Attempt access as unauthorized user
+3. Test direct URL access
+4. Verify permission enforcement
+
+**Expected Result:**
+- Only authorized users can access files
+- Direct URL access properly controlled
+- Permission violations logged
+
+**Pass/Fail:** ___
+
+### File Upload Integration Testing
+
+#### Test Case I1: Database Integration
+**Objective:** Verify file data integration with database
+**Steps:**
+1. Upload file and complete student registration
+2. Query database for student record
+3. Verify all file-related fields populated
+4. Check data consistency
+5. Test file URL validity
+6. Verify Document field contains file URL
+7. Test file accessibility through URL
+8. Check file metadata storage
+
+**Expected Result:**
+- All file metadata saved correctly
+- File URL accessible and valid
+- Data relationships maintained
+- Document field properly populated
+- File metadata complete and accurate
+
+**Pass/Fail:** ___
+
+#### Test Case I2: Backend Verification Integration
+**Objective:** Test backend file verification process
+**Steps:**
+1. Upload file
+2. Monitor backend verification call
+3. Check verification status update
+4. Verify error handling
+5. Test security scanning integration
+6. Verify permission checks
+7. Test notification triggers
+8. Check audit logging
+
+**Expected Result:**
+- Backend verification called automatically
+- Status updated correctly
+- Errors handled gracefully
+- Security scanning completes
+- Permission checks enforced
+- Notifications sent appropriately
+- Audit trail maintained
+
+**Pass/Fail:** ___
 
 #### Performance Benchmarks
 1. **Page Load Time:** < 3 seconds

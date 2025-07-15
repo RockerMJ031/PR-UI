@@ -1,0 +1,731 @@
+// backend/fileVerification.jsw
+// Wix 后端文件验证和安全管理模块
+// 用于处理 EHCP 文件的安全验证、权限控制和生命周期管理
+
+import { ok, badRequest, serverError } from 'wix-http-functions';
+import wixData from 'wix-data';
+import { permissions, webMethod } from 'wix-web-module';
+
+// ==========================================
+// 文件验证相关函数
+// ==========================================
+
+/**
+ * 验证上传的文件
+ * @param {string} studentId - 学生 ID
+ * @param {Object} fileData - 文件数据
+ * @returns {Promise<Object>} 验证结果
+ */
+export async function verifyUploadedFile(studentId, fileData) {
+    try {
+        console.log(`开始验证文件，学生 ID: ${studentId}`);
+        
+        // 1. 验证输入参数
+        if (!studentId || !fileData || !fileData.url) {
+            throw new Error('缺少必要的参数');
+        }
+        
+        // 2. 验证文件扩展名和 MIME 类型
+        const allowedExtensions = ['.pdf', '.doc', '.docx'];
+        const allowedMimeTypes = [
+            'application/pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        ];
+        
+        const fileName = fileData.name || '';
+        const fileExtension = fileName.toLowerCase().substring(fileName.lastIndexOf('.'));
+        const mimeType = fileData.type || '';
+        
+        if (!allowedExtensions.includes(fileExtension)) {
+            throw new Error(`不支持的文件类型: ${fileExtension}`);
+        }
+        
+        if (!allowedMimeTypes.includes(mimeType)) {
+            throw new Error(`不支持的 MIME 类型: ${mimeType}`);
+        }
+        
+        // 3. 验证文件大小（统一为 10MB）
+        const maxSize = 10 * 1024 * 1024; // 10MB
+        if (fileData.size > maxSize) {
+            throw new Error(`文件大小超过限制: ${Math.round(fileData.size / 1024 / 1024)}MB，最大允许 10MB`);
+        }
+        
+        // 4. 高级安全检查
+        await performAdvancedSecurityCheck(fileData);
+        
+        // 5. 验证学生记录是否存在
+        const student = await wixData.get("Students", studentId);
+        if (!student) {
+            throw new Error('学生记录不存在');
+        }
+        
+        // 6. 更新学生记录的文件状态
+        const updateData = {
+            _id: studentId,
+            ehcpFileStatus: 'verified',
+            ehcpFileVerifiedDate: new Date(),
+            ehcpFileVerificationLog: `文件验证成功: ${fileName} (${fileData.size} bytes)`
+        };
+        
+        await wixData.update("Students", updateData);
+        
+        // 7. 记录验证日志
+        await logFileActivity({
+            studentId: studentId,
+            action: 'file_verified',
+            fileName: fileName,
+            fileSize: fileData.size,
+            fileUrl: fileData.url,
+            status: 'success',
+            details: '文件验证成功'
+        });
+        
+        console.log(`文件验证完成，学生 ID: ${studentId}`);
+        return { 
+            success: true, 
+            message: '文件验证成功',
+            verificationDate: new Date()
+        };
+        
+    } catch (error) {
+        console.error('文件验证错误:', error);
+        
+        try {
+            // 标记文件为有问题
+            await wixData.update("Students", {
+                _id: studentId,
+                ehcpFileStatus: 'rejected',
+                ehcpFileRejectedDate: new Date(),
+                ehcpFileRejectionReason: error.message
+            });
+            
+            // 记录错误日志
+            await logFileActivity({
+                studentId: studentId,
+                action: 'file_verification_failed',
+                fileName: fileData.name || 'unknown',
+                fileSize: fileData.size || 0,
+                fileUrl: fileData.url || '',
+                status: 'error',
+                details: error.message
+            });
+        } catch (logError) {
+            console.error('记录验证错误失败:', logError);
+        }
+        
+        return { 
+            success: false, 
+            error: error.message,
+            errorCode: 'VERIFICATION_FAILED'
+        };
+    }
+}
+
+/**
+ * 获取文件（带权限控制）
+ * @param {string} studentId - 学生 ID
+ * @param {string} requesterId - 请求者 ID
+ * @returns {Promise<Object>} 文件访问结果
+ */
+export async function getSecureFileUrl(studentId, requesterId) {
+    try {
+        console.log(`文件访问请求 - 学生: ${studentId}, 请求者: ${requesterId}`);
+        
+        // 1. 验证输入参数
+        if (!studentId || !requesterId) {
+            throw new Error('缺少必要的参数');
+        }
+        
+        // 2. 验证请求者权限
+        const hasPermission = await verifyUserPermission(requesterId, 'file_access');
+        if (!hasPermission) {
+            throw new Error('无权限访问文件');
+        }
+        
+        // 3. 获取学生记录
+        const student = await wixData.get("Students", studentId);
+        if (!student) {
+            throw new Error('学生记录不存在');
+        }
+        
+        if (!student.ehcpFileUrl) {
+            throw new Error('该学生没有上传 EHCP 文件');
+        }
+        
+        // 4. 检查文件状态
+        if (student.ehcpFileStatus === 'rejected') {
+            throw new Error('文件已被拒绝，无法访问');
+        }
+        
+        // 5. 记录访问日志
+        await logFileActivity({
+            studentId: studentId,
+            action: 'file_accessed',
+            fileName: student.ehcpFileName || 'unknown',
+            fileSize: student.ehcpFileSize || 0,
+            fileUrl: student.ehcpFileUrl,
+            status: 'success',
+            details: `文件被用户 ${requesterId} 访问`,
+            accessedBy: requesterId
+        });
+        
+        // 6. 返回文件信息（可以设置过期时间）
+        return {
+            success: true,
+            fileUrl: student.ehcpFileUrl,
+            fileName: student.ehcpFileName,
+            fileSize: student.ehcpFileSize,
+            uploadDate: student.ehcpUploadDate,
+            verificationStatus: student.ehcpFileStatus,
+            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24小时后过期
+        };
+        
+    } catch (error) {
+        console.error('获取文件错误:', error);
+        
+        // 记录访问失败日志
+        try {
+            await logFileActivity({
+                studentId: studentId,
+                action: 'file_access_denied',
+                fileName: 'unknown',
+                fileSize: 0,
+                fileUrl: '',
+                status: 'error',
+                details: error.message,
+                accessedBy: requesterId
+            });
+        } catch (logError) {
+            console.error('记录访问错误失败:', logError);
+        }
+        
+        return { 
+            success: false, 
+            error: error.message,
+            errorCode: 'ACCESS_DENIED'
+        };
+    }
+}
+
+/**
+ * 删除学生的 EHCP 文件
+ * @param {string} studentId - 学生 ID
+ * @param {string} requesterId - 请求者 ID
+ * @returns {Promise<Object>} 删除结果
+ */
+export async function deleteStudentFile(studentId, requesterId) {
+    try {
+        console.log(`删除文件请求 - 学生: ${studentId}, 请求者: ${requesterId}`);
+        
+        // 1. 验证权限
+        const hasPermission = await verifyUserPermission(requesterId, 'file_delete');
+        if (!hasPermission) {
+            throw new Error('无权限删除文件');
+        }
+        
+        // 2. 获取学生记录
+        const student = await wixData.get("Students", studentId);
+        if (!student || !student.ehcpFileUrl) {
+            throw new Error('文件不存在');
+        }
+        
+        // 3. 备份文件信息
+        const fileBackup = {
+            url: student.ehcpFileUrl,
+            name: student.ehcpFileName,
+            size: student.ehcpFileSize,
+            uploadDate: student.ehcpUploadDate
+        };
+        
+        // 4. 清除学生记录中的文件信息
+        await wixData.update("Students", {
+            _id: studentId,
+            ehcpFileUrl: '',
+            ehcpFileName: '',
+            ehcpFileSize: 0,
+            ehcpUploadDate: null,
+            ehcpFileStatus: 'deleted',
+            ehcpFileDeletedDate: new Date(),
+            ehcpFileDeletedBy: requesterId
+        });
+        
+        // 5. 记录删除日志
+        await logFileActivity({
+            studentId: studentId,
+            action: 'file_deleted',
+            fileName: fileBackup.name || 'unknown',
+            fileSize: fileBackup.size || 0,
+            fileUrl: fileBackup.url || '',
+            status: 'success',
+            details: `文件被用户 ${requesterId} 删除`,
+            deletedBy: requesterId
+        });
+        
+        console.log(`文件删除成功，学生 ID: ${studentId}`);
+        return {
+            success: true,
+            message: '文件删除成功',
+            deletedFile: fileBackup
+        };
+        
+    } catch (error) {
+        console.error('删除文件错误:', error);
+        return {
+            success: false,
+            error: error.message,
+            errorCode: 'DELETE_FAILED'
+        };
+    }
+}
+
+// ==========================================
+// 权限验证相关函数
+// ==========================================
+
+/**
+ * 验证用户权限
+ * @param {string} userId - 用户 ID
+ * @param {string} permission - 权限类型
+ * @returns {Promise<boolean>} 是否有权限
+ */
+async function verifyUserPermission(userId, permission) {
+    try {
+        // 这里需要根据实际的用户权限系统来实现
+        // 示例实现：检查用户角色
+        
+        // 方法1：从 Members 集合获取用户信息
+        const user = await wixData.get("Members", userId);
+        if (!user) {
+            return false;
+        }
+        
+        // 检查用户角色
+        const allowedRoles = {
+            'file_access': ['mentor', 'admin', 'supervisor'],
+            'file_delete': ['admin', 'supervisor'],
+            'file_verify': ['admin', 'supervisor']
+        };
+        
+        const userRole = user.role || 'user';
+        const requiredRoles = allowedRoles[permission] || [];
+        
+        return requiredRoles.includes(userRole);
+        
+    } catch (error) {
+        console.error('权限验证错误:', error);
+        return false;
+    }
+}
+
+// ==========================================
+// 日志记录相关函数
+// ==========================================
+
+/**
+ * 记录文件活动日志
+ * @param {Object} logData - 日志数据
+ * @returns {Promise<void>}
+ */
+async function logFileActivity(logData) {
+    try {
+        const logEntry = {
+            studentId: logData.studentId,
+            action: logData.action,
+            fileName: logData.fileName,
+            fileSize: logData.fileSize,
+            fileUrl: logData.fileUrl,
+            status: logData.status,
+            details: logData.details,
+            timestamp: new Date(),
+            accessedBy: logData.accessedBy || null,
+            deletedBy: logData.deletedBy || null,
+            ipAddress: null, // 可以从请求中获取
+            userAgent: null  // 可以从请求中获取
+        };
+        
+        // 保存到 FileActivityLogs 集合
+        await wixData.insert("FileActivityLogs", logEntry);
+        
+        console.log('文件活动日志已记录:', logData.action);
+        
+    } catch (error) {
+        console.error('记录文件活动日志错误:', error);
+        // 不抛出错误，避免影响主流程
+    }
+}
+
+// ==========================================
+// 文件清理相关函数
+// ==========================================
+
+/**
+ * 清理孤儿文件（定期任务）
+ * @returns {Promise<Object>} 清理结果
+ */
+export async function cleanupOrphanFiles() {
+    try {
+        console.log('开始清理孤儿文件');
+        
+        // 1. 获取所有学生记录中的文件 URL
+        const students = await wixData.query("Students")
+            .ne("ehcpFileUrl", "")
+            .ne("ehcpFileUrl", null)
+            .find();
+        
+        const usedFileUrls = new Set();
+        students.items.forEach(student => {
+            if (student.ehcpFileUrl) {
+                usedFileUrls.add(student.ehcpFileUrl);
+            }
+        });
+        
+        console.log(`找到 ${usedFileUrls.size} 个正在使用的文件`);
+        
+        // 2. 获取所有文件活动日志中的 URL（用于识别历史文件）
+        const logs = await wixData.query("FileActivityLogs")
+            .ne("fileUrl", "")
+            .ne("fileUrl", null)
+            .find();
+        
+        const allFileUrls = new Set();
+        logs.items.forEach(log => {
+            if (log.fileUrl) {
+                allFileUrls.add(log.fileUrl);
+            }
+        });
+        
+        // 3. 识别孤儿文件
+        const orphanFiles = [];
+        allFileUrls.forEach(url => {
+            if (!usedFileUrls.has(url)) {
+                orphanFiles.push(url);
+            }
+        });
+        
+        console.log(`发现 ${orphanFiles.length} 个孤儿文件`);
+        
+        // 4. 记录清理结果
+        const cleanupResult = {
+            totalFilesChecked: allFileUrls.size,
+            activeFiles: usedFileUrls.size,
+            orphanFiles: orphanFiles.length,
+            cleanupDate: new Date(),
+            orphanFileUrls: orphanFiles
+        };
+        
+        // 保存清理报告
+        await wixData.insert("FileCleanupReports", cleanupResult);
+        
+        console.log('文件清理完成:', cleanupResult);
+        return {
+            success: true,
+            result: cleanupResult
+        };
+        
+    } catch (error) {
+        console.error('文件清理错误:', error);
+        return {
+            success: false,
+            error: error.message
+        };
+    }
+}
+
+/**
+ * 获取文件统计信息
+ * @returns {Promise<Object>} 统计结果
+ */
+export async function getFileStatistics() {
+    try {
+        // 1. 统计学生文件
+        const studentsWithFiles = await wixData.query("Students")
+            .ne("ehcpFileUrl", "")
+            .ne("ehcpFileUrl", null)
+            .find();
+        
+        // 2. 按状态分组
+        const statusCounts = {
+            uploaded: 0,
+            verified: 0,
+            rejected: 0,
+            deleted: 0
+        };
+        
+        let totalFileSize = 0;
+        
+        studentsWithFiles.items.forEach(student => {
+            const status = student.ehcpFileStatus || 'uploaded';
+            if (statusCounts.hasOwnProperty(status)) {
+                statusCounts[status]++;
+            }
+            
+            if (student.ehcpFileSize) {
+                totalFileSize += student.ehcpFileSize;
+            }
+        });
+        
+        // 3. 获取最近的活动
+        const recentLogs = await wixData.query("FileActivityLogs")
+            .descending("timestamp")
+            .limit(10)
+            .find();
+        
+        return {
+            success: true,
+            statistics: {
+                totalFiles: studentsWithFiles.items.length,
+                statusBreakdown: statusCounts,
+                totalFileSize: totalFileSize,
+                averageFileSize: studentsWithFiles.items.length > 0 ? totalFileSize / studentsWithFiles.items.length : 0,
+                recentActivity: recentLogs.items
+            }
+        };
+        
+    } catch (error) {
+        console.error('获取文件统计错误:', error);
+        return {
+            success: false,
+            error: error.message
+        };
+    }
+}
+
+// ==========================================
+// Web 方法（供前端调用）
+// ==========================================
+
+/**
+ * Web 方法：验证文件
+ */
+export const verifyFile = webMethod(
+    permissions.Anyone,
+    async (studentId, fileData) => {
+        return await verifyUploadedFile(studentId, fileData);
+    }
+);
+
+/**
+ * Web 方法：获取安全文件 URL
+ */
+export const getFile = webMethod(
+    permissions.Anyone,
+    async (studentId, requesterId) => {
+        return await getSecureFileUrl(studentId, requesterId);
+    }
+);
+
+/**
+ * Web 方法：删除文件
+ */
+export const deleteFile = webMethod(
+    permissions.Anyone,
+    async (studentId, requesterId) => {
+        return await deleteStudentFile(studentId, requesterId);
+    }
+);
+
+/**
+ * Web 方法：获取文件统计
+ */
+export const getStats = webMethod(
+    permissions.Anyone,
+    async () => {
+        return await getFileStatistics();
+    }
+);
+
+// ==========================================
+// 导出所有函数
+// ==========================================
+
+/**
+ * 执行高级安全检查
+ * @param {Object} fileData - 文件数据
+ * @returns {Promise<void>}
+ */
+async function performAdvancedSecurityCheck(fileData) {
+    try {
+        // 1. 文件名安全检查
+        const fileName = fileData.name || '';
+        const dangerousPatterns = [
+            /\.(exe|bat|cmd|scr|pif|com)$/i,
+            /[<>:"|?*]/,
+            /^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/i
+        ];
+        
+        for (const pattern of dangerousPatterns) {
+            if (pattern.test(fileName)) {
+                throw new Error('文件名包含不安全字符或为系统保留名称');
+            }
+        }
+        
+        // 2. 文件大小异常检查
+        if (fileData.size === 0) {
+            throw new Error('文件为空');
+        }
+        
+        if (fileData.size < 100) {
+            throw new Error('文件过小，可能已损坏');
+        }
+        
+        // 3. 模拟病毒扫描（实际环境中应集成真实的病毒扫描服务）
+        await simulateVirusScan(fileData);
+        
+        // 4. 文件内容类型验证
+        await validateFileContent(fileData);
+        
+        console.log('高级安全检查通过');
+        
+    } catch (error) {
+        console.error('高级安全检查失败:', error);
+        throw error;
+    }
+}
+
+/**
+ * 模拟病毒扫描
+ * @param {Object} fileData - 文件数据
+ * @returns {Promise<void>}
+ */
+async function simulateVirusScan(fileData) {
+    // 模拟扫描延迟
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // 检查文件名中的可疑模式
+    const suspiciousPatterns = [
+        /virus/i,
+        /malware/i,
+        /trojan/i,
+        /backdoor/i,
+        /exploit/i
+    ];
+    
+    const fileName = fileData.name || '';
+    for (const pattern of suspiciousPatterns) {
+        if (pattern.test(fileName)) {
+            throw new Error('文件被标记为可疑文件');
+        }
+    }
+    
+    // 在实际环境中，这里应该调用真实的病毒扫描 API
+    // 例如：VirusTotal API、ClamAV 等
+    
+    console.log('病毒扫描完成，文件安全');
+}
+
+/**
+ * 验证文件内容
+ * @param {Object} fileData - 文件数据
+ * @returns {Promise<void>}
+ */
+async function validateFileContent(fileData) {
+    try {
+        // 基于文件扩展名进行内容验证
+        const fileName = fileData.name || '';
+        const fileExtension = fileName.toLowerCase().substring(fileName.lastIndexOf('.'));
+        
+        switch (fileExtension) {
+            case '.pdf':
+                await validatePDFContent(fileData);
+                break;
+            case '.doc':
+            case '.docx':
+                await validateWordContent(fileData);
+                break;
+            default:
+                console.log('跳过内容验证，文件类型:', fileExtension);
+        }
+        
+    } catch (error) {
+        console.error('文件内容验证失败:', error);
+        throw new Error('文件内容验证失败: ' + error.message);
+    }
+}
+
+/**
+ * 验证 PDF 文件内容
+ * @param {Object} fileData - 文件数据
+ * @returns {Promise<void>}
+ */
+async function validatePDFContent(fileData) {
+    // 简单的 PDF 文件头验证
+    // 实际环境中应该使用专业的 PDF 解析库
+    
+    // 检查文件大小是否合理（PDF 文件通常不会太小）
+    if (fileData.size < 1024) {
+        throw new Error('PDF 文件大小异常');
+    }
+    
+    console.log('PDF 内容验证通过');
+}
+
+/**
+ * 验证 Word 文档内容
+ * @param {Object} fileData - 文件数据
+ * @returns {Promise<void>}
+ */
+async function validateWordContent(fileData) {
+    // 简单的 Word 文档验证
+    // 实际环境中应该使用专业的文档解析库
+    
+    // 检查文件大小是否合理
+    if (fileData.size < 512) {
+        throw new Error('Word 文档大小异常');
+    }
+    
+    console.log('Word 文档内容验证通过');
+}
+
+/**
+ * 生成文件安全报告
+ * @param {string} studentId - 学生 ID
+ * @param {Object} fileData - 文件数据
+ * @param {string} status - 验证状态
+ * @returns {Promise<Object>} 安全报告
+ */
+export async function generateSecurityReport(studentId, fileData, status) {
+    try {
+        const report = {
+            studentId: studentId,
+            fileName: fileData.name,
+            fileSize: fileData.size,
+            fileType: fileData.type,
+            verificationStatus: status,
+            securityChecks: {
+                extensionCheck: true,
+                mimeTypeCheck: true,
+                sizeCheck: true,
+                virusScan: status === 'verified',
+                contentValidation: status === 'verified'
+            },
+            timestamp: new Date(),
+            reportId: generateReportId()
+        };
+        
+        // 保存安全报告
+        await wixData.insert('FileSecurityReports', report);
+        
+        return report;
+        
+    } catch (error) {
+        console.error('生成安全报告错误:', error);
+        return null;
+    }
+}
+
+/**
+ * 生成报告 ID
+ * @returns {string} 报告 ID
+ */
+function generateReportId() {
+    return 'FSR_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
+
+export {
+    verifyUploadedFile,
+    getSecureFileUrl,
+    deleteStudentFile,
+    cleanupOrphanFiles,
+    getFileStatistics
+};

@@ -1,0 +1,300 @@
+// backend/larkIntegration.jsw
+// Wix 后端 Lark 集成模块
+// 用于发送通知到 Lark（飞书）
+
+import { fetch } from 'wix-fetch';
+import { getSecret } from 'wix-secrets-backend';
+import { permissions, webMethod } from 'wix-web-module';
+import wixData from 'wix-data';
+
+// ==========================================
+// Lark 通知相关函数
+// ==========================================
+
+/**
+ * 从环境变量获取 Lark webhook URL
+ * @returns {Promise<string>} Webhook URL
+ */
+const getLarkWebhookUrl = () => {
+    return getSecret('LARK_WEBHOOK_URL')
+        .then(url => {
+            if (!url) {
+                throw new Error('LARK_WEBHOOK_URL 环境变量未设置');
+            }
+            return url;
+        })
+        .catch(error => {
+            console.error('获取 Lark Webhook URL 失败:', error);
+            // 返回默认值或抛出错误
+            throw new Error('Lark 配置错误');
+        });
+};
+
+/**
+ * 发送通知到 Lark
+ * @param {Object} data - 通知数据
+ * @returns {Promise<Object>} 发送结果
+ */
+export async function sendLarkNotification(data) {
+    try {
+        console.log('准备发送 Lark 通知:', data);
+        
+        // 获取 Webhook URL
+        const webhookUrl = await getLarkWebhookUrl();
+        
+        // 格式化消息
+        const message = formatLarkMessage(data);
+        
+        // 发送请求
+        const response = await fetch(webhookUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(message)
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        // 记录发送日志
+        await logLarkActivity({
+            type: data.type,
+            status: 'success',
+            message: message.content.text,
+            response: result
+        });
+        
+        console.log('Lark 通知发送成功:', result);
+        return { success: true, result };
+        
+    } catch (error) {
+        console.error('发送 Lark 通知错误:', error);
+        
+        // 记录错误日志
+        await logLarkActivity({
+            type: data.type || 'unknown',
+            status: 'error',
+            message: error.message,
+            error: error.message
+        });
+        
+        return { success: false, error: error.message };
+    }
+}
+
+/**
+ * 格式化 Lark 消息
+ * @param {Object} data - 原始数据
+ * @returns {Object} 格式化的消息
+ */
+function formatLarkMessage(data) {
+    let messageText = '';
+    
+    switch (data.type) {
+        case 'ap_student_registration':
+            messageText = `⭐ 新 AP 学生注册\n\n` +
+                        `👤 姓名: ${data.studentName}\n` +
+                        `📧 邮箱: ${data.studentEmail}\n` +
+                        `📱 电话: ${data.studentPhone}\n` +
+                        `📄 EHCP 文件: ${data.hasEHCPFile ? '✅ 已上传' : '❌ 未上传'}\n` +
+                        `🕐 时间: ${new Date().toLocaleString('zh-CN')}`;
+            break;
+            
+        case 'student_added':
+            messageText = `🎓 新学生添加\n\n` +
+                        `👤 姓名: ${data.studentName}\n` +
+                        `📧 邮箱: ${data.studentEmail}\n` +
+                        `📱 电话: ${data.studentPhone || '未提供'}\n` +
+                        `🕐 时间: ${new Date().toLocaleString('zh-CN')}`;
+            break;
+            
+        case 'file_uploaded':
+            messageText = `📁 文件上传通知\n\n` +
+                        `👤 学生: ${data.studentName}\n` +
+                        `📄 文件: ${data.fileName}\n` +
+                        `📊 大小: ${formatFileSize(data.fileSize)}\n` +
+                        `🕐 时间: ${new Date().toLocaleString('zh-CN')}`;
+            break;
+            
+        case 'file_verified':
+            messageText = `✅ 文件验证完成\n\n` +
+                        `👤 学生: ${data.studentName}\n` +
+                        `📄 文件: ${data.fileName}\n` +
+                        `✅ 状态: 验证通过\n` +
+                        `🕐 时间: ${new Date().toLocaleString('zh-CN')}`;
+            break;
+            
+        case 'system_alert':
+            messageText = `⚠️ 系统警告\n\n` +
+                        `📋 类型: ${data.alertType}\n` +
+                        `📝 消息: ${data.message}\n` +
+                        `🕐 时间: ${new Date().toLocaleString('zh-CN')}`;
+            break;
+            
+        default:
+            messageText = `📊 系统通知\n\n${JSON.stringify(data, null, 2)}`;
+    }
+    
+    return {
+        msg_type: 'text',
+        content: {
+            text: messageText
+        }
+    };
+}
+
+/**
+ * 格式化文件大小
+ * @param {number} bytes - 字节数
+ * @returns {string} 格式化的文件大小
+ */
+function formatFileSize(bytes) {
+    if (!bytes) return '0 B';
+    
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+/**
+ * 记录 Lark 活动日志
+ * @param {Object} logData - 日志数据
+ * @returns {Promise<void>}
+ */
+async function logLarkActivity(logData) {
+    try {
+        const logEntry = {
+            type: logData.type,
+            status: logData.status,
+            message: logData.message,
+            response: logData.response || null,
+            error: logData.error || null,
+            timestamp: new Date(),
+            source: 'lark_integration'
+        };
+        
+        await wixData.insert('LarkActivityLogs', logEntry);
+        console.log('Lark 活动日志已记录');
+        
+    } catch (error) {
+        console.error('记录 Lark 活动日志错误:', error);
+        // 不抛出错误，避免影响主流程
+    }
+}
+
+/**
+ * 批量发送 Lark 通知
+ * @param {Array} notifications - 通知数组
+ * @returns {Promise<Object>} 批量发送结果
+ */
+export async function sendBatchLarkNotifications(notifications) {
+    try {
+        const results = [];
+        
+        for (const notification of notifications) {
+            const result = await sendLarkNotification(notification);
+            results.push(result);
+            
+            // 添加延迟避免频率限制
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        
+        const successCount = results.filter(r => r.success).length;
+        const failureCount = results.length - successCount;
+        
+        return {
+            success: true,
+            total: results.length,
+            successful: successCount,
+            failed: failureCount,
+            results: results
+        };
+        
+    } catch (error) {
+        console.error('批量发送 Lark 通知错误:', error);
+        return {
+            success: false,
+            error: error.message
+        };
+    }
+}
+
+/**
+ * 测试 Lark 连接
+ * @returns {Promise<Object>} 测试结果
+ */
+export async function testLarkConnection() {
+    try {
+        const testData = {
+            type: 'system_alert',
+            alertType: '连接测试',
+            message: 'Lark 集成测试消息'
+        };
+        
+        const result = await sendLarkNotification(testData);
+        
+        return {
+            success: result.success,
+            message: result.success ? 'Lark 连接测试成功' : 'Lark 连接测试失败',
+            details: result
+        };
+        
+    } catch (error) {
+        console.error('Lark 连接测试错误:', error);
+        return {
+            success: false,
+            message: 'Lark 连接测试失败',
+            error: error.message
+        };
+    }
+}
+
+// ==========================================
+// Web 方法（供前端调用）
+// ==========================================
+
+/**
+ * Web 方法：发送 Lark 通知
+ */
+export const sendNotification = webMethod(
+    permissions.Anyone,
+    async (data) => {
+        return await sendLarkNotification(data);
+    }
+);
+
+/**
+ * Web 方法：批量发送通知
+ */
+export const sendBatchNotifications = webMethod(
+    permissions.Anyone,
+    async (notifications) => {
+        return await sendBatchLarkNotifications(notifications);
+    }
+);
+
+/**
+ * Web 方法：测试连接
+ */
+export const testConnection = webMethod(
+    permissions.Anyone,
+    async () => {
+        return await testLarkConnection();
+    }
+);
+
+// ==========================================
+// 导出所有函数
+// ==========================================
+
+export {
+    sendLarkNotification,
+    sendBatchLarkNotifications,
+    testLarkConnection
+};

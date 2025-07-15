@@ -8,23 +8,39 @@
 // 导入所需的 Wix 模块
 import wixData from 'wix-data';
 import wixLocation from 'wix-location';
+import wixUsers from 'wix-users';
+import wixWindowFrontend from 'wix-window-frontend';
 import { local } from 'wix-storage';
 
 // 页面初始化
 $w.onReady(function () {
     console.log('导师仪表盘已加载');
     
-    // 初始化页面
-    initializePage();
-    
-    // 设置事件处理器
-    setupEventHandlers();
-    
-    // 加载初始数据
-    loadInitialData();
-    
-    // 设置响应式设计
-    setupResponsiveDesign();
+    // 检查用户权限
+    checkUserPermissions()
+        .then((hasPermission) => {
+            if (!hasPermission) {
+                showErrorMessage('您没有访问此页面的权限');
+                wixLocation.to('/unauthorized');
+                return;
+            }
+            
+            // 初始化页面
+            initializePage();
+            
+            // 设置事件处理器
+            setupEventHandlers();
+            
+            // 加载初始数据
+            loadInitialData();
+            
+            // 设置响应式设计
+            setupResponsiveDesign();
+        })
+        .catch((error) => {
+            console.error('权限检查失败:', error);
+            showErrorMessage('权限验证失败，请重新登录');
+        });
 });
 
 // 初始化页面函数
@@ -147,7 +163,11 @@ function loadCourses() {
     wixData.query("Courses")
         .find()
         .then((results) => {
-            $w('#coursesDataset').setData(results.items);
+            // 设置课程数据集 - 修复 Dataset 使用方式
+            $w('#coursesDataset').setFilter(wixData.filter());
+            $w('#coursesDataset').onReady(() => {
+                // Dataset 会自动加载数据
+            });
             populateCourseDropdowns(results.items);
             console.log('课程已加载:', results.items.length);
         })
@@ -172,7 +192,11 @@ function loadStudents() {
     wixData.query("Students")
         .find()
         .then((results) => {
-            $w('#studentsDataset').setData(results.items);
+            // 设置数据集数据 - 修复 Dataset 使用方式
+            $w('#studentsDataset').setFilter(wixData.filter());
+            $w('#studentsDataset').onReady(() => {
+                // Dataset 会自动加载数据，无需手动 setData
+            });
             populateStudentDropdowns(results.items);
             updateAPStudentCount(results.items);
             console.log('学生已加载:', results.items.length);
@@ -204,7 +228,11 @@ function loadAPStudents() {
         .eq("isAP", true)
         .find()
         .then((results) => {
-            $w('#apStudentsDataset').setData(results.items);
+            // 设置 AP 学生数据集 - 修复 Dataset 使用方式
+            $w('#apStudentsDataset').setFilter(wixData.filter().eq('isAP', true));
+            $w('#apStudentsDataset').onReady(() => {
+                // Dataset 会自动加载数据
+            });
             console.log('AP 学生已加载:', results.items.length);
         })
         .catch((error) => {
@@ -218,7 +246,11 @@ function loadPricingPlans() {
         .ascending("displayOrder")
         .find()
         .then((results) => {
-            $w('#pricingDataset').setData(results.items);
+            // 设置价格数据集 - 修复 Dataset 使用方式
+            $w('#pricingDataset').setFilter(wixData.filter());
+            $w('#pricingDataset').onReady(() => {
+                // Dataset 会自动加载数据
+            });
             console.log('价格方案已加载:', results.items.length);
         })
         .catch((error) => {
@@ -288,25 +320,34 @@ function openRemoveAPModal() {
 
 // 提交添加学生
 function submitAddStudent() {
-    // 获取表单数据
-    const studentData = {
-        name: $w('#studentNameInput').value,
-        email: $w('#studentEmailInput').value,
-        phone: $w('#studentPhoneInput').value,
-        status: $w('#studentStatusDropdown').value,
-        courses: [$w('#studentCourseDropdown').value],
-        isAP: false,
-        dateAdded: new Date(),
-        lastActive: new Date()
-    };
-    
-    // 验证表单数据
-    if (!validateStudentData(studentData)) {
-        return;
-    }
-    
-    // 保存到数据库
-    wixData.insert("Students", studentData)
+    // 检查权限
+    checkUserPermissions('add_student')
+        .then((hasPermission) => {
+            if (!hasPermission) {
+                showErrorMessage('您没有添加学生的权限');
+                return Promise.reject('权限不足');
+            }
+            
+            // 获取表单数据
+            const studentData = {
+                name: $w('#studentNameInput').value,
+                email: $w('#studentEmailInput').value,
+                phone: $w('#studentPhoneInput').value,
+                status: $w('#studentStatusDropdown').value,
+                courses: [$w('#studentCourseDropdown').value],
+                isAP: false,
+                dateAdded: new Date(),
+                lastActive: new Date()
+            };
+            
+            // 验证表单数据
+            if (!validateStudentData(studentData)) {
+                return;
+            }
+            
+            // 保存到数据库
+            return wixData.insert("Students", studentData);
+        })
         .then((result) => {
             showSuccessMessage('学生添加成功！');
             clearAddStudentForm();
@@ -360,6 +401,48 @@ function isValidEmail(email) {
 
 // 注册 AP 学生
 function registerAPStudent() {
+    // 检查权限
+    checkUserPermissions('register_ap_student')
+        .then((hasPermission) => {
+            if (!hasPermission) {
+                showErrorMessage('您没有注册 AP 学生的权限');
+                return Promise.reject('权限不足');
+            }
+            
+            return processAPStudentRegistration();
+        })
+        .catch((error) => {
+            console.error('权限检查失败:', error);
+            showErrorMessage('权限验证失败');
+        });
+}
+
+// 处理 AP 学生注册流程
+function processAPStudentRegistration() {
+    // 获取EHCP文件信息
+    const uploadButton = $w('#ehcpFileUpload');
+    let ehcpFileData = {
+        document: null,
+        url: '',
+        fileName: '',
+        fileSize: 0,
+        uploadDate: null,
+        status: 'none'
+    };
+    
+    // 检查并获取文件URL
+    if (uploadButton.value.length > 0 && uploadButton.value[0].url) {
+        const file = uploadButton.value[0];
+        ehcpFileData = {
+            document: file, // 完整的 Document 对象
+            url: file.url,
+            fileName: file.name,
+            fileSize: file.size,
+            uploadDate: new Date(),
+            status: 'uploaded'
+        };
+    }
+    
     // 获取表单数据
     const apStudentData = {
         name: $w('#apStudentNameInput').value,
@@ -371,6 +454,15 @@ function registerAPStudent() {
         medicalInfo: $w('#medicalInfoTextarea').value,
         educationBackground: $w('#educationBackgroundTextarea').value,
         educationPlan: $w('#educationPlanDropdown').value,
+        
+        // EHCP文件相关字段
+        ehcpFile: ehcpFileData.document, // Document 字段
+        ehcpFileUrl: ehcpFileData.url,
+        ehcpFileName: ehcpFileData.fileName,
+        ehcpFileSize: ehcpFileData.fileSize,
+        ehcpUploadDate: ehcpFileData.uploadDate,
+        ehcpFileStatus: ehcpFileData.status,
+        
         isAP: true,
         status: 'active',
         dateAdded: new Date(),
@@ -391,10 +483,18 @@ function registerAPStudent() {
             loadAPStudents();
             updateStatistics();
             
-            // 发送到 Lark
-            sendToLark({
-                action: 'register_ap_student',
-                student: apStudentData
+            // 如果有文件，发送到后端进行安全验证
+            if (ehcpFileData.url) {
+                verifyUploadedFile(result._id, ehcpFileData);
+            }
+            
+            // 发送到 Lark - 使用环境变量管理 Webhook URL
+            sendLarkNotification({
+                type: 'ap_student_registration',
+                studentName: apStudentData.name,
+                studentEmail: apStudentData.guardianEmail,
+                studentPhone: apStudentData.guardianPhone,
+                hasEHCPFile: ehcpFileData.status === 'uploaded'
             });
             
             console.log('AP 学生已注册:', result);
@@ -470,6 +570,13 @@ function clearAPStudentForm() {
     $w('#fileUploadMessage').hide();
 }
 
+// 文件上传状态管理
+let fileUploadStatus = {
+    isUploading: false,
+    isComplete: false,
+    fileData: null
+};
+
 // 处理文件上传
 function handleFileUpload() {
     const uploadButton = $w('#ehcpFileUpload');
@@ -477,14 +584,14 @@ function handleFileUpload() {
     if (uploadButton.value.length > 0) {
         const file = uploadButton.value[0];
         
-        // 验证文件大小（5MB 限制）
+        // 检查文件大小（5MB 限制）
         if (file.size > 5 * 1024 * 1024) {
             showErrorMessage('文件大小必须小于 5MB');
             uploadButton.reset();
             return;
         }
         
-        // 验证文件类型
+        // 检查文件类型
         const allowedTypes = ['.pdf', '.doc', '.docx', '.jpg', '.png'];
         const fileExtension = file.name.toLowerCase().substring(file.name.lastIndexOf('.'));
         
@@ -494,12 +601,126 @@ function handleFileUpload() {
             return;
         }
         
-        // 显示文件信息
-        $w('#fileUploadMessage').text = `文件已上传: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+        // 设置上传状态
+        fileUploadStatus.isUploading = true;
+        fileUploadStatus.isComplete = false;
+        fileUploadStatus.fileData = file;
+        
+        // 禁用提交按钮，防止过早提交
+        updateSubmitButtonState();
+        
+        // 显示上传进度
+        $w('#fileUploadMessage').text = `正在上传文件: ${file.name}...`;
         $w('#fileUploadMessage').show();
         
-        console.log('文件上传成功:', file.name);
+        // 监控上传完成状态
+        monitorFileUploadStatus(file);
+        
+        console.log('文件上传开始:', file.name);
     }
+}
+
+// 监控文件上传状态
+function monitorFileUploadStatus(file) {
+    const checkInterval = setInterval(() => {
+        const uploadButton = $w('#ehcpFileUpload');
+        
+        if (uploadButton.value.length > 0 && uploadButton.value[0].url) {
+            // 上传完成
+            clearInterval(checkInterval);
+            
+            fileUploadStatus.isUploading = false;
+            fileUploadStatus.isComplete = true;
+            fileUploadStatus.fileData = uploadButton.value[0];
+            
+            $w('#fileUploadMessage').text = `文件上传成功: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+            updateSubmitButtonState(); // 重新启用提交按钮
+            
+            console.log('文件上传完成，URL:', uploadButton.value[0].url);
+        }
+    }, 500); // 每500ms检查一次
+    
+    // 30秒超时保护
+    setTimeout(() => {
+        clearInterval(checkInterval);
+        if (!$w('#ehcpFileUpload').value[0]?.url) {
+            fileUploadStatus.isUploading = false;
+            fileUploadStatus.isComplete = false;
+            showErrorMessage('文件上传超时，请重试');
+            updateSubmitButtonState();
+        }
+    }, 30000);
+}
+
+// 更新提交按钮状态
+function updateSubmitButtonState() {
+    const submitBtn = $w('#registerAPStudentBtn');
+    if (fileUploadStatus.isUploading) {
+        submitBtn.disable();
+        submitBtn.label = "文件上传中...";
+    } else {
+        submitBtn.enable();
+        submitBtn.label = "注册学生";
+    }
+}
+
+// 调用后端文件验证
+function verifyUploadedFile(studentId, fileData) {
+    import('backend/fileVerification')
+        .then((fileModule) => {
+            return fileModule.verifyUploadedFile(studentId, fileData);
+        })
+        .then((result) => {
+            if (result.success) {
+                console.log('文件验证成功');
+                // 可以在这里更新UI显示验证状态
+            } else {
+                console.error('文件验证失败:', result.error);
+                showUserFriendlyError({ code: 'VERIFICATION_FAILED' });
+            }
+        })
+        .catch((error) => {
+            console.error('调用文件验证错误:', error);
+            showUserFriendlyError({ code: 'VERIFICATION_FAILED' });
+        });
+}
+
+// 用户友好的错误提示
+function showUserFriendlyError(error) {
+    const errorMessages = {
+        'FILE_TOO_LARGE': '文件大小不能超过 5MB',
+        'INVALID_FILE_TYPE': '请上传 PDF、Word 文档或图片文件',
+        'UPLOAD_FAILED': '文件上传失败，请重试',
+        'VERIFICATION_FAILED': '文件验证失败，请检查文件格式',
+        'PERMISSION_DENIED': '没有权限执行此操作',
+        'NETWORK_ERROR': '网络连接错误，请检查网络后重试'
+    };
+    
+    const message = errorMessages[error.code] || '操作失败，请重试';
+    showErrorMessage(message);
+}
+
+// 增强的文件安全验证
+function validateFileSecurely(file) {
+    const allowedTypes = [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'image/jpeg',
+        'image/png'
+    ];
+    
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    
+    if (!allowedTypes.includes(file.type)) {
+        throw new Error('INVALID_FILE_TYPE');
+    }
+    
+    if (file.size > maxSize) {
+        throw new Error('FILE_TOO_LARGE');
+    }
+    
+    return true;
 }
 
 // 发送数据到 Lark
@@ -514,6 +735,20 @@ function sendToLark(data) {
         })
         .catch((error) => {
             console.error('发送到 Lark 错误:', error);
+        });
+}
+
+// 发送 Lark 通知的简化函数
+function sendLarkNotification(data) {
+    import('backend/larkIntegration')
+        .then((larkModule) => {
+            return larkModule.sendLarkNotification(data);
+        })
+        .then((result) => {
+            console.log('Lark 通知发送成功:', result);
+        })
+        .catch((error) => {
+            console.error('Lark 通知发送失败:', error);
         });
 }
 
@@ -554,9 +789,64 @@ function showErrorMessage(message) {
 // 隐藏所有模态框（替换 HTML 模态框隐藏功能）
 // 原始: 对每个模态框使用 modal.style.display = 'none'
 function hideAllModals() {
-    $w('#courseManagementLightbox').hide();      // Wix Lightbox 而非 HTML 模态框
-    $w('#studentManagementLightbox').hide();    // Wix Lightbox 而非 HTML 模态框
-    $w('#apStudentRegistrationLightbox').hide(); // Wix Lightbox 而非 HTML 模态框
+    // 检查元素是否存在再隐藏
+    if ($w('#courseManagementLightbox')) {
+        $w('#courseManagementLightbox').hide();      // Wix Lightbox 而非 HTML 模态框
+    }
+    if ($w('#studentManagementLightbox')) {
+        $w('#studentManagementLightbox').hide();    // Wix Lightbox 而非 HTML 模态框
+    }
+    if ($w('#apStudentRegistrationLightbox')) {
+        $w('#apStudentRegistrationLightbox').hide(); // Wix Lightbox 而非 HTML 模态框
+    }
+}
+
+// 检查用户权限
+function checkUserPermissions(action = null) {
+    // 使用已导入的 wixUsers 模块
+    if (!wixUsers.currentUser.loggedIn) {
+        return Promise.resolve(false);
+    }
+    
+    return Promise.resolve(true)
+        .then(() => {
+            // 继续权限检查逻辑
+            
+            // 获取当前用户角色
+            return wixData.query('UserRoles')
+                .eq('userId', wixUsers.currentUser.id)
+                .find()
+                .then((results) => {
+                    if (results.items.length === 0) {
+                        return false;
+                    }
+                    
+                    const userRole = results.items[0];
+                    
+                    // 检查特定操作权限
+                    if (action) {
+                        return checkActionPermission(userRole.role, action);
+                    }
+                    
+                    // 检查基本访问权限
+                    return ['mentor', 'admin', 'supervisor'].includes(userRole.role);
+                });
+        })
+        .catch((error) => {
+            console.error('权限检查错误:', error);
+            return false;
+        });
+}
+
+// 检查操作权限
+function checkActionPermission(userRole, action) {
+    const permissions = {
+        'admin': ['add_student', 'remove_student', 'register_ap_student', 'manage_courses', 'view_reports'],
+        'supervisor': ['add_student', 'register_ap_student', 'view_reports'],
+        'mentor': ['add_student', 'view_reports']
+    };
+    
+    return permissions[userRole] && permissions[userRole].includes(action);
 }
 
 // 设置用户信息
@@ -577,15 +867,41 @@ function setupUserInfo() {
 
 // 设置响应式设计
 function setupResponsiveDesign() {
-    // 移动端断点处理
-    if (window.innerWidth <= 768) {
-        $w('#sidebarColumn').hide();
-        adjustMobileLayout();
-    }
-    
-    // 平板端断点处理
-    if (window.innerWidth > 768 && window.innerWidth <= 1200) {
-        adjustTabletLayout();
+    // 使用 Wix FormFactor API 进行响应式设计
+    try {
+        wixWindowFrontend.formFactor.onChange((formFactor) => {
+            switch (formFactor) {
+                case 'Mobile':
+                    adjustMobileLayout();
+                    break;
+                case 'Tablet':
+                    adjustTabletLayout();
+                    break;
+                case 'Desktop':
+                    adjustDesktopLayout();
+                    break;
+            }
+        });
+        
+        // 初始化时也要设置
+        const currentFormFactor = wixWindowFrontend.formFactor.formFactor;
+        if (currentFormFactor === 'Mobile') {
+            adjustMobileLayout();
+        } else if (currentFormFactor === 'Tablet') {
+            adjustTabletLayout();
+        } else {
+            adjustDesktopLayout();
+        }
+    } catch (error) {
+        console.warn('FormFactor API 不可用，使用降级方法:', error);
+        // 降级到传统方法
+        if (window.innerWidth <= 768) {
+            adjustMobileLayout();
+        } else if (window.innerWidth > 768 && window.innerWidth <= 1200) {
+            adjustTabletLayout();
+        } else {
+            adjustDesktopLayout();
+        }
     }
 }
 
@@ -602,9 +918,22 @@ function adjustMobileLayout() {
 // 调整平板端布局
 function adjustTabletLayout() {
     // 为平板视图调整
-    $w('#sidebarColumn').style.width = '220px';
+    if ($w('#sidebarColumn')) {
+        $w('#sidebarColumn').style.width = '220px';
+    }
     
     console.log('平板端布局已应用');
+}
+
+// 调整桌面端布局
+function adjustDesktopLayout() {
+    // 为桌面视图调整
+    if ($w('#sidebarColumn')) {
+        $w('#sidebarColumn').show();
+        $w('#sidebarColumn').style.width = '250px';
+    }
+    
+    console.log('桌面端布局已应用');
 }
 
 // 更新统计数据
@@ -629,7 +958,8 @@ function updateStatistics() {
             .find()
             .then((results) => {
                 if (results.items.length > 0) {
-                    return wixData.update("Statistics", updatedStats, results.items[0]._id);
+                    updatedStats._id = results.items[0]._id;
+                    return wixData.update("Statistics", updatedStats);
                 } else {
                     return wixData.insert("Statistics", updatedStats);
                 }
@@ -679,39 +1009,85 @@ function handleStatusCheck() {
 
 // backend/larkIntegration.js
 // 从 wix-fetch 导入 fetch
-// import { fetch } from 'wix-fetch';
+import { fetch } from 'wix-fetch';
+import { getSecret } from 'wix-secrets-backend';
 
-// Lark webhook URL（替换为您的实际 webhook URL）
-// const LARK_WEBHOOK_URL = 'https://open.larksuite.com/open-apis/bot/v2/hook/YOUR_WEBHOOK_TOKEN';
+// 从环境变量获取 Lark webhook URL
+const getLarkWebhookUrl = () => {
+    return getSecret('LARK_WEBHOOK_URL')
+        .then(url => {
+            if (!url) {
+                throw new Error('LARK_WEBHOOK_URL 环境变量未设置');
+            }
+            return url;
+        });
+};
 
 // 发送通知到 Lark
-/*
 export function sendNotificationToLark(data) {
-    const message = formatLarkMessage(data);
-    
-    const options = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(message)
-    };
-    
-    return fetch(LARK_WEBHOOK_URL, options)
-        .then(response => response.json())
+    return getLarkWebhookUrl()
+        .then(webhookUrl => {
+            const message = formatLarkMessage(data);
+            
+            const options = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(message)
+            };
+            
+            return fetch(webhookUrl, options);
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(result => {
             console.log('Lark 通知发送成功:', result);
-            return result;
+            return { success: true, result };
         })
         .catch(error => {
             console.error('发送 Lark 通知错误:', error);
-            throw error;
+            return { success: false, error: error.message };
         });
 }
-*/
+
+// 简化的 Lark 通知发送函数
+export function sendLarkNotification(data) {
+    return getLarkWebhookUrl()
+        .then(webhookUrl => {
+            const message = formatSimpleLarkMessage(data);
+            
+            const options = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(message)
+            };
+            
+            return fetch(webhookUrl, options);
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(result => {
+            console.log('Lark 通知发送成功:', result);
+            return { success: true, result };
+        })
+        .catch(error => {
+            console.error('发送 Lark 通知错误:', error);
+            return { success: false, error: error.message };
+        });
+}
 
 // 为 Lark 格式化消息
-/*
 function formatLarkMessage(data) {
     let messageText = '';
     
@@ -745,7 +1121,39 @@ function formatLarkMessage(data) {
         }
     };
 }
-*/
+
+// 简化的消息格式化函数
+function formatSimpleLarkMessage(data) {
+    let messageText = '';
+    
+    switch (data.type) {
+        case 'ap_student_registration':
+            messageText = `⭐ 新 AP 学生注册\n\n` +
+                        `姓名: ${data.studentName}\n` +
+                        `邮箱: ${data.studentEmail}\n` +
+                        `电话: ${data.studentPhone}\n` +
+                        `EHCP 文件: ${data.hasEHCPFile ? '已上传' : '未上传'}\n` +
+                        `时间: ${new Date().toLocaleString()}`;
+            break;
+            
+        case 'student_added':
+            messageText = `🎓 新学生添加\n\n` +
+                        `姓名: ${data.studentName}\n` +
+                        `邮箱: ${data.studentEmail}\n` +
+                        `时间: ${new Date().toLocaleString()}`;
+            break;
+            
+        default:
+            messageText = `📊 系统通知\n\n${JSON.stringify(data, null, 2)}`;
+    }
+    
+    return {
+        msg_type: 'text',
+        content: {
+            text: messageText
+        }
+    };
+}
 
 // ==========================================
 // 使用说明

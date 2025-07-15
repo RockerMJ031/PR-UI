@@ -12,7 +12,8 @@
 This guide will help you create a comprehensive mentor dashboard in Wix with the following features:
 - **Course Management**: Course enrollment, extension, and cancellation
 - **Tutoring Student Management**: Add and remove tutoring students
-- **Alternative Provision (AP) Student Management**: Specialized AP student enrollment with curriculum selection
+- **Alternative Provision (AP) Student Management**: Specialized AP student enrollment with curriculum selection and EHCP file upload
+- **EHCP File Management**: Secure file upload, validation, and lifecycle management
 - **Ticket Management**: Support ticket submission and tracking
 - **Statistics Display**: Real-time student counts and metrics
 - **Pricing Plans**: Four-tier curriculum selection for AP students
@@ -29,6 +30,67 @@ This guide will help you create a comprehensive mentor dashboard in Wix with the
 **Estimated Time:** 4-6 hours
 **Difficulty Level:** Intermediate
 **Required Wix Plan:** Business and eCommerce (for database functionality)
+
+## Database Schema
+
+### Students Collection
+```javascript
+{
+    _id: "string",
+    name: "string",
+    age: "number",
+    sendStatus: "string",
+    guardianName: "string",
+    guardianPhone: "string",
+    guardianEmail: "string",
+    medicalInfo: "string",
+    educationBackground: "string",
+    educationPlan: "string",
+    
+    // EHCP文件相关字段
+    ehcpFileUrl: "string",        // EHCP文件URL
+    ehcpFileName: "string",      // 原始文件名
+    ehcpFileSize: "number",      // 文件大小（字节）
+    ehcpUploadDate: "datetime",  // 上传日期
+    ehcpFileStatus: "string",    // 文件状态：none, uploaded, verified, rejected
+    
+    isAP: "boolean",
+    status: "string",
+    dateAdded: "datetime",
+    lastActive: "datetime"
+}
+```
+
+### FileActivityLogs Collection (新增)
+```javascript
+{
+    _id: "string",
+    studentId: "string",         // 关联的学生ID
+    fileName: "string",          // 文件名
+    fileUrl: "string",           // 文件URL
+    action: "string",            // 操作类型：upload, access, delete, verify
+    actionBy: "string",          // 操作者ID
+    actionDate: "datetime",      // 操作时间
+    ipAddress: "string",         // IP地址
+    userAgent: "string",         // 用户代理
+    result: "string",            // 操作结果：success, failed
+    errorMessage: "string"       // 错误信息（如果有）
+}
+```
+
+### FileCleanupReports Collection (新增)
+```javascript
+{
+    _id: "string",
+    reportDate: "datetime",      // 报告日期
+    totalFilesChecked: "number", // 检查的文件总数
+    orphanFiles: "array",        // 孤儿文件列表
+    deletedFiles: "array",       // 已删除的文件列表
+    cleanupStatus: "string",     // 清理状态：completed, failed, partial
+    executionTime: "number",     // 执行时间（毫秒）
+    notes: "string"              // 备注
+}
+```
 
 ## Required Wix Elements
 
@@ -348,23 +410,97 @@ Create complete form in AP Student Lightbox:
 - `registerAPStudentBtn` - Register
 - `cancelAPRegistrationBtn` - Cancel
 
-### Phase 10: Responsive Design (45 minutes)
+### Phase 10: EHCP File Upload Implementation (60 minutes)
 
-#### Step 10.1: Mobile Layout
+#### Step 10.1: Backend Security Setup
+1. **Create Backend Module**
+   - Create `backend/fileVerification.jsw`
+   - Add file type validation functions
+   - Implement secure file access controls
+   - Set up audit logging
+
+2. **Configure File Upload Security**
+   - Set allowed file types: PDF, DOC, DOCX
+   - Set maximum file size: 10MB
+   - Enable virus scanning (if available)
+   - Configure access permissions
+
+#### Step 10.2: Frontend File Upload Integration
+1. **Add File Upload Elements**
+   - `ehcpFileUpload` - Upload button in AP student form
+   - `fileUploadStatus` - Status indicator
+   - `fileUploadProgress` - Progress bar
+   - `uploadedFileName` - Display uploaded file name
+
+2. **Implement Upload Monitoring**
+   ```javascript
+   // File upload event handler
+   $w('#ehcpFileUpload').onChange((event) => {
+     const file = event.target.files[0];
+     validateAndUploadFile(file);
+   });
+   ```
+
+#### Step 10.3: Database Schema Updates
+1. **Update Students Collection**
+   - Add `ehcpFileUrl` field (string)
+   - Add `ehcpFileName` field (string)
+   - Add `ehcpFileSize` field (number)
+   - Add `ehcpUploadDate` field (datetime)
+   - Add `ehcpFileStatus` field (string)
+
+2. **Create FileActivityLogs Collection**
+   - Set up audit trail for file operations
+   - Configure automatic logging
+
+### Phase 11: Responsive Design (45 minutes)
+
+#### Step 11.1: Mobile Layout
 1. **Switch to mobile view**
 2. **Hide sidebar**
 3. **Adjust grid to single column**
 4. **Adjust font sizes and spacing**
+5. **Optimize file upload for mobile**
 
-#### Step 10.2: Tablet Layout
+#### Step 11.2: Tablet Layout
 1. **Switch to tablet view**
 2. **Adjust sidebar width to 200px**
 3. **Adjust grid to 2 columns**
 4. **Optimize touch interactions**
+5. **Test file upload on tablet devices**
 
 ## Deployment and Maintenance
 
-### Step 11: Pre-Deployment Checklist
+### Step 12: EHCP File Management Testing (30 minutes)
+
+#### Step 12.1: File Upload Testing
+1. **Test Valid File Types**
+   - Upload PDF files
+   - Upload DOC/DOCX files
+   - Verify successful uploads
+
+2. **Test File Validation**
+   - Test invalid file types (should be rejected)
+   - Test oversized files (should be rejected)
+   - Test empty files (should be rejected)
+
+3. **Test File Security**
+   - Verify file access permissions
+   - Test unauthorized access attempts
+   - Check audit logging functionality
+
+#### Step 12.2: Database Integration Testing
+1. **Verify Data Persistence**
+   - Check file URL saving to database
+   - Verify file metadata storage
+   - Test file status updates
+
+2. **Test File Lifecycle**
+   - Test file upload process
+   - Test file access and download
+   - Test file deletion (if implemented)
+
+### Step 13: Pre-Deployment Checklist
 
 #### Content Review
 - [ ] All text content is accurate and professional
@@ -387,7 +523,7 @@ Create complete form in AP Student Lightbox:
 - [ ] Database operations tested
 - [ ] Third-party integrations tested
 
-### Step 12: Deployment Process
+### Step 14: Deployment Process
 
 1. **Final Testing:**
    - Test in Wix preview mode
@@ -407,7 +543,26 @@ Create complete form in AP Student Lightbox:
    - Test form submissions
    - Monitor error logs
 
-### Step 13: Ongoing Maintenance
+### Step 15: Ongoing Maintenance
+
+#### EHCP File Management Tasks
+**Daily Tasks:**
+- Monitor file upload activities
+- Check file storage usage
+- Review file access logs
+
+**Weekly Tasks:**
+- Clean up orphaned files
+- Review file security reports
+- Check file backup status
+
+**Monthly Tasks:**
+- Generate file activity reports
+- Review and update file retention policies
+- Audit file access permissions
+- Optimize file storage
+
+#### General Maintenance Tasks
 
 #### Daily Tasks
 - Monitor website performance
