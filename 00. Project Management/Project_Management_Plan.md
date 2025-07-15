@@ -154,7 +154,7 @@
 | Responsive Optimization | Mobile adaptation, cross-browser testing |
 | Interactive Prototyping | User flow validation, interaction design |
 
-### Edi - QA Engineer
+### Edi - QA
 
 #### Week 1-2 (July 15-29): Test Planning
 | Task | Description |
