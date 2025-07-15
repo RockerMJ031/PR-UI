@@ -54,7 +54,6 @@
   - students-enhanced.html
   - sessions-enhanced.html
 - Reports System Implementation (Wix_Reports_Code.js)
-- Index/Main Page Integration (Wix_Index_Code.js)
 - Internal QA Test Results
 - Bug Fix Documentation
 - Performance Optimization Report
@@ -304,11 +303,6 @@
 - **Testing Documentation**: `05. Reports/Wix_Reports_Testing.md`
 - **Frontend Implementation**: `reports-enhanced.html`
 
-#### 06. Index/Main Page
-- **Implementation Guide**: `06. Index/Wix_Index_Guide.md`
-- **Source Code**: `06. Index/Wix_Index_Code.js`
-- **Testing Documentation**: `06. Index/Wix_Index_Testing.md`
-- **Frontend Implementation**: `index.html`
 
 ### Database & Architecture
 - **CMS Database Configuration**: `00. Project Management/CMS_数据库配置指南.md`
