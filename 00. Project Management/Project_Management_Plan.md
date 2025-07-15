@@ -1,8 +1,8 @@
-# Tutor Management System Project Management Plan
+# Mentor database and function ready
 
 ## Project Overview
 
-**Project Name**: Tutor Management System  
+**Project Name**: Mentor database and function ready  
 **Project Timeline**: July 15, 2025 - August 23, 2025  
 **Project Type**: Web Application Development  
 
@@ -14,7 +14,7 @@
 |--------|------|-------------------------|
 | **MJ Quan** | Technical Lead | Code development, architecture design, backend logic implementation |
 | **Shihaam** | UI/UX Designer | Wix page design, user interface optimization, interaction design |
-| **Edi** | QA Engineer | Functional testing, user acceptance testing, quality assurance |
+| **Edi** | QA  | Functional testing, user acceptance testing, quality assurance |
 
 ## Milestones & Deliverables
 
