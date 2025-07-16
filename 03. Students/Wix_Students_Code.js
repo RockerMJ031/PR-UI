@@ -1870,7 +1870,6 @@ function adjustForDesktop() {
  * Handles student-related backend operations
  */
 
-/*
 import { ok, badRequest, serverError } from 'wix-http-functions';
 import wixData from 'wix-data';
 import { sendEmail } from 'backend_email-service';
@@ -1958,7 +1957,8 @@ function sendWelcomeEmail(student) {
     const emailData = {
         to: student.email,
         subject: 'Welcome to Our Program',
-        body: generateWelcomeEmailBody(student)
+        body: generateWelcomeEmailBody(student),
+        type: 'confirmation'
     };
     
     return sendEmail(emailData)
@@ -1977,14 +1977,12 @@ function generateWelcomeEmailBody(student) {
         <p>Please keep this information for your records.</p>
     `;
 }
-*/
 
 /**
  * Backend file: backend/communication.jsw
  * Handles student communication
  */
 
-/*
 import { ok, serverError } from 'wix-http-functions';
 import wixData from 'wix-data';
 import { sendEmail } from 'backend_email-service';
@@ -2008,7 +2006,8 @@ export function sendStudentMessage(request) {
                 sendEmail({
                     to: student.email,
                     subject: subject,
-                    body: message
+                    body: message,
+                    type: 'notification'
                 })
             ]);
         })
@@ -2037,7 +2036,6 @@ export function sendBulkMessage(request) {
             return serverError({ error: 'Failed to send bulk message' });
         });
 }
-*/
 
 console.log('Wix Students Management Dashboard code loaded successfully');
 
