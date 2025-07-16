@@ -775,9 +775,10 @@ function updateStudentForm() {
     const studentData = collectFormData();
     
     if (formData && formData.studentId && validateStudentData(studentData)) {
+        studentData._id = formData.studentId;
         studentData.lastModified = new Date();
         
-        wixData.update('Students', studentData, formData.studentId)
+        wixData.update('Students', studentData)
             .then((result) => {
                 showMessage('Student updated successfully', 'success');
                 hideAllModals();
@@ -1147,7 +1148,11 @@ function performBulkStatusUpdate() {
     }
     
     const updatePromises = selectedStudents.map(student => 
-        wixData.update('Students', { status: newStatus, lastModified: new Date() }, student._id)
+        wixData.update('Students', { 
+            _id: student._id,
+            status: newStatus, 
+            lastModified: new Date() 
+        })
     );
     
     Promise.all(updatePromises)
@@ -1896,8 +1901,9 @@ export function updateStudent(request) {
     
     return validateStudentData(studentData)
         .then(() => {
+            studentData._id = studentId;
             studentData.lastModified = new Date();
-            return wixData.update('Students', studentData, studentId);
+            return wixData.update('Students', studentData);
         })
         .then((result) => {
             return ok({ student: result });

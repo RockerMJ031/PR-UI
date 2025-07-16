@@ -324,6 +324,46 @@ The Students Management Dashboard is a comprehensive system for managing student
    - Mode: Read only
    - For progress tracking
 
+#### Important: Correct wixData.update Usage
+
+When updating records, always include the `_id` field in the update object:
+
+```javascript
+// CORRECT: Include _id in the update object
+wixData.update('Students', {
+  _id: studentId,
+  firstName: 'Updated Name',
+  status: 'active',
+  lastModified: new Date()
+})
+.then((result) => {
+  console.log('Student updated successfully');
+})
+.catch((error) => {
+  console.error('Update failed:', error);
+});
+
+// INCORRECT: Do not pass _id as a separate third parameter
+// wixData.update('Students', updateData, studentId); // This will cause errors!
+```
+
+For bulk updates, use the same pattern:
+
+```javascript
+// CORRECT: Bulk update with _id in each object
+const updatePromises = selectedStudents.map(student => {
+  return wixData.update('Students', {
+    _id: student._id,
+    status: newStatus,
+    lastModified: new Date()
+  });
+});
+
+Promise.all(updatePromises)
+  .then(() => console.log('Bulk update completed'))
+  .catch(error => console.error('Bulk update failed:', error));
+```
+
 ### Step 8: Students Table Setup
 
 1. **Table Configuration**

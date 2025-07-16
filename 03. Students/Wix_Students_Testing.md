@@ -39,9 +39,21 @@ This document provides a complete testing strategy for the Wix Students Manageme
 
 - **TC-DB-002**: Update existing student record
   - Modify student information
-  - Save changes
+  - Save changes using correct wixData.update syntax
   - Verify updates in database
   - Check lastModified timestamp
+  - **Important**: Ensure wixData.update uses correct parameter format:
+    ```javascript
+    // CORRECT: Include _id in the update object
+    wixData.update('Students', {
+      _id: studentId,
+      firstName: 'Updated Name',
+      lastModified: new Date()
+    })
+    
+    // INCORRECT: Do not pass _id as separate parameter
+    // wixData.update('Students', updateData, studentId) // This is wrong!
+    ```
 
 - **TC-DB-003**: Delete student record
   - Select student for deletion
@@ -49,7 +61,26 @@ This document provides a complete testing strategy for the Wix Students Manageme
   - Verify record removed from database
   - Check related records handling
 
-- **TC-DB-004**: Data validation
+- **TC-DB-004**: Bulk update operations
+  - Select multiple students for status update
+  - Perform bulk status change
+  - Verify all records updated correctly
+  - **Important**: Ensure bulk updates use correct wixData.update syntax:
+    ```javascript
+    // CORRECT: Include _id in each update object
+    const updatePromises = selectedStudents.map(student => {
+      return wixData.update('Students', {
+        _id: student._id,
+        status: newStatus,
+        lastModified: new Date()
+      });
+    });
+    
+    // INCORRECT: Do not pass _id as separate parameter
+    // wixData.update('Students', updateData, student._id) // This is wrong!
+    ```
+
+- **TC-DB-005**: Data validation
   - Test required field validation
   - Test email format validation
   - Test phone number validation
