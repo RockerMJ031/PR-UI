@@ -1532,7 +1532,7 @@ function adjustForDesktop() {
 /*
 import { ok, badRequest, serverError } from 'wix-http-functions';
 import wixData from 'wix-data';
-import { sendEmail } from 'backend/email-service';
+import { sendEmail } from 'backend_email-service';
 
 export function createSession(request) {
     const { sessionData } = request.body;

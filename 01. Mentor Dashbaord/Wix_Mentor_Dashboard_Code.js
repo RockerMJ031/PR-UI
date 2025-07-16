@@ -9,7 +9,7 @@
 import wixData from 'wix-data';
 import wixLocation from 'wix-location';
 import wixUsers from 'wix-users';
-import wixWindowFrontend from 'wix-window-frontend';
+import wixWindow from 'wix-window';
 import { local } from 'wix-storage';
 
 // 页面初始化
@@ -666,7 +666,7 @@ function updateSubmitButtonState() {
 
 // 调用后端文件验证
 function verifyUploadedFile(studentId, fileData) {
-    import('backend/fileVerification')
+    import('backend_fileVerification')
         .then((fileModule) => {
             return fileModule.verifyUploadedFile(studentId, fileData);
         })
@@ -726,7 +726,7 @@ function validateFileSecurely(file) {
 // 发送数据到 Lark
 function sendToLark(data) {
     // 调用后端函数发送到 Lark
-    import('backend/larkIntegration')
+    import('backend_larkIntegration')
         .then((larkModule) => {
             return larkModule.sendNotificationToLark(data);
         })
@@ -740,7 +740,7 @@ function sendToLark(data) {
 
 // 发送 Lark 通知的简化函数
 function sendLarkNotification(data) {
-    import('backend/larkIntegration')
+    import('backend_larkIntegration')
         .then((larkModule) => {
             return larkModule.sendLarkNotification(data);
         })
@@ -869,29 +869,24 @@ function setupUserInfo() {
 function setupResponsiveDesign() {
     // 使用 Wix FormFactor API 进行响应式设计
     try {
-        wixWindowFrontend.formFactor.onChange((formFactor) => {
-            switch (formFactor) {
-                case 'Mobile':
-                    adjustMobileLayout();
-                    break;
-                case 'Tablet':
-                    adjustTabletLayout();
-                    break;
-                case 'Desktop':
-                    adjustDesktopLayout();
-                    break;
-            }
-        });
-        
-        // 初始化时也要设置
-        const currentFormFactor = wixWindowFrontend.formFactor.formFactor;
-        if (currentFormFactor === 'Mobile') {
-            adjustMobileLayout();
-        } else if (currentFormFactor === 'Tablet') {
-            adjustTabletLayout();
-        } else {
-            adjustDesktopLayout();
+        // 获取当前设备类型并应用相应布局
+        const currentFormFactor = wixWindow.formFactor;
+        switch (currentFormFactor) {
+            case 'Mobile':
+                adjustMobileLayout();
+                break;
+            case 'Tablet':
+                adjustTabletLayout();
+                break;
+            case 'Desktop':
+                adjustDesktopLayout();
+                break;
+            default:
+                adjustDesktopLayout();
+                break;
         }
+        
+        console.log('响应式设计已应用，当前设备类型:', currentFormFactor);
     } catch (error) {
         console.warn('FormFactor API 不可用，使用降级方法:', error);
         // 降级到传统方法

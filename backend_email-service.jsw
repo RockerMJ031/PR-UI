@@ -1,0 +1,279 @@
+// backend_email-service.jsw
+// 邮件服务后端模块
+
+import { fetch } from 'wix-fetch';
+import { getSecret } from 'wix-secrets-backend';
+
+/**
+ * 发送邮件通知
+ * @param {Object} emailData - 邮件数据
+ * @param {string} emailData.to - 收件人邮箱
+ * @param {string} emailData.subject - 邮件主题
+ * @param {string} emailData.body - 邮件内容
+ * @param {string} emailData.type - 邮件类型 (notification, confirmation, reminder)
+ * @returns {Promise<Object>} 发送结果
+ */
+export function sendEmail(emailData) {
+    return validateEmailData(emailData)
+        .then(() => {
+            // 根据邮件类型选择发送方式
+            switch (emailData.type) {
+                case 'notification':
+                    return sendNotificationEmail(emailData);
+                case 'confirmation':
+                    return sendConfirmationEmail(emailData);
+                case 'reminder':
+                    return sendReminderEmail(emailData);
+                default:
+                    return sendGenericEmail(emailData);
+            }
+        })
+        .then((result) => {
+            console.log('邮件发送成功:', result);
+            return { success: true, result };
+        })
+        .catch((error) => {
+            console.error('邮件发送失败:', error);
+            return { success: false, error: error.message };
+        });
+}
+
+/**
+ * 验证邮件数据
+ * @param {Object} emailData - 邮件数据
+ * @returns {Promise<void>}
+ */
+function validateEmailData(emailData) {
+    return new Promise((resolve, reject) => {
+        if (!emailData.to || !isValidEmail(emailData.to)) {
+            reject(new Error('无效的收件人邮箱地址'));
+            return;
+        }
+        
+        if (!emailData.subject || emailData.subject.trim() === '') {
+            reject(new Error('邮件主题不能为空'));
+            return;
+        }
+        
+        if (!emailData.body || emailData.body.trim() === '') {
+            reject(new Error('邮件内容不能为空'));
+            return;
+        }
+        
+        resolve();
+    });
+}
+
+/**
+ * 验证邮箱格式
+ * @param {string} email - 邮箱地址
+ * @returns {boolean}
+ */
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+/**
+ * 发送通知邮件
+ * @param {Object} emailData - 邮件数据
+ * @returns {Promise<Object>}
+ */
+function sendNotificationEmail(emailData) {
+    const template = {
+        to: emailData.to,
+        subject: `[通知] ${emailData.subject}`,
+        html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #2c3e50;">系统通知</h2>
+                <div style="background-color: #f8f9fa; padding: 20px; border-radius: 5px;">
+                    ${emailData.body}
+                </div>
+                <p style="color: #7f8c8d; font-size: 12px; margin-top: 20px;">
+                    此邮件由系统自动发送，请勿回复。
+                </p>
+            </div>
+        `
+    };
+    
+    return sendEmailViaProvider(template);
+}
+
+/**
+ * 发送确认邮件
+ * @param {Object} emailData - 邮件数据
+ * @returns {Promise<Object>}
+ */
+function sendConfirmationEmail(emailData) {
+    const template = {
+        to: emailData.to,
+        subject: `[确认] ${emailData.subject}`,
+        html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #27ae60;">操作确认</h2>
+                <div style="background-color: #d4edda; padding: 20px; border-radius: 5px; border-left: 4px solid #27ae60;">
+                    ${emailData.body}
+                </div>
+                <p style="color: #7f8c8d; font-size: 12px; margin-top: 20px;">
+                    如有疑问，请联系系统管理员。
+                </p>
+            </div>
+        `
+    };
+    
+    return sendEmailViaProvider(template);
+}
+
+/**
+ * 发送提醒邮件
+ * @param {Object} emailData - 邮件数据
+ * @returns {Promise<Object>}
+ */
+function sendReminderEmail(emailData) {
+    const template = {
+        to: emailData.to,
+        subject: `[提醒] ${emailData.subject}`,
+        html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #f39c12;">重要提醒</h2>
+                <div style="background-color: #fff3cd; padding: 20px; border-radius: 5px; border-left: 4px solid #f39c12;">
+                    ${emailData.body}
+                </div>
+                <p style="color: #7f8c8d; font-size: 12px; margin-top: 20px;">
+                    请及时处理相关事项。
+                </p>
+            </div>
+        `
+    };
+    
+    return sendEmailViaProvider(template);
+}
+
+/**
+ * 发送通用邮件
+ * @param {Object} emailData - 邮件数据
+ * @returns {Promise<Object>}
+ */
+function sendGenericEmail(emailData) {
+    const template = {
+        to: emailData.to,
+        subject: emailData.subject,
+        html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <div style="padding: 20px;">
+                    ${emailData.body}
+                </div>
+            </div>
+        `
+    };
+    
+    return sendEmailViaProvider(template);
+}
+
+/**
+ * 通过邮件服务提供商发送邮件
+ * @param {Object} template - 邮件模板
+ * @returns {Promise<Object>}
+ */
+function sendEmailViaProvider(template) {
+    // 这里可以集成实际的邮件服务提供商 (如 SendGrid, Mailgun 等)
+    // 目前返回模拟成功响应
+    return new Promise((resolve) => {
+        // 模拟异步邮件发送
+        setTimeout(() => {
+            resolve({
+                messageId: generateMessageId(),
+                status: 'sent',
+                timestamp: new Date().toISOString()
+            });
+        }, 100);
+    });
+}
+
+/**
+ * 生成邮件消息ID
+ * @returns {string}
+ */
+function generateMessageId() {
+    return 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
+
+/**
+ * 批量发送邮件
+ * @param {Array<Object>} emailList - 邮件列表
+ * @returns {Promise<Array<Object>>} 发送结果列表
+ */
+export function sendBulkEmails(emailList) {
+    if (!Array.isArray(emailList) || emailList.length === 0) {
+        return Promise.reject(new Error('邮件列表不能为空'));
+    }
+    
+    const promises = emailList.map(emailData => sendEmail(emailData));
+    
+    return Promise.allSettled(promises)
+        .then(results => {
+            const successCount = results.filter(r => r.status === 'fulfilled' && r.value.success).length;
+            const failureCount = results.length - successCount;
+            
+            console.log(`批量邮件发送完成: 成功 ${successCount}, 失败 ${failureCount}`);
+            
+            return {
+                total: results.length,
+                success: successCount,
+                failure: failureCount,
+                results: results
+            };
+        });
+}
+
+/**
+ * 发送学生注册确认邮件
+ * @param {Object} studentData - 学生数据
+ * @returns {Promise<Object>}
+ */
+export function sendStudentRegistrationEmail(studentData) {
+    const emailData = {
+        to: studentData.email,
+        subject: '学生注册确认',
+        body: `
+            <h3>欢迎加入我们的学习平台！</h3>
+            <p>亲爱的 ${studentData.name}，</p>
+            <p>您的学生账户已成功创建。以下是您的注册信息：</p>
+            <ul>
+                <li><strong>姓名：</strong>${studentData.name}</li>
+                <li><strong>邮箱：</strong>${studentData.email}</li>
+                <li><strong>注册时间：</strong>${new Date().toLocaleString('zh-CN')}</li>
+            </ul>
+            <p>请妥善保管您的登录信息，如有任何问题请联系我们。</p>
+        `,
+        type: 'confirmation'
+    };
+    
+    return sendEmail(emailData);
+}
+
+/**
+ * 发送课程提醒邮件
+ * @param {Object} sessionData - 课程数据
+ * @returns {Promise<Object>}
+ */
+export function sendSessionReminderEmail(sessionData) {
+    const emailData = {
+        to: sessionData.studentEmail,
+        subject: '课程提醒',
+        body: `
+            <h3>课程提醒</h3>
+            <p>亲爱的 ${sessionData.studentName}，</p>
+            <p>您有一节课程即将开始：</p>
+            <ul>
+                <li><strong>课程：</strong>${sessionData.courseName}</li>
+                <li><strong>时间：</strong>${sessionData.startTime}</li>
+                <li><strong>导师：</strong>${sessionData.mentorName}</li>
+            </ul>
+            <p>请准时参加课程。</p>
+        `,
+        type: 'reminder'
+    };
+    
+    return sendEmail(emailData);
+}

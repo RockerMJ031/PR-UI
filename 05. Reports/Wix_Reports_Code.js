@@ -1122,7 +1122,7 @@ Place the following code in appropriate backend files:
 // backend/reports.jsw
 import { ok, badRequest, serverError } from 'wix-http-functions';
 import wixData from 'wix-data';
-import { sendEmail } from 'backend/email-service';
+import { sendEmail } from 'backend_email-service';
 
 // Generate and send scheduled reports
 export async function processScheduledReports() {

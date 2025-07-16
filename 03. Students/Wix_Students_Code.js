@@ -1873,7 +1873,7 @@ function adjustForDesktop() {
 /*
 import { ok, badRequest, serverError } from 'wix-http-functions';
 import wixData from 'wix-data';
-import { sendEmail } from 'backend/email-service';
+import { sendEmail } from 'backend_email-service';
 
 export function createStudent(request) {
     const { studentData } = request.body;
@@ -1987,7 +1987,7 @@ function generateWelcomeEmailBody(student) {
 /*
 import { ok, serverError } from 'wix-http-functions';
 import wixData from 'wix-data';
-import { sendEmail } from 'backend/email-service';
+import { sendEmail } from 'backend_email-service';
 
 export function sendStudentMessage(request) {
     const { studentId, subject, message } = request.body;
