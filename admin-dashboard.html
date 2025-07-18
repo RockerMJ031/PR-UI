@@ -977,6 +977,8 @@
                             <label>👤 Student Basic Information</label>
                             <input type="text" placeholder="First Name" class="form-input" title="👤 Student's first name" required>
                             <input type="text" placeholder="Last Name" class="form-input" title="👤 Student's last name" required>
+                            <div class="form-input-label">🎂 Date of Birth</div>
+                            <input type="date" placeholder="Date of Birth" class="form-input" title="🎂 Student's date of birth" required>
                             <input type="email" placeholder="Email Address" class="form-input" title="📧 Student's email address" required>
                             <input type="tel" placeholder="Contact Phone (Optional)" class="form-input" title="📞 Contact phone number">
                             <div class="form-input-label">📚 Class Start Date (When lessons begin)</div>
@@ -1002,6 +1004,8 @@
                                 <option value="WJEC">WJEC</option>
                                 <option value="CIE">CIE</option>
                             </select>
+                            <div class="form-input-label">🏠 Home Address</div>
+                            <textarea placeholder="Student's home address" class="form-input" title="🏠 Student's residential address" style="min-height: 60px; resize: vertical;"></textarea>
                         </div>
                         
                         <div class="form-actions">
@@ -1120,12 +1124,8 @@
                         <input type="text" id="studentLastName" name="studentLastName" required title="Student's last name">
                     </div>
                     <div class="form-group">
-                        <label for="studentAge">🎂 Age *</label>
-                        <input type="number" id="studentAge" name="studentAge" required title="Student's current age">
-                    </div>
-                    <div class="form-group">
-                        <label for="enrollmentDate">📅 Enrollment Date (Registration) *</label>
-                        <input type="date" id="enrollmentDate" name="enrollmentDate" required title="Date when student officially enrolled">
+                        <label for="studentDateOfBirth">🎂 Date of Birth *</label>
+                        <input type="date" id="studentDateOfBirth" name="studentDateOfBirth" required title="Student's date of birth">
                     </div>
                     <div class="form-group">
                         <label for="classStartDate">📚 Class Start Date (First Lesson) *</label>
@@ -1188,6 +1188,10 @@
                     <div class="form-group">
                         <label for="previousEducation">Previous Education Setting</label>
                         <textarea id="previousEducation" name="previousEducation" placeholder="Previous school or educational setting"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="homeAddress">🏠 Home Address</label>
+                        <textarea id="homeAddress" name="homeAddress" placeholder="Student's home address" title="Student's residential address"></textarea>
                     </div>
                 </div>
                 
