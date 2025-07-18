@@ -1051,6 +1051,51 @@
         </div>
     </div>
 
+    <!-- Course Cancellation Confirmation Modal -->
+    <div id="courseCancellationLightbox" class="modal">
+        <div class="modal-content cancellation-modal">
+            <div class="modal-header">
+                <h2>Course Cancellation</h2>
+                <span class="close" id="closeCancellationModalBtn">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="cancellation-info">
+                    <div class="cancellation-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Two Week Notice Required</span>
+                    </div>
+                    <p>Course cancellation requires a minimum of two weeks advance notice. The cancellation will take effect from the calculated date below.</p>
+                </div>
+                
+                <div class="course-selection">
+                    <label for="cancellationCourseDropdown"><strong>Select Course to Cancel:</strong></label>
+                    <select id="cancellationCourseDropdown" class="course-dropdown">
+                        <option value="">Choose a course...</option>
+                    </select>
+                </div>
+                
+                <div class="cancellation-details" id="cancellationDetails" style="display: none;">
+                    <h4>Course Information:</h4>
+                    <div id="selectedCourseInfo"></div>
+                    <div class="cancellation-date" id="cancellationDate"></div>
+                </div>
+                
+                <div class="reason-section">
+                    <label for="cancellationReasonTextarea"><strong>Reason for Cancellation:</strong></label>
+                    <textarea id="cancellationReasonTextarea" class="reason-textarea" placeholder="Please provide the reason for course cancellation..."></textarea>
+                </div>
+                
+                <div class="confirmation-actions">
+                    <button class="btn btn-secondary" id="closeCancellationModalBtn">Cancel</button>
+                    <button class="btn btn-danger" id="confirmCancellationBtn">
+                        <i class="fas fa-times"></i>
+                        Confirm Cancellation
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- AP Student Registration Modal -->
     <div id="apStudentModal" class="modal">
         <div class="modal-content ap-modal">
@@ -1308,19 +1353,133 @@
                 // In real implementation, this would redirect to Wix form or API call
                 window.open('https://purpleruler.larksuite.com/share/base/form/shrusquF0kTZixa4bKNTqTUSPme', '_blank');
             } else if (action === 'cancel') {
-                // Handle course cancellation
-                if (confirm(`Are you sure you want to cancel course ${classId}?`)) {
-                    alert(`Course ${classId} has been marked for cancellation.`);
-                    closeCourseModal();
-                }
+                // Open course cancellation modal instead of simple confirm
+                openCourseCancellationModal();
+                closeCourseModal();
             }
         }
+
+        // Course Cancellation Modal Functions
+        function openCourseCancellationModal() {
+            const modal = document.getElementById('courseCancellationLightbox');
+            loadCancellableCourses();
+            modal.style.display = 'block';
+        }
+        
+        function closeCancellationModal() {
+            const modal = document.getElementById('courseCancellationLightbox');
+            modal.style.display = 'none';
+            // Reset form
+            document.getElementById('cancellationCourseDropdown').value = '';
+            document.getElementById('cancellationReasonTextarea').value = '';
+            document.getElementById('cancellationDetails').style.display = 'none';
+        }
+        
+        function loadCancellableCourses() {
+            const dropdown = document.getElementById('cancellationCourseDropdown');
+            dropdown.innerHTML = '<option value="">Choose a course...</option>';
+            
+            courseData.forEach(course => {
+                const option = document.createElement('option');
+                option.value = course.classId;
+                option.textContent = `${course.classId} - ${course.studentName} (${course.subject})`;
+                dropdown.appendChild(option);
+            });
+        }
+        
+        function calculateCancellationDate() {
+            const today = new Date();
+            const cancellationDate = new Date(today.getTime() + (14 * 24 * 60 * 60 * 1000)); // Add 14 days
+            return cancellationDate;
+        }
+        
+        function formatDate(date) {
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            return date.toLocaleDateString('en-GB', options);
+        }
+        
+        function confirmCourseCancellation() {
+            const selectedCourse = document.getElementById('cancellationCourseDropdown').value;
+            const reason = document.getElementById('cancellationReasonTextarea').value.trim();
+            
+            if (!selectedCourse) {
+                alert('Please select a course to cancel.');
+                return;
+            }
+            
+            if (!reason) {
+                alert('Please provide a reason for cancellation.');
+                return;
+            }
+            
+            const cancellationDate = calculateCancellationDate();
+            const formattedDate = formatDate(cancellationDate);
+            
+            if (confirm(`Confirm cancellation of course ${selectedCourse}?\n\nCancellation will take effect on: ${formattedDate}\n\nReason: ${reason}`)) {
+                // In real implementation, this would save to database
+                alert(`Course ${selectedCourse} has been scheduled for cancellation on ${formattedDate}.\n\nNotifications will be sent to all relevant parties.`);
+                closeCancellationModal();
+            }
+        }
+        
+        // Event listeners for cancellation modal
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cancel Course button
+            const cancelCourseBtn = document.getElementById('cancelCourseBtn');
+            if (cancelCourseBtn) {
+                cancelCourseBtn.addEventListener('click', function() {
+                    openCourseCancellationModal();
+                });
+            }
+            
+            // Course selection change handler
+            document.getElementById('cancellationCourseDropdown').addEventListener('change', function() {
+                const selectedCourseId = this.value;
+                const detailsDiv = document.getElementById('cancellationDetails');
+                const courseInfoDiv = document.getElementById('selectedCourseInfo');
+                const dateDiv = document.getElementById('cancellationDate');
+                
+                if (selectedCourseId) {
+                    const course = courseData.find(c => c.classId === selectedCourseId);
+                    if (course) {
+                        courseInfoDiv.innerHTML = `
+                            <p><strong>Class ID:</strong> ${course.classId}</p>
+                            <p><strong>Student:</strong> ${course.studentName}</p>
+                            <p><strong>Subject:</strong> ${course.subject}</p>
+                            <p><strong>Remaining Lessons:</strong> ${course.qtyLessons}</p>
+                        `;
+                        
+                        const cancellationDate = calculateCancellationDate();
+                        dateDiv.textContent = `Cancellation Date: ${formatDate(cancellationDate)}`;
+                        
+                        detailsDiv.style.display = 'block';
+                    }
+                } else {
+                    detailsDiv.style.display = 'none';
+                }
+            });
+            
+            // Close modal buttons
+            document.querySelectorAll('#closeCancellationModalBtn').forEach(btn => {
+                btn.addEventListener('click', closeCancellationModal);
+            });
+            
+            // Confirm cancellation button
+            document.getElementById('confirmCancellationBtn').addEventListener('click', confirmCourseCancellation);
+        });
 
         // Close modal when clicking outside of it
         window.onclick = function(event) {
             const modal = document.getElementById('courseModal');
             const studentModal = document.getElementById('studentModal');
             const apStudentModal = document.getElementById('apStudentModal');
+            const cancellationModal = document.getElementById('courseCancellationLightbox');
+            
             if (event.target === modal) {
                 closeCourseModal();
             }
@@ -1329,6 +1488,9 @@
             }
             if (event.target === apStudentModal) {
                 closeAPStudentModal();
+            }
+            if (event.target === cancellationModal) {
+                closeCancellationModal();
             }
         }
 
@@ -2250,6 +2412,106 @@
             box-shadow: 0 0 0 3px rgba(102, 51, 153, 0.1);
         }
 
+        /* Course Cancellation Modal Styles */
+        .cancellation-modal {
+            max-width: 600px;
+        }
+        
+        .cancellation-info {
+            background: linear-gradient(135deg, #fff5f5, #fff);
+            border: 2px solid var(--danger-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .cancellation-warning {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--danger-color);
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .cancellation-warning i {
+            font-size: 1.5rem;
+        }
+        
+        .cancellation-details {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .cancellation-date {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            color: var(--info-color);
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .course-selection {
+            margin-bottom: 25px;
+        }
+        
+        .course-dropdown {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            transition: border-color 0.3s ease;
+        }
+        
+        .course-dropdown:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .reason-section {
+            margin-bottom: 25px;
+        }
+        
+        .reason-textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+        
+        .reason-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .confirmation-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 30px;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger-color), #c82333);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #c82333, #a71e2a);
+            transform: translateY(-2px);
+        }
+
         /* Responsive Design for Modal */
         @media (max-width: 768px) {
             .modal-content {
@@ -2285,6 +2547,10 @@
             }
 
             .form-actions {
+                flex-direction: column;
+            }
+            
+            .confirmation-actions {
                 flex-direction: column;
             }
         }

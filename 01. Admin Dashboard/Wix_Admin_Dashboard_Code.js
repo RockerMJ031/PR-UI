@@ -76,6 +76,9 @@ function setupEventHandlers() {
     $w('#submitTicketBtn').onClick(() => handleTicketSubmission());
     $w('#checkStatusBtn').onClick(() => handleStatusCheck());
     
+    // 课程取消按钮
+    $w('#cancelCourseBtn').onClick(() => openCourseCancellationModal());
+    
     // 模态框关闭按钮
     $w('#closeCourseModalBtn').onClick(() => $w('#courseManagementLightbox').hide());
     $w('#closeStudentModalBtn').onClick(() => $w('#studentManagementLightbox').hide());
@@ -84,6 +87,10 @@ function setupEventHandlers() {
     // 表单提交按钮
     $w('#submitAddStudentBtn').onClick(() => submitAddStudent());
     $w('#registerAPStudentBtn').onClick(() => registerAPStudent());
+    
+    // 课程取消相关按钮
+    $w('#confirmCancellationBtn').onClick(() => confirmCourseCancellation());
+    $w('#closeCancellationModalBtn').onClick(() => $w('#courseCancellationLightbox').hide());
     
     // 标签页导航
     $w('#addStudentTabBtn').onClick(() => switchStudentModalTab('add'));
@@ -1151,6 +1158,206 @@ function formatSimpleLarkMessage(data) {
 }
 
 // ==========================================
+// 课程取消功能
+// ==========================================
+
+// 打开课程取消模态框
+function openCourseCancellationModal() {
+    // 加载可取消的课程列表
+    loadCancellableCourses();
+    
+    // 显示课程取消模态框
+    $w('#courseCancellationLightbox').show();
+    
+    console.log('课程取消模态框已打开');
+}
+
+// 加载可取消的课程列表
+function loadCancellableCourses() {
+    wixData.query("Courses")
+        .eq("status", "active") // 只显示活跃课程
+        .find()
+        .then((results) => {
+            const options = results.items.map(course => ({
+                label: `${course.title} - ${course.subject}`,
+                value: course._id
+            }));
+            
+            // 填充课程下拉菜单
+            $w('#cancelCourseDropdown').options = options;
+            
+            console.log('可取消课程已加载:', results.items.length);
+        })
+        .catch((error) => {
+            console.error('加载可取消课程错误:', error);
+            showErrorMessage('Failed to load courses for cancellation');
+        });
+}
+
+// 计算两周后的日期
+function calculateCancellationDate() {
+    const today = new Date();
+    const cancellationDate = new Date(today);
+    cancellationDate.setDate(today.getDate() + 14); // 添加14天（2周自然日）
+    
+    return cancellationDate;
+}
+
+// 格式化日期显示
+function formatDate(date) {
+    const options = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        weekday: 'long'
+    };
+    
+    return date.toLocaleDateString('en-US', options);
+}
+
+// 确认课程取消
+function confirmCourseCancellation() {
+    // 获取选中的课程ID
+    const selectedCourseId = $w('#cancelCourseDropdown').value;
+    
+    if (!selectedCourseId) {
+        showErrorMessage('Please select a course to cancel');
+        return;
+    }
+    
+    // 计算取消日期
+    const cancellationDate = calculateCancellationDate();
+    const formattedDate = formatDate(cancellationDate);
+    
+    // 显示确认信息
+    const confirmationMessage = `Course cancellation requires 2 weeks advance notice.\n\n` +
+                               `The selected course will be cancelled on: ${formattedDate}\n\n` +
+                               `Are you sure you want to proceed with this cancellation?`;
+    
+    // 使用 Wix 确认对话框
+    wixWindow.openLightbox('confirmationDialog', {
+        title: 'Course Cancellation Confirmation',
+        message: confirmationMessage,
+        courseId: selectedCourseId,
+        cancellationDate: cancellationDate
+    })
+    .then((result) => {
+        if (result && result.confirmed) {
+            processCancellation(selectedCourseId, cancellationDate);
+        }
+    })
+    .catch((error) => {
+        console.error('确认对话框错误:', error);
+        // 备用确认方式
+        if (confirm(confirmationMessage)) {
+            processCancellation(selectedCourseId, cancellationDate);
+        }
+    });
+}
+
+// 处理课程取消流程
+function processCancellation(courseId, cancellationDate) {
+    // 检查用户权限
+    checkUserPermissions('cancel_course')
+        .then((hasPermission) => {
+            if (!hasPermission) {
+                showErrorMessage('You do not have permission to cancel courses');
+                return Promise.reject('权限不足');
+            }
+            
+            // 获取课程信息
+            return wixData.get("Courses", courseId);
+        })
+        .then((course) => {
+            // 更新课程状态为"待取消"
+            const updatedCourse = {
+                ...course,
+                status: 'pending_cancellation',
+                cancellationDate: cancellationDate,
+                cancellationRequestDate: new Date(),
+                lastModified: new Date()
+            };
+            
+            return wixData.update("Courses", updatedCourse);
+        })
+        .then((result) => {
+            // 创建取消记录
+            const cancellationRecord = {
+                courseId: courseId,
+                courseName: result.title,
+                requestDate: new Date(),
+                scheduledCancellationDate: cancellationDate,
+                status: 'scheduled',
+                requestedBy: 'admin', // 可以从用户会话获取
+                reason: $w('#cancellationReasonTextarea').value || 'Administrative cancellation'
+            };
+            
+            return wixData.insert("CourseCancellations", cancellationRecord);
+        })
+        .then((cancellationResult) => {
+            // 发送通知到相关学生和教师
+            sendCancellationNotifications(courseId, cancellationDate);
+            
+            // 发送到 Lark
+            sendLarkNotification({
+                type: 'course_cancellation',
+                courseId: courseId,
+                cancellationDate: formatDate(cancellationDate),
+                requestDate: new Date().toLocaleString()
+            });
+            
+            // 显示成功消息
+            showSuccessMessage(`Course cancellation scheduled for ${formatDate(cancellationDate)}`);
+            
+            // 关闭模态框
+            $w('#courseCancellationLightbox').hide();
+            
+            // 刷新课程数据
+            loadCourses();
+            
+            console.log('课程取消已安排:', cancellationResult);
+        })
+        .catch((error) => {
+            console.error('课程取消处理错误:', error);
+            showErrorMessage('Failed to schedule course cancellation. Please try again.');
+        });
+}
+
+// 发送取消通知
+function sendCancellationNotifications(courseId, cancellationDate) {
+    // 查找该课程的所有学生
+    wixData.query("Students")
+        .contains("courses", courseId)
+        .find()
+        .then((students) => {
+            students.items.forEach(student => {
+                // 这里可以集成邮件服务发送通知
+                console.log(`通知学生 ${student.name} 课程取消信息`);
+            });
+        })
+        .catch((error) => {
+            console.error('发送学生通知错误:', error);
+        });
+    
+    // 查找该课程的教师
+    wixData.query("Courses")
+        .eq("_id", courseId)
+        .find()
+        .then((results) => {
+            if (results.items.length > 0) {
+                const course = results.items[0];
+                if (course.teacherId) {
+                    // 发送教师通知
+                    console.log(`通知教师课程取消信息`);
+                }
+            }
+        })
+        .catch((error) => {
+            console.error('发送教师通知错误:', error);
+        });
+}
+
+// ==========================================
 // 使用说明
 // ==========================================
 
@@ -1172,20 +1379,38 @@ function formatSimpleLarkMessage(data) {
    - 确保所有数据连接已正确配置
    - 验证字段名称和类型匹配
    - 设置正确的权限
+   - 创建 CourseCancellations 数据集用于存储课程取消记录
 
 4. 元素 ID 检查：
    - 确保所有 Wix 元素的 ID 与代码中使用的 ID 完全匹配
    - 特别注意 Lightbox、输入字段和按钮的 ID
+   - 新增课程取消相关元素：
+     * #cancelCourseBtn - 课程取消按钮
+     * #courseCancellationLightbox - 课程取消模态框
+     * #cancelCourseDropdown - 课程选择下拉菜单
+     * #cancellationReasonTextarea - 取消原因文本框
+     * #confirmCancellationBtn - 确认取消按钮
+     * #closeCancellationModalBtn - 关闭模态框按钮
 
-5. 测试：
+5. 课程取消功能说明：
+   - 课程取消需要提前2周（14个自然日）通知
+   - 系统会自动计算取消日期并显示确认信息
+   - 取消请求会创建记录并通知相关学生和教师
+   - 支持 Lark 通知集成
+   - 页面显示为英文，但代码注释为中文
+
+6. 测试：
    - 在预览模式下测试所有功能
    - 验证表单提交和数据库操作
    - 测试响应式设计
    - 验证 Lark 通知
+   - 特别测试课程取消功能的日期计算和确认流程
 
 注意事项：
 - 此代码使用 Wix Velo 语法，不是标准 JavaScript
 - 确保您的 Wix 计划支持数据库功能
 - 在生产环境中使用前，请彻底测试所有功能
 - 定期备份您的数据库和代码
+- 课程取消功能需要管理员权限验证
+- 建议设置邮件通知服务以自动通知相关人员
 */
