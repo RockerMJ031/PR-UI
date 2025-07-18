@@ -302,7 +302,7 @@ async function verifyUserPermission(userId, permission) {
         
         // 检查用户角色
         const allowedRoles = {
-            'file_access': ['mentor', 'admin', 'supervisor'],
+            'file_access': ['admin', 'supervisor'],
             'file_delete': ['admin', 'supervisor'],
             'file_verify': ['admin', 'supervisor']
         };

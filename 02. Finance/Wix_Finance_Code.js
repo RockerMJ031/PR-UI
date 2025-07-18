@@ -700,9 +700,9 @@ function syncWithStudentManagement() {
     console.log('Syncing with student management system');
 }
 
-function syncWithMentorDashboard() {
-    // Sync financial data with mentor dashboard
-    console.log('Syncing with mentor dashboard');
+function syncWithAdminDashboard() {
+    // Sync financial data with admin dashboard
+    console.log('Syncing with admin dashboard');
 }
 
 function updateSessionBookingPricing() {

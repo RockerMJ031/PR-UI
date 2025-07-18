@@ -6,7 +6,7 @@
 
 ## 项目信息
 
-- **项目名称**: 导师管理系统 (Mentor Management System)
+- **项目名称**: 管理员管理系统 (Admin Management System)
 - **开发平台**: Wix CMS + Velo
 - **项目周期**: 6周 (2025年7月15日 - 2025年8月26日)
 - **团队规模**: 3人

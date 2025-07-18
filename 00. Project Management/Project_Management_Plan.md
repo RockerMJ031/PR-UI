@@ -1,8 +1,8 @@
-# Mentor database and function ready
+# Admin database and function ready
 
 ## Project Overview
 
-**Project Name**: Mentor database and function ready  
+**Project Name**: Admin database and function ready  
 **Project Timeline**: July 15, 2025 - August 23, 2025  
 **Project Type**: Web Application Development  
 
@@ -41,7 +41,7 @@
 - Database Collections Setup
 - Data Flow Architecture
 - Backend Integration Code:
-  - Mentor Dashboard Module (Wix_Mentor_Dashboard_Code.js)
+  - Admin Dashboard Module (Wix_Admin_Dashboard_Code.js)
   - Finance Management Module (Wix_Finance_Code.js)
   - Student Management Module (Wix_Students_Code.js)
   - Session Management Module (Wix_Sessions_Code.js)
@@ -49,7 +49,7 @@
 ### Milestone 4: Staging Site Passes Internal QA (August 14, 2025)
 **Deliverables:**
 - Complete Frontend Implementation:
-  - mentor-dashboard.html
+  - admin-dashboard.html
   - finance.html
   - students-enhanced.html
   - sessions-enhanced.html
@@ -108,7 +108,7 @@
 | Task | Description |
 |------|-------------|
 | Wix CMS Implementation | Database collections setup, API endpoints |
-| Mentor Dashboard Backend | Dashboard logic, statistics, data aggregation |
+| Admin Dashboard Backend | Dashboard logic, statistics, data aggregation |
 | Student Management Backend | Student CRUD, data binding, filtering, search |
 | Session Management Backend | Session scheduling, status management, notifications |
 | Finance Management Backend | Fee calculation, payment tracking, report generation |
@@ -140,7 +140,7 @@
 #### Week 2 (July 23-28): High-Fidelity Mockups
 | Task | Description |
 |------|-------------|
-| Mentor Dashboard Design | Dashboard layout, charts, navigation design |
+| Admin Dashboard Design | Dashboard layout, charts, navigation design |
 | Student Management Interface | Student lists, detail pages, form designs |
 | Session Management UI | Calendar views, session cards, status indicators |
 | Finance Management Design | Financial reports, payment interfaces, statistics |
@@ -273,11 +273,11 @@
 
 ### Technical Documentation Structure
 
-#### 01. Mentor Dashboard
-- **Implementation Guide**: `01. Mentor Dashboard/Wix_Mentor_Dashboard_Guide.md`
-- **Source Code**: `01. Mentor Dashboard/Wix_Mentor_Dashboard_Code.js`
-- **Testing Documentation**: `01. Mentor Dashboard/Wix_Mentor_Dashboard_Testing.md`
-- **Frontend Implementation**: `mentor-dashboard.html`
+#### 01. Admin Dashboard
+- **Implementation Guide**: `01. Admin Dashboard/Wix_Admin_Dashboard_Guide.md`
+- **Source Code**: `01. Admin Dashboard/Wix_Admin_Dashboard_Code.js`
+- **Testing Documentation**: `01. Admin Dashboard/Wix_Admin_Dashboard_Testing.md`
+- **Frontend Implementation**: `admin-dashboard.html`
 
 #### 02. Finance Management
 - **Implementation Guide**: `02. Finance/Wix_Finance_Guide.md`

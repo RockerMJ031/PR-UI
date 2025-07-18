@@ -28,7 +28,7 @@ let currentStudentType = 'alternative'; // 'alternative' or 'tutoring'
 let studentsData = {
     students: [],
     courses: [],
-    mentors: [],
+    admins: [],
     statistics: {},
     filters: {
         search: '',
@@ -105,7 +105,7 @@ function checkUserPermissions() {
     wixUsers.currentUser.getRoles()
         .then((roles) => {
             const hasAccess = roles.some(role => 
-                ['admin', 'mentor', 'staff'].includes(role.title.toLowerCase())
+                ['admin', 'staff'].includes(role.title.toLowerCase())
             );
             
             if (!hasAccess) {
@@ -213,7 +213,7 @@ function loadStudentsData() {
     Promise.all([
         loadStudents(),
         loadCourses(),
-        loadMentors(),
+        loadAdmins(),
         calculateStatistics()
     ])
     .then(() => {
@@ -336,11 +336,11 @@ function loadCourses() {
         });
 }
 
-function loadMentors() {
-    return wixData.query('Mentors')
+function loadAdmins() {
+    return wixData.query('Admins')
         .find()
         .then((results) => {
-            studentsData.mentors = results.items;
+            studentsData.admins = results.items;
             return results.items;
         });
 }
@@ -532,12 +532,12 @@ function loadFormDependencies() {
     }));
     $w('#courseSelect').options = courseOptions;
     
-    // Populate mentor dropdown
-    const mentorOptions = studentsData.mentors.map(mentor => ({
-        label: `${mentor.firstName} ${mentor.lastName}`,
-        value: mentor._id
+    // Populate admin dropdown
+    const adminOptions = studentsData.admins.map(admin => ({
+        label: `${admin.firstName} ${admin.lastName}`,
+        value: admin._id
     }));
-    $w('#mentorSelect').options = mentorOptions;
+    $w('#adminSelect').options = adminOptions;
     
     // Set status options
     $w('#statusSelect').options = [
@@ -800,7 +800,7 @@ function collectFormData() {
         dateOfBirth: $w('#dateOfBirthInput').value,
         enrollmentDate: $w('#enrollmentDateInput').value,
         courseId: $w('#courseSelect').value,
-        mentorId: $w('#mentorSelect').value,
+        adminId: $w('#adminSelect').value,
         status: $w('#statusSelect').value,
         parentEmail: $w('#parentEmailInput').value,
         parentPhone: $w('#parentPhoneInput').value,
@@ -1002,7 +1002,7 @@ function populateStudentDetails(student) {
     $w('#detailEnrollmentDate').text = formatDate(student.enrollmentDate);
     $w('#detailStatus').text = student.status;
     $w('#detailCourse').text = getCourseNameById(student.courseId);
-    $w('#detailMentor').text = getMentorNameById(student.mentorId);
+    $w('#detailAdmin').text = getAdminNameById(student.adminId);
     
     // Contact information
     $w('#detailParentEmail').text = student.parentEmail || 'N/A';
@@ -1344,7 +1344,7 @@ function convertToCSV(students) {
     const headers = [
         'Student ID', 'First Name', 'Last Name', 'Email', 'Phone',
         'Date of Birth', 'Enrollment Date', 'Status', 'Course',
-        'Mentor', 'Parent Email', 'Parent Phone', 'Address',
+        'Admin', 'Parent Email', 'Parent Phone', 'Address',
         'Emergency Contact', 'Academic Level', 'Special Needs', 'Notes'
     ];
     
@@ -1358,7 +1358,7 @@ function convertToCSV(students) {
         formatDate(student.enrollmentDate),
         student.status,
         getCourseNameById(student.courseId),
-        getMentorNameById(student.mentorId),
+        getAdminNameById(student.adminId),
         student.parentEmail || '',
         student.parentPhone || '',
         student.address || '',
@@ -1638,9 +1638,9 @@ function getCourseNameById(courseId) {
     return course ? course.courseName : 'N/A';
 }
 
-function getMentorNameById(mentorId) {
-    const mentor = studentsData.mentors.find(m => m._id === mentorId);
-    return mentor ? `${mentor.firstName} ${mentor.lastName}` : 'N/A';
+function getAdminNameById(adminId) {
+    const admin = studentsData.admins.find(m => m._id === adminId);
+    return admin ? `${admin.firstName} ${admin.lastName}` : 'N/A';
 }
 
 function getStudentProgress(studentId) {
@@ -2047,7 +2047,7 @@ console.log('Wix Students Management Dashboard code loaded successfully');
  *    - StudentProgress: Academic progress tracking
  *    - StudentCommunication: Message history
  *    - Courses: Available courses
- *    - Mentors: Assigned mentors
+ *    - Admins: Assigned admins
  * 
  * 2. Required Wix Elements:
  *    - Statistics cards with appropriate IDs

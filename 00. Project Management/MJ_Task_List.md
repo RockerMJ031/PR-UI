@@ -1,6 +1,6 @@
 # MJ Quan - 任务清单
 
-## 项目：Mentor database and function ready
+## 项目：Admin database and function ready
 **项目周期**: 2025年7月15日 - 2025年8月23日
 **角色**: Technical Lead
 
@@ -22,7 +22,7 @@
 | 任务名称 | 开始日期 | 结束日期 | 优先级 | 描述 |
 |---------|---------|---------|-------|-----|
 | Wix CMS Implementation | 2025-07-23 | 2025-07-26 | 高 | 数据库集合设置、API端点 |
-| Mentor Dashboard Backend | 2025-07-27 | 2025-07-30 | 高 | 仪表板逻辑、统计、数据聚合 |
+| Admin Dashboard Backend | 2025-07-27 | 2025-07-30 | 高 | 仪表板逻辑、统计、数据聚合 |
 | Student Management Backend | 2025-07-31 | 2025-08-02 | 高 | 学生CRUD、数据绑定、过滤、搜索 |
 | Session Management Backend | 2025-08-01 | 2025-08-03 | 高 | 会话调度、状态管理、通知 |
 | Finance Management Backend | 2025-08-02 | 2025-08-04 | 高 | 费用计算、付款跟踪、报告生成 |
@@ -61,14 +61,14 @@
 - Wix CMS Schema Implementation
 - API Mapping Documentation
 - Backend Integration Code:
-  - Mentor Dashboard Module (Wix_Mentor_Dashboard_Code.js)
+  - Admin Dashboard Module (Wix_Admin_Dashboard_Code.js)
   - Finance Management Module (Wix_Finance_Code.js)
   - Student Management Module (Wix_Students_Code.js)
   - Session Management Module (Wix_Sessions_Code.js)
 
 ### 里程碑4 (2025年8月14日)
 - Complete Frontend Implementation:
-  - mentor-dashboard.html
+  - admin-dashboard.html
   - finance.html
   - students-enhanced.html
   - sessions-enhanced.html
@@ -91,4 +91,4 @@
 
 **创建日期**: 2025年7月15日  
 **负责人**: MJ Quan  
-**项目**: Mentor database and function ready
+**项目**: Admin database and function ready

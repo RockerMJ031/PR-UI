@@ -268,7 +268,7 @@ export function sendSessionReminderEmail(sessionData) {
             <ul>
                 <li><strong>课程：</strong>${sessionData.courseName}</li>
                 <li><strong>时间：</strong>${sessionData.startTime}</li>
-                <li><strong>导师：</strong>${sessionData.mentorName}</li>
+                <li><strong>管理员：</strong>${sessionData.adminName}</li>
             </ul>
             <p>请准时参加课程。</p>
         `,

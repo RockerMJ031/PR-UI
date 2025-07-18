@@ -29,7 +29,7 @@
   lastName: "string", // 姓氏
   email: "string", // 邮箱地址
   phone: "string", // 电话号码
-  role: "string", // 角色: admin, mentor, student, parent, staff
+  role: "string", // 角色: admin, student, parent, staff
   avatar: "string", // 头像URL
   preferences: {
     theme: "string", // light, dark
@@ -52,35 +52,25 @@
 }
 ```
 
-### Mentors 集合
-**使用页面**: 导师仪表盘、会话管理、学生管理  
-**代码调用**: `wixData.query('Mentors')`
+### Admins 集合
+**使用页面**: 管理员仪表盘、会话管理、学生管理  
+**代码调用**: `wixData.query('Admins')`
 
 ```javascript
 {
   _id: "string",
   userId: "string", // 关联Users集合
-  mentorId: "string", // 导师编号
+  adminId: "string", // 管理员编号
   firstName: "string",
   lastName: "string",
   email: "string",
   phone: "string",
-  specializations: ["string"], // 专业领域
-  qualifications: ["string"], // 资质证书
-  experience: "number", // 工作年限
-  hourlyRate: "number", // 时薪
-  availability: {
-    monday: ["string"], // 时间段数组
-    tuesday: ["string"],
-    wednesday: ["string"],
-    thursday: ["string"],
-    friday: ["string"],
-    saturday: ["string"],
-    sunday: ["string"]
-  },
+  department: "string", // 所属部门
+  position: "string", // 职位
+  permissions: ["string"], // 权限列表
   status: "string", // active, inactive, on_leave
-  rating: "number", // 评分 1-5
-  totalSessions: "number", // 总课程数
+  lastLogin: "datetime", // 最后登录时间
+  managedStudents: "number", // 管理的学生数量
   joinDate: "date", // 入职日期
   _createdDate: "datetime",
   _updatedDate: "datetime"
@@ -121,7 +111,7 @@
   specialNeeds: "text", // 特殊需求
   subject: "string", // 单个科目（普通学生）或课程分类（AP学生）
   subjects: ["string"], // 学习科目列表（兼容性保留）
-  currentMentor: "string", // 当前导师ID
+  currentAdmin: "string", // 当前管理员ID
   totalSessions: "number", // 总课程数
   attendanceRate: "number", // 出勤率
   averageGrade: "number", // 平均成绩
@@ -155,7 +145,7 @@
 ```
 
 ### APStudents 集合
-**使用页面**: 导师仪表盘（AP学生专用）、学生管理页面  
+**使用页面**: 管理员仪表盘（AP学生专用）、学生管理页面  
 **代码调用**: `wixData.query('APStudents')`
 
 ```javascript
@@ -188,7 +178,7 @@
   actScore: "number", // ACT分数
   extracurriculars: ["string"], // 课外活动
   counselorNotes: "text", // 顾问备注
-  currentMentor: "string", // 当前导师ID
+  currentAdmin: "string", // 当前管理员ID
   totalSessions: "number", // 总课程数
   attendanceRate: "number", // 出勤率
   averageGrade: "number", // 平均成绩
@@ -209,7 +199,7 @@
   _id: "string",
   communicationId: "string",
   studentId: "string", // 关联Students
-  mentorId: "string", // 关联Mentors
+  adminId: "string", // 关联Admins
   type: "string", // email, phone, meeting, note
   subject: "string", // 主题
   content: "text", // 内容
@@ -228,7 +218,7 @@
 ## 课程会话集合
 
 ### Courses 集合
-**使用页面**: 导师仪表盘、会话管理、学生管理  
+**使用页面**: 管理员仪表盘、会话管理、学生管理  
 **代码调用**: `wixData.query('Courses')`
 
 ```javascript
@@ -243,7 +233,7 @@
   price: "number", // 课程价格
   maxStudents: "number", // 最大学生数
   currentStudents: "number", // 当前学生数
-  mentorId: "string", // 关联Mentors
+  adminId: "string", // 关联Admins
   syllabus: "text", // 教学大纲
   materials: ["string"], // 教材列表
   prerequisites: ["string"], // 先修要求
@@ -256,7 +246,7 @@
 ```
 
 ### Sessions 集合
-**使用页面**: 会话管理页面、导师仪表盘、日历组件  
+**使用页面**: 会话管理页面、管理员仪表盘、日历组件  
 **代码调用**: `wixData.query('Sessions')`
 
 ```javascript
@@ -265,7 +255,7 @@
   sessionId: "string", // 会话编号
   title: "string", // 会话标题
   description: "text", // 会话描述
-  mentorId: "string", // 关联Mentors
+  adminId: "string", // 关联Admins
   studentId: "string", // 关联Students（单个学生）
   students: ["string"], // 关联Students（多个学生）
   courseId: "string", // 关联Courses
@@ -342,7 +332,7 @@
   _id: "string",
   sessionId: "string", // 关联Sessions
   studentId: "string", // 关联Students
-  mentorId: "string", // 关联Mentors
+  adminId: "string", // 关联Admins
   rating: "number", // 评分 1-5
   feedback: "text", // 文字反馈
   categories: {
@@ -504,7 +494,7 @@
 ```
 
 ### PricingPlans 集合
-**使用页面**: 导师仪表盘、财务管理页面  
+**使用页面**: 管理员仪表盘、财务管理页面  
 **代码调用**: `wixData.query('PricingPlans')`
 
 ```javascript
@@ -670,8 +660,8 @@
   date: "date", // 统计日期
   totalStudents: "number", // 总学生数
   activeStudents: "number", // 活跃学生数
-  totalMentors: "number", // 总导师数
-  activeMentors: "number", // 活跃导师数
+  totalAdmins: "number", // 总管理员数
+  activeAdmins: "number", // 活跃管理员数
   totalSessions: "number", // 总课程数
   sessionsToday: "number", // 今日课程数
   sessionsThisWeek: "number", // 本周课程数
@@ -715,7 +705,7 @@
 ```
 
 ### Tickets 集合
-**使用页面**: 导师仪表盘、系统管理  
+**使用页面**: 管理员仪表盘、系统管理  
 **代码调用**: `wixData.query('Tickets')`
 
 ```javascript
@@ -755,7 +745,7 @@
 #### 管理员权限 (Admin)
 - **所有集合**: 完全访问权限（创建、读取、更新、删除）
 
-#### 导师权限 (Mentor)
+#### 管理员权限 (Admin)
 - **Students**: 读取、更新（仅分配给自己的学生）
 - **Sessions**: 完全访问权限（仅自己的课程）
 - **SessionAttendance**: 完全访问权限（仅自己的课程）
@@ -791,16 +781,16 @@
 - `studentId` (唯一索引)
 - `email` (唯一索引)
 - `status`
-- `currentMentor`
+- `currentAdmin`
 - `enrollmentDate`
 
 ### Sessions 集合
 - `sessionId` (唯一索引)
-- `mentorId`
+- `adminId`
 - `studentId`
 - `scheduledDate`
 - `status`
-- 复合索引: `mentorId + scheduledDate`
+- 复合索引: `adminId + scheduledDate`
 - 复合索引: `studentId + scheduledDate`
 
 ### Payments 集合
@@ -850,7 +840,7 @@
 
 经过对所有代码文件的检查，以下是各个模块中实际使用的数据库集合：
 
-#### 01. 导师仪表盘 (Mentor Dashboard)
+#### 01. 管理员仪表盘 (Admin Dashboard)
 - ✅ `Statistics` - 统计数据
 - ✅ `Courses` - 课程信息
 - ✅ `Students` - 学生信息
@@ -865,14 +855,14 @@
 #### 03. 学生管理 (Students)
 - ✅ `Students` - 学生基本信息
 - ✅ `Courses` - 课程信息
-- ✅ `Mentors` - 导师信息
+- ✅ `Admins` - 管理员信息
 - ✅ `StudentProgress` - 学生进度
 - ✅ `StudentCommunication` - 学生沟通记录
 
 #### 04. 会话管理 (Sessions)
 - ✅ `Sessions` - 会话记录
 - ✅ `Students` - 学生信息
-- ✅ `Mentors` - 导师信息
+- ✅ `Admins` - 管理员信息
 - ✅ `Subjects` - 科目信息
 - ✅ `SessionAttendance` - 出勤记录
 
@@ -888,7 +878,7 @@
 #### 06. 主仪表盘 (Index)
 - ✅ `SystemStats` - 系统统计
 - ✅ `Students` - 学生信息
-- ✅ `Mentors` - 导师信息
+- ✅ `Admins` - 管理员信息
 - ✅ `Sessions` - 会话信息
 - ✅ `Invoices` - 发票信息
 - ✅ `SessionAttendance` - 出勤信息
@@ -943,7 +933,7 @@
 |---------|-----------|----------|
 | Students | 6 | 学生信息管理 |
 | Sessions | 4 | 会话管理 |
-| Mentors | 3 | 导师信息 |
+| Admins | 3 | 管理员信息 |
 | Courses | 3 | 课程管理 |
 | Reports | 2 | 报表生成 |
 | Invoices | 3 | 发票管理 |
@@ -959,7 +949,7 @@
 所有集合的权限配置已根据实际使用情况进行了验证和调整：
 
 - ✅ 管理员权限：所有集合完全访问
-- ✅ 导师权限：相关集合的适当访问权限
+- ✅ 管理员权限：相关集合的适当访问权限
 - ✅ 学生权限：仅自己相关数据的读取权限
 - ✅ 家长权限：仅孩子相关数据的读取权限
 

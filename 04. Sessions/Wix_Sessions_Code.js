@@ -1727,7 +1727,7 @@ function generateNotificationEmail(session, action) {
  *    - title (Text)
  *    - description (Text)
  *    - studentId (Reference to Students)
- *    - mentorId (Reference to Mentors)
+ *    - adminId (Reference to Admins)
  *    - subjectId (Reference to Subjects)
  *    - sessionType (Text: individual, group, workshop, assessment)
  *    - status (Text: scheduled, in-progress, completed, cancelled)
@@ -1765,12 +1765,13 @@ function generateNotificationEmail(session, action) {
  *    - phone (Text)
  *    - status (Text)
  * 
- * 4. Mentors Collection:
+ * 4. Admins Collection:
  *    - firstName (Text)
  *    - lastName (Text)
  *    - email (Text)
  *    - phone (Text)
- *    - specializations (Text)
+ *    - department (Text)
+ *    - position (Text)
  * 
  * 5. Subjects Collection:
  *    - subjectName (Text)
@@ -1822,7 +1823,7 @@ function generateNotificationEmail(session, action) {
  * Search and Filters:
  * - #searchInput (Input)
  * - #statusFilter (Dropdown)
- * - #mentorFilter (Dropdown)
+ * - #adminFilter (Dropdown)
  * - #subjectFilter (Dropdown)
  * - #sessionTypeFilter (Dropdown)
  * - #startDatePicker (DatePicker)
@@ -1835,7 +1836,7 @@ function generateNotificationEmail(session, action) {
  * - #sessionTitleInput (Input)
  * - #sessionDescriptionInput (TextBox)
  * - #studentSelect (Dropdown)
- * - #mentorSelect (Dropdown)
+ * - #adminSelect (Dropdown)
  * - #subjectSelect (Dropdown)
  * - #sessionTypeSelect (Dropdown)
  * - #statusSelect (Dropdown)
@@ -1869,7 +1870,7 @@ function generateNotificationEmail(session, action) {
  * 
  * MEMBER PERMISSIONS:
  * - Admin: Full access to all sessions
- * - Mentor: Access to own sessions
+ * - Admin: Access to assigned sessions
  * - Staff: Read access to all sessions
  * - Scheduler: Create and edit sessions
  * 
