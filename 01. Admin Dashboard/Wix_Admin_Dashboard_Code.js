@@ -11,6 +11,8 @@ import wixLocation from 'wix-location';
 import wixUsers from 'wix-users';
 import wixWindow from 'wix-window';
 import { local } from 'wix-storage';
+import { syncFromLark, syncToLark, batchSync, testLarkBaseConnection } from 'backend/larkBaseSync';
+
 
 // 页面初始化
 $w.onReady(function () {
@@ -75,6 +77,12 @@ function setupEventHandlers() {
     $w('#removeAPStudentBtn').onClick(() => openRemoveAPModal());
     $w('#submitTicketBtn').onClick(() => handleTicketSubmission());
     $w('#checkStatusBtn').onClick(() => handleStatusCheck());
+    
+    // Lark Base 同步按钮
+    $w('#syncWithLarkBtn').onClick(() => openLarkSyncModal());
+    $w('#testLarkConnectionBtn').onClick(() => testLarkConnection());
+    $w('#syncAllStudentsBtn').onClick(() => syncAllStudentsToLark());
+    $w('#pullFromLarkBtn').onClick(() => pullStudentsFromLark());
     
     // 课程取消按钮
     $w('#cancelCourseBtn').onClick(() => openCourseCancellationModal());
@@ -337,14 +345,25 @@ function submitAddStudent() {
             
             // 获取表单数据
             const studentData = {
-                name: $w('#studentNameInput').value,
+                firstName: $w('#studentNameInput').value.split(' ')[0] || '',
+                lastName: $w('#studentNameInput').value.split(' ')[1] || '',
                 email: $w('#studentEmailInput').value,
                 phone: $w('#studentPhoneInput').value,
                 status: $w('#studentStatusDropdown').value,
                 courses: [$w('#studentCourseDropdown').value],
                 isAP: false,
-                dateAdded: new Date(),
-                lastActive: new Date()
+                studentType: 'tutoring',
+                product: 'Tutoring',
+                enrollmentDate: new Date(),
+                lastActive: new Date(),
+                // Lark 集成字段
+                syncStatus: 'pending',
+                lastSyncWithLark: null,
+                larkSyncData: {
+                    lastPullDate: null,
+                    lastPushDate: null,
+                    syncErrors: []
+                }
             };
             
             // 验证表单数据
@@ -362,12 +381,49 @@ function submitAddStudent() {
             updateStatistics();
             
             // 发送到 Lark
-            sendToLark({
-                action: 'add_student',
-                student: studentData
+            sendLarkNotification({
+                type: 'student_added',
+                studentName: `${result.firstName} ${result.lastName}`,
+                studentEmail: result.email
             });
             
+            // 询问是否同步到 Lark Base
+            if (confirm('是否立即同步到 Lark Base？')) {
+                // 同步到 Lark Base
+                return syncToLark(result._id)
+                    .then((syncResult) => {
+                        if (syncResult.success) {
+                            showSuccessMessage('同步到 Lark Base 成功！');
+                            
+                            // 更新学生记录
+                            return wixData.get('Students', result._id)
+                                .then((student) => {
+                                    student.syncStatus = 'synced';
+                                    student.lastSyncWithLark = new Date();
+                                    student.larkBaseRecordId = syncResult.larkRecordId;
+                                    return wixData.update('Students', student);
+                                });
+                        } else {
+                            showErrorMessage('同步到 Lark Base 失败: ' + syncResult.error);
+                            
+                            // 更新学生记录
+                            return wixData.get('Students', result._id)
+                                .then((student) => {
+                                    student.syncStatus = 'error';
+                                    student.larkSyncData = student.larkSyncData || {};
+                                    student.larkSyncData.syncErrors = student.larkSyncData.syncErrors || [];
+                                    student.larkSyncData.syncErrors.push({
+                                        date: new Date(),
+                                        error: syncResult.error
+                                    });
+                                    return wixData.update('Students', student);
+                                });
+                        }
+                    });
+            }
+            
             console.log('学生已添加:', result);
+            return result;
         })
         .catch((error) => {
             console.error('添加学生错误:', error);
@@ -377,7 +433,7 @@ function submitAddStudent() {
 
 // 验证学生数据
 function validateStudentData(data) {
-    if (!data.name || data.name.trim() === '') {
+    if ((!data.firstName || data.firstName.trim() === '') && (!data.lastName || data.lastName.trim() === '')) {
         showErrorMessage('请输入学生姓名');
         return false;
     }
@@ -451,29 +507,48 @@ function processAPStudentRegistration() {
     }
     
     // 获取表单数据
+    const fullName = $w('#apStudentNameInput').value;
+    const nameParts = fullName.split(' ');
+    
     const apStudentData = {
-        name: $w('#apStudentNameInput').value,
+        firstName: nameParts[0] || '',
+        lastName: nameParts.length > 1 ? nameParts.slice(1).join(' ') : '',
         age: parseInt($w('#apStudentAgeInput').value),
-        sendStatus: $w('#sendStatusDropdown').value,
+        send: $w('#sendDropdown').value, // 更新为新的 CMS 字段名称和元素 ID
         guardianName: $w('#guardianNameInput').value,
         guardianPhone: $w('#guardianPhoneInput').value,
         guardianEmail: $w('#guardianEmailInput').value,
         medicalInfo: $w('#medicalInfoTextarea').value,
         educationBackground: $w('#educationBackgroundTextarea').value,
-        educationPlan: $w('#educationPlanDropdown').value,
+        subjects: $w('#subjectsDropdown').value, // 更新为新的 CMS 字段名称和元素 ID
         
         // EHCP文件相关字段
-        ehcpFile: ehcpFileData.document, // Document 字段
-        ehcpFileUrl: ehcpFileData.url,
+        ehcpDocument: ehcpFileData.url, // 更新为新的 CMS 字段名称
         ehcpFileName: ehcpFileData.fileName,
         ehcpFileSize: ehcpFileData.fileSize,
         ehcpUploadDate: ehcpFileData.uploadDate,
         ehcpFileStatus: ehcpFileData.status,
         
+        // 学生类型和状态
         isAP: true,
-        status: 'active',
-        dateAdded: new Date(),
-        lastActive: new Date()
+        studentType: 'alternative',
+        product: 'PRA - Core Subject',
+        status: 'Activated', // 更新为新的状态值
+        enrollmentDate: new Date(),
+        lastActive: new Date(),
+        
+        // AP 学生特有字段
+        curriculum: $w('#subjectsDropdown').value, // 更新为与 subjects 相同的值
+        apCourses: [],
+        
+        // Lark 集成字段
+        syncStatus: 'pending',
+        lastSyncWithLark: null,
+        larkSyncData: {
+            lastPullDate: null,
+            lastPushDate: null,
+            syncErrors: []
+        }
     };
     
     // 验证表单数据
@@ -498,23 +573,61 @@ function processAPStudentRegistration() {
             // 发送到 Lark - 使用环境变量管理 Webhook URL
             sendLarkNotification({
                 type: 'ap_student_registration',
-                studentName: apStudentData.name,
+                studentName: `${apStudentData.firstName} ${apStudentData.lastName}`,
                 studentEmail: apStudentData.guardianEmail,
                 studentPhone: apStudentData.guardianPhone,
                 hasEHCPFile: ehcpFileData.status === 'uploaded'
             });
             
-            console.log('AP 学生已注册:', result);
+            // 询问是否同步到 Lark Base
+            if (confirm('是否立即同步到 Lark Base？')) {
+                // 同步到 Lark Base
+                syncToLark(result._id)
+                    .then((syncResult) => {
+                        if (syncResult.success) {
+                            showSuccessMessage('同步到 Lark Base 成功！');
+                            
+                            // 更新学生记录
+                            return wixData.get('Students', result._id)
+                                .then((student) => {
+                                    student.syncStatus = 'synced';
+                                    student.lastSyncWithLark = new Date();
+                                    student.larkBaseRecordId = syncResult.larkRecordId;
+                                    return wixData.update('Students', student);
+                                });
+                        } else {
+                            showErrorMessage('同步到 Lark Base 失败: ' + syncResult.error);
+                            
+                            // 更新学生记录
+                            return wixData.get('Students', result._id)
+                                .then((student) => {
+                                    student.syncStatus = 'error';
+                                    student.larkSyncData = student.larkSyncData || {};
+                                    student.larkSyncData.syncErrors = student.larkSyncData.syncErrors || [];
+                                    student.larkSyncData.syncErrors.push({
+                                        date: new Date(),
+                                        error: syncResult.error
+                                    });
+                                    return wixData.update('Students', student);
+                                });
+                        }
+                    });
+            }
+            
+            // 关闭模态框
+            $w('#apStudentRegistrationLightbox').hide();
+            
+            return result;
         })
         .catch((error) => {
-            console.error('注册 AP 学生错误:', error);
-            showErrorMessage('注册 AP 学生失败。请重试。');
+            console.error('AP 学生注册错误:', error);
+            showErrorMessage('AP 学生注册失败。请重试。');
         });
 }
 
 // 验证 AP 学生数据
 function validateAPStudentData(data) {
-    if (!data.name || data.name.trim() === '') {
+    if ((!data.firstName || data.firstName.trim() === '') && (!data.lastName || data.lastName.trim() === '')) {
         showErrorMessage('请输入学生姓名');
         return false;
     }
@@ -524,7 +637,7 @@ function validateAPStudentData(data) {
         return false;
     }
     
-    if (!data.sendStatus) {
+    if (!data.send) {
         showErrorMessage('请选择 SEND 状态');
         return false;
     }
@@ -544,8 +657,8 @@ function validateAPStudentData(data) {
         return false;
     }
     
-    if (!data.educationPlan) {
-        showErrorMessage('请选择教育计划');
+    if (!data.subjects) {
+        showErrorMessage('请选择学习科目');
         return false;
     }
     
@@ -566,13 +679,13 @@ function clearAddStudentForm() {
 function clearAPStudentForm() {
     $w('#apStudentNameInput').value = '';
     $w('#apStudentAgeInput').value = '';
-    $w('#sendStatusDropdown').selectedIndex = 0;
+    $w('#sendDropdown').selectedIndex = 0;
     $w('#guardianNameInput').value = '';
     $w('#guardianPhoneInput').value = '';
     $w('#guardianEmailInput').value = '';
     $w('#medicalInfoTextarea').value = '';
     $w('#educationBackgroundTextarea').value = '';
-    $w('#educationPlanDropdown').selectedIndex = 0;
+    $w('#subjectsDropdown').selectedIndex = 0;
     $w('#apRegistrationMessage').hide();
     $w('#fileUploadMessage').hide();
 }
@@ -1155,6 +1268,210 @@ function formatSimpleLarkMessage(data) {
             text: messageText
         }
     };
+}
+
+// ==========================================
+// Lark Base 同步功能
+// ==========================================
+
+// 打开 Lark 同步模态框
+function openLarkSyncModal() {
+    // 加载学生列表
+    loadStudentsForLarkSync();
+    
+    // 显示 Lark 同步模态框
+    $w('#larkSyncLightbox').show();
+    
+    console.log('Lark 同步模态框已打开');
+}
+
+// 加载学生列表用于 Lark 同步
+function loadStudentsForLarkSync() {
+    wixData.query("Students")
+        .find()
+        .then((results) => {
+            const students = results.items;
+            
+            // 填充学生下拉菜单
+            const options = students.map(student => ({
+                label: `${student.firstName} ${student.lastName} - ${student.email}`,
+                value: student._id
+            }));
+            
+            $w('#syncStudentDropdown').options = options;
+            
+            // 更新同步状态
+            updateSyncStatus(students);
+            
+            console.log('学生列表已加载用于 Lark 同步:', students.length);
+        })
+        .catch((error) => {
+            console.error('加载学生列表错误:', error);
+            showErrorMessage('加载学生列表失败');
+        });
+}
+
+// 更新同步状态
+function updateSyncStatus(students) {
+    const syncedCount = students.filter(s => s.syncStatus === 'synced').length;
+    const pendingCount = students.filter(s => s.syncStatus === 'pending').length;
+    const errorCount = students.filter(s => s.syncStatus === 'error').length;
+    
+    $w('#syncedCountText').text = syncedCount.toString();
+    $w('#pendingCountText').text = pendingCount.toString();
+    $w('#errorCountText').text = errorCount.toString();
+    $w('#totalStudentsText').text = students.length.toString();
+}
+
+// 测试 Lark 连接
+function testLarkConnection() {
+    $w('#testConnectionStatus').text = '正在测试连接...';
+    $w('#testConnectionStatus').show();
+    
+    testLarkBaseConnection()
+        .then((result) => {
+            if (result.success) {
+                $w('#testConnectionStatus').text = '连接成功！' + (result.details ? ` 表名: ${result.details.tableName}` : '');
+                $w('#testConnectionStatus').style.color = '#28a745';
+            } else {
+                $w('#testConnectionStatus').text = '连接失败: ' + result.error;
+                $w('#testConnectionStatus').style.color = '#dc3545';
+            }
+        })
+        .catch((error) => {
+            console.error('测试 Lark 连接错误:', error);
+            $w('#testConnectionStatus').text = '连接错误: ' + error.message;
+            $w('#testConnectionStatus').style.color = '#dc3545';
+        });
+}
+
+// 同步单个学生到 Lark
+function syncStudentToLark() {
+    const studentId = $w('#syncStudentDropdown').value;
+    
+    if (!studentId) {
+        showErrorMessage('请选择要同步的学生');
+        return;
+    }
+    
+    $w('#syncStatus').text = '正在同步...';
+    $w('#syncStatus').show();
+    
+    syncToLark(studentId)
+        .then((result) => {
+            if (result.success) {
+                $w('#syncStatus').text = '同步成功！';
+                $w('#syncStatus').style.color = '#28a745';
+                
+                // 更新学生记录的同步状态
+                return wixData.get('Students', studentId)
+                    .then((student) => {
+                        student.syncStatus = 'synced';
+                        student.lastSyncWithLark = new Date();
+                        student.larkBaseRecordId = result.larkRecordId;
+                        return wixData.update('Students', student);
+                    });
+            } else {
+                $w('#syncStatus').text = '同步失败: ' + result.error;
+                $w('#syncStatus').style.color = '#dc3545';
+                
+                // 更新学生记录的同步状态
+                return wixData.get('Students', studentId)
+                    .then((student) => {
+                        student.syncStatus = 'error';
+                        student.larkSyncData = student.larkSyncData || {};
+                        student.larkSyncData.syncErrors = student.larkSyncData.syncErrors || [];
+                        student.larkSyncData.syncErrors.push({
+                            date: new Date(),
+                            error: result.error
+                        });
+                        return wixData.update('Students', student);
+                    });
+            }
+        })
+        .then(() => {
+            // 重新加载学生列表以更新状态
+            loadStudentsForLarkSync();
+        })
+        .catch((error) => {
+            console.error('同步学生到 Lark 错误:', error);
+            $w('#syncStatus').text = '同步错误: ' + error.message;
+            $w('#syncStatus').style.color = '#dc3545';
+        });
+}
+
+// 同步所有学生到 Lark
+function syncAllStudentsToLark() {
+    $w('#syncAllStatus').text = '正在同步所有学生...';
+    $w('#syncAllStatus').show();
+    
+    // 获取所有学生 ID
+    wixData.query('Students')
+        .find()
+        .then((results) => {
+            const studentIds = results.items.map(student => student._id);
+            
+            if (studentIds.length === 0) {
+                $w('#syncAllStatus').text = '没有学生需要同步';
+                return;
+            }
+            
+            // 批量同步
+            return batchSync('wix_to_lark', studentIds);
+        })
+        .then((result) => {
+            if (result.success) {
+                $w('#syncAllStatus').text = `同步完成！成功: ${result.successful}, 失败: ${result.failed}, 总计: ${result.total}`;
+                $w('#syncAllStatus').style.color = result.failed > 0 ? '#ffc107' : '#28a745';
+            } else {
+                $w('#syncAllStatus').text = '批量同步失败: ' + result.error;
+                $w('#syncAllStatus').style.color = '#dc3545';
+            }
+            
+            // 重新加载学生列表以更新状态
+            loadStudentsForLarkSync();
+        })
+        .catch((error) => {
+            console.error('批量同步学生错误:', error);
+            $w('#syncAllStatus').text = '批量同步错误: ' + error.message;
+            $w('#syncAllStatus').style.color = '#dc3545';
+        });
+}
+
+// 从 Lark 拉取学生数据
+function pullStudentsFromLark() {
+    $w('#pullStatus').text = '正在从 Lark 拉取数据...';
+    $w('#pullStatus').show();
+    
+    // 这里需要实现从 Lark Base 拉取数据的逻辑
+    // 可以通过 Lark Base API 获取学生记录，然后更新到 Wix 数据库
+    
+    // 示例：假设我们有一个学生的 Lark Base 记录 ID
+    const larkRecordId = $w('#larkRecordIdInput').value;
+    
+    if (!larkRecordId) {
+        showErrorMessage('请输入 Lark Base 记录 ID');
+        return;
+    }
+    
+    syncFromLark(larkRecordId)
+        .then((result) => {
+            if (result.success) {
+                $w('#pullStatus').text = '数据拉取成功！';
+                $w('#pullStatus').style.color = '#28a745';
+                
+                // 重新加载学生列表以更新状态
+                loadStudentsForLarkSync();
+            } else {
+                $w('#pullStatus').text = '数据拉取失败: ' + result.error;
+                $w('#pullStatus').style.color = '#dc3545';
+            }
+        })
+        .catch((error) => {
+            console.error('从 Lark 拉取数据错误:', error);
+            $w('#pullStatus').text = '数据拉取错误: ' + error.message;
+            $w('#pullStatus').style.color = '#dc3545';
+        });
 }
 
 // ==========================================

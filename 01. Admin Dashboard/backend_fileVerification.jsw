@@ -60,9 +60,10 @@ export async function verifyUploadedFile(studentId, fileData) {
             throw new Error('学生记录不存在');
         }
         
-        // 6. 更新学生记录的文件状态
+        // 6. 更新学生记录的文件状态 - 适配新的 CMS 字段名称
         const updateData = {
             _id: studentId,
+            ehcpDocument: fileData.url, // 更新为新的 CMS 字段名称
             ehcpFileStatus: 'verified',
             ehcpFileVerifiedDate: new Date(),
             ehcpFileVerificationLog: `文件验证成功: ${fileName} (${fileData.size} bytes)`
@@ -149,7 +150,8 @@ export async function getSecureFileUrl(studentId, requesterId) {
             throw new Error('学生记录不存在');
         }
         
-        if (!student.ehcpFileUrl) {
+        // 使用新的 CMS 字段名称 ehcpDocument
+        if (!student.ehcpDocument) {
             throw new Error('该学生没有上传 EHCP 文件');
         }
         
@@ -164,7 +166,7 @@ export async function getSecureFileUrl(studentId, requesterId) {
             action: 'file_accessed',
             fileName: student.ehcpFileName || 'unknown',
             fileSize: student.ehcpFileSize || 0,
-            fileUrl: student.ehcpFileUrl,
+            fileUrl: student.ehcpDocument, // 使用新的 CMS 字段名称
             status: 'success',
             details: `文件被用户 ${requesterId} 访问`,
             accessedBy: requesterId
@@ -173,7 +175,7 @@ export async function getSecureFileUrl(studentId, requesterId) {
         // 6. 返回文件信息（可以设置过期时间）
         return {
             success: true,
-            fileUrl: student.ehcpFileUrl,
+            fileUrl: student.ehcpDocument, // 使用新的 CMS 字段名称
             fileName: student.ehcpFileName,
             fileSize: student.ehcpFileSize,
             uploadDate: student.ehcpUploadDate,
@@ -200,8 +202,8 @@ export async function getSecureFileUrl(studentId, requesterId) {
             console.error('记录访问错误失败:', logError);
         }
         
-        return { 
-            success: false, 
+        return {
+            success: false,
             error: error.message,
             errorCode: 'ACCESS_DENIED'
         };
@@ -369,14 +371,14 @@ export async function cleanupOrphanFiles() {
         
         // 1. 获取所有学生记录中的文件 URL
         const students = await wixData.query("Students")
-            .ne("ehcpFileUrl", "")
-            .ne("ehcpFileUrl", null)
+            .ne("ehcpDocument", "") // 使用新的 CMS 字段名称
+            .ne("ehcpDocument", null) // 使用新的 CMS 字段名称
             .find();
         
         const usedFileUrls = new Set();
         students.items.forEach(student => {
-            if (student.ehcpFileUrl) {
-                usedFileUrls.add(student.ehcpFileUrl);
+            if (student.ehcpDocument) { // 使用新的 CMS 字段名称
+                usedFileUrls.add(student.ehcpDocument); // 使用新的 CMS 字段名称
             }
         });
         
@@ -403,31 +405,51 @@ export async function cleanupOrphanFiles() {
             }
         });
         
-        console.log(`发现 ${orphanFiles.length} 个孤儿文件`);
+        console.log(`找到 ${orphanFiles.length} 个孤儿文件`);
         
-        // 4. 记录清理结果
-        const cleanupResult = {
+        // 4. 记录清理报告
+        const cleanupReport = {
+            reportDate: new Date(),
             totalFilesChecked: allFileUrls.size,
-            activeFiles: usedFileUrls.size,
-            orphanFiles: orphanFiles.length,
-            cleanupDate: new Date(),
-            orphanFileUrls: orphanFiles
+            orphanFiles: orphanFiles,
+            deletedFiles: [],
+            cleanupStatus: 'completed',
+            executionTime: 0,
+            notes: `找到 ${orphanFiles.length} 个孤儿文件`
         };
         
-        // 保存清理报告
-        await wixData.insert("FileCleanupReports", cleanupResult);
+        await wixData.insert("FileCleanupReports", cleanupReport);
         
-        console.log('文件清理完成:', cleanupResult);
         return {
             success: true,
-            result: cleanupResult
+            orphanFilesCount: orphanFiles.length,
+            orphanFiles: orphanFiles
         };
         
     } catch (error) {
-        console.error('文件清理错误:', error);
+        console.error('清理孤儿文件错误:', error);
+        
+        // 记录错误报告
+        try {
+            const errorReport = {
+                reportDate: new Date(),
+                totalFilesChecked: 0,
+                orphanFiles: [],
+                deletedFiles: [],
+                cleanupStatus: 'failed',
+                executionTime: 0,
+                notes: `清理失败: ${error.message}`
+            };
+            
+            await wixData.insert("FileCleanupReports", errorReport);
+        } catch (reportError) {
+            console.error('记录清理错误报告失败:', reportError);
+        }
+        
         return {
             success: false,
-            error: error.message
+            error: error.message,
+            errorCode: 'CLEANUP_FAILED'
         };
     }
 }

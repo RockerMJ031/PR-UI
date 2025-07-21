@@ -236,11 +236,11 @@ function loadFinancialData() {
 function loadStudents() {
     // Mock function to load students data
     return Promise.resolve([
-        { id: 'STU001', name: 'Emma Johnson', email: 'emma@example.com', studentType: 'Full Time' },
-        { id: 'STU002', name: 'James Smith', email: 'james@example.com', studentType: 'Part Time' },
-        { id: 'STU003', name: 'Sophie Chen', email: 'sophie@example.com', studentType: 'Full Time' },
-        { id: 'STU004', name: 'Michael Brown', email: 'michael@example.com', studentType: 'Part Time' },
-        { id: 'STU005', name: 'Isabella Davis', email: 'isabella@example.com', studentType: 'Full Time' }
+        { id: 'STU001', name: 'Emma Johnson', email: 'emma@example.com', studentType: 'Full Time', product: 'PRA - All Subject' },
+        { id: 'STU002', name: 'James Smith', email: 'james@example.com', studentType: 'Part Time', product: 'Tutoring' },
+        { id: 'STU003', name: 'Sophie Chen', email: 'sophie@example.com', studentType: 'Full Time', product: 'PRA - Core Subject' },
+        { id: 'STU004', name: 'Michael Brown', email: 'michael@example.com', studentType: 'Part Time', product: 'Tutoring' },
+        { id: 'STU005', name: 'Isabella Davis', email: 'isabella@example.com', studentType: 'Full Time', product: 'PRA - All Subject + Therapy' }
     ]);
 }
 
@@ -387,11 +387,15 @@ function addTransaction(transactionData) {
 // FINANCIAL CALCULATIONS
 // ==========================================
 
-function calculateMonthlyRevenue(studentType = null, curriculumType = null) {
+function calculateMonthlyRevenue(studentType = null, curriculumType = null, product = null) {
     let transactions = financialData.transactions.filter(t => t.status === 'paid');
     
     if (curriculumType) {
         transactions = transactions.filter(t => t.curriculumType === curriculumType);
+    }
+    
+    if (product) {
+        transactions = transactions.filter(t => t.product === product);
     }
     
     const currentMonth = new Date().getMonth();

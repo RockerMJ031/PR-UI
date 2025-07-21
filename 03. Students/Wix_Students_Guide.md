@@ -58,11 +58,15 @@ The Students Management Dashboard is a comprehensive system for managing student
   dateOfBirth: "date",
   enrollmentDate: "date",
   status: "text", // active, inactive, graduated, suspended
-  studentType: "text", // "alternative" (AP学生) 或 "tutoring" (普通辅导学生)
+  studentType: "text", // "alternative" (AP学生) 或 "tutoring" (普通辅导学生) - 兼容旧代码，新代码应使用product字段
+  product: "text", // "Tutoring", "PRA - Core Subject", "PRA - All Subject", "PRA - All Subject + Therapy", "Purple Ruler Blueprint"
   courseId: "text", // Reference to Courses collection
   mentorId: "text", // Reference to Mentors collection
-  parentEmail: "text",
-  parentPhone: "text",
+  guardianParentName: "text", // 家长姓名
+  guardianEmail: "text", // 家长邮箱
+  guardianPhone: "text", // 家长电话
+  parentEmail: "text", // 兼容旧代码，新代码应使用guardianEmail
+  parentPhone: "text", // 兼容旧代码，新代码应使用guardianPhone
   address: "text",
   emergencyContact: "text",
   profilePhoto: "image",

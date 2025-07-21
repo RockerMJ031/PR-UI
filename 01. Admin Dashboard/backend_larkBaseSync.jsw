@@ -1,0 +1,675 @@
+// backend/larkBaseSync.jsw
+// Wix 后端 Lark Base 集成模块
+// 用于与 Lark Base 进行学生数据同步
+
+import { fetch } from 'wix-fetch';
+import { getSecret } from 'wix-secrets-backend';
+import { permissions, webMethod } from 'wix-web-module';
+import wixData from 'wix-data';
+
+// ==========================================
+// Lark Base API 配置
+// ==========================================
+
+/**
+ * 获取 Lark Base API 配置
+ * @returns {Promise<Object>} API 配置
+ */
+const getLarkBaseConfig = async () => {
+    try {
+        const appId = await getSecret('LARK_APP_ID');
+        const appSecret = await getSecret('LARK_APP_SECRET');
+        const baseId = await getSecret('LARK_BASE_ID');
+        const tableId = await getSecret('LARK_STUDENT_TABLE_ID');
+        
+        if (!appId || !appSecret || !baseId || !tableId) {
+            throw new Error('Lark Base 配置不完整');
+        }
+        
+        return {
+            appId,
+            appSecret,
+            baseId,
+            tableId
+        };
+    } catch (error) {
+        console.error('获取 Lark Base 配置失败:', error);
+        throw new Error('Lark Base 配置错误');
+    }
+};
+
+/**
+ * 获取 Lark API 访问令牌
+ * @returns {Promise<string>} 访问令牌
+ */
+async function getLarkAccessToken() {
+    try {
+        const config = await getLarkBaseConfig();
+        
+        const response = await fetch('https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                'app_id': config.appId,
+                'app_secret': config.appSecret
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`获取访问令牌失败: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.code !== 0) {
+            throw new Error(`获取访问令牌错误: ${data.msg}`);
+        }
+        
+        return data.tenant_access_token;
+    } catch (error) {
+        console.error('获取 Lark 访问令牌失败:', error);
+        throw error;
+    }
+}
+
+// ==========================================
+// Lark Base 数据操作函数
+// ==========================================
+
+/**
+ * 从 Lark Base 获取学生记录
+ * @param {string} recordId - Lark Base 记录 ID
+ * @returns {Promise<Object>} 学生记录
+ */
+async function getLarkBaseStudentRecord(recordId) {
+    try {
+        const token = await getLarkAccessToken();
+        const config = await getLarkBaseConfig();
+        
+        const response = await fetch(`https://open.feishu.cn/open-apis/bitable/v1/apps/${config.baseId}/tables/${config.tableId}/records/${recordId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`获取学生记录失败: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.code !== 0) {
+            throw new Error(`获取学生记录错误: ${data.msg}`);
+        }
+        
+        return data.data.record;
+    } catch (error) {
+        console.error('获取 Lark Base 学生记录失败:', error);
+        throw error;
+    }
+}
+
+/**
+ * 更新 Lark Base 学生记录
+ * @param {string} recordId - Lark Base 记录 ID
+ * @param {Object} fields - 要更新的字段
+ * @returns {Promise<Object>} 更新结果
+ */
+async function updateLarkBaseStudentRecord(recordId, fields) {
+    try {
+        const token = await getLarkAccessToken();
+        const config = await getLarkBaseConfig();
+        
+        const response = await fetch(`https://open.feishu.cn/open-apis/bitable/v1/apps/${config.baseId}/tables/${config.tableId}/records/${recordId}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                fields: fields
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`更新学生记录失败: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.code !== 0) {
+            throw new Error(`更新学生记录错误: ${data.msg}`);
+        }
+        
+        return data.data.record;
+    } catch (error) {
+        console.error('更新 Lark Base 学生记录失败:', error);
+        throw error;
+    }
+}
+
+/**
+ * 创建 Lark Base 学生记录
+ * @param {Object} fields - 学生字段
+ * @returns {Promise<Object>} 创建结果
+ */
+async function createLarkBaseStudentRecord(fields) {
+    try {
+        const token = await getLarkAccessToken();
+        const config = await getLarkBaseConfig();
+        
+        const response = await fetch(`https://open.feishu.cn/open-apis/bitable/v1/apps/${config.baseId}/tables/${config.tableId}/records`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                fields: fields
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`创建学生记录失败: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.code !== 0) {
+            throw new Error(`创建学生记录错误: ${data.msg}`);
+        }
+        
+        return data.data.record;
+    } catch (error) {
+        console.error('创建 Lark Base 学生记录失败:', error);
+        throw error;
+    }
+}
+
+/**
+ * 查询 Lark Base 学生记录
+ * @param {Object} filter - 查询过滤条件
+ * @returns {Promise<Array>} 学生记录列表
+ */
+async function queryLarkBaseStudentRecords(filter) {
+    try {
+        const token = await getLarkAccessToken();
+        const config = await getLarkBaseConfig();
+        
+        const response = await fetch(`https://open.feishu.cn/open-apis/bitable/v1/apps/${config.baseId}/tables/${config.tableId}/records/query`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                filter_by_formula: filter
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`查询学生记录失败: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.code !== 0) {
+            throw new Error(`查询学生记录错误: ${data.msg}`);
+        }
+        
+        return data.data.items;
+    } catch (error) {
+        console.error('查询 Lark Base 学生记录失败:', error);
+        throw error;
+    }
+}
+
+// ==========================================
+// 数据同步函数
+// ==========================================
+
+/**
+ * 将 Lark Base 学生数据转换为 Wix 格式
+ * @param {Object} larkStudent - Lark Base 学生数据
+ * @returns {Object} Wix 格式的学生数据
+ */
+function mapLarkToWixStudent(larkStudent) {
+    const fields = larkStudent.fields;
+    
+    return {
+        firstName: fields.FirstName || '',
+        lastName: fields.LastName || '',
+        email: fields.Email || '',
+        phone: fields.Phone || '',
+        dateOfBirth: fields.DateOfBirth ? new Date(fields.DateOfBirth) : null,
+        enrollmentDate: fields.EnrollmentDate ? new Date(fields.EnrollmentDate) : new Date(),
+        status: fields.Status || 'Activated',
+        studentType: fields.StudentType || 'tutoring',
+        product: fields.Product || 'Tutoring',
+        grade: fields.Grade || '',
+        school: fields.School || '',
+        guardianParentName: fields.ParentName || '',
+        guardianEmail: fields.ParentEmail || '',
+        guardianPhone: fields.ParentPhone || '',
+        medicalInfo: fields.MedicalInfo || '',
+        specialNeeds: fields.SpecialNeeds || '',
+        subject: fields.Subject || '',
+        subjects: fields.Subjects ? fields.Subjects.split(',') : [],
+        isAP: fields.IsAP === 'true' || fields.StudentType === 'alternative',
+        send: fields.Send || 'No',
+        
+        // AP 学生特有字段
+        curriculum: fields.Curriculum || '',
+        apCourses: fields.APCourses ? fields.APCourses.split(',') : [],
+        gpa: fields.GPA ? parseFloat(fields.GPA) : null,
+        satScore: fields.SATScore ? parseInt(fields.SATScore) : null,
+        actScore: fields.ACTScore ? parseInt(fields.ACTScore) : null,
+        extracurriculars: fields.Extracurriculars ? fields.Extracurriculars.split(',') : [],
+        counselorNotes: fields.CounselorNotes || '',
+        
+        // EHCP 文件字段
+        ehcpDocument: fields.EHCPDocument || '',
+        ehcpFileName: fields.EHCPFileName || '',
+        ehcpFileSize: fields.EHCPFileSize ? parseInt(fields.EHCPFileSize) : null,
+        ehcpUploadDate: fields.EHCPUploadDate ? new Date(fields.EHCPUploadDate) : null,
+        ehcpFileStatus: fields.EHCPFileStatus || '',
+        
+        // Lark 集成字段
+        larkStudentId: fields.LarkStudentId || '',
+        larkBaseRecordId: larkStudent.record_id,
+        lastSyncWithLark: new Date(),
+        syncStatus: 'synced',
+        larkSyncData: {
+            lastPullDate: new Date(),
+            lastPushDate: null,
+            syncErrors: []
+        }
+    };
+}
+
+/**
+ * 将 Wix 学生数据转换为 Lark Base 格式
+ * @param {Object} wixStudent - Wix 学生数据
+ * @returns {Object} Lark Base 格式的学生数据
+ */
+function mapWixToLarkStudent(wixStudent) {
+    return {
+        FirstName: wixStudent.firstName || '',
+        LastName: wixStudent.lastName || '',
+        Email: wixStudent.email || '',
+        Phone: wixStudent.phone || '',
+        DateOfBirth: wixStudent.dateOfBirth ? wixStudent.dateOfBirth.toISOString().split('T')[0] : '',
+        EnrollmentDate: wixStudent.enrollmentDate ? wixStudent.enrollmentDate.toISOString().split('T')[0] : '',
+        Status: wixStudent.status || 'Activated',
+        StudentType: wixStudent.studentType || 'tutoring',
+        Product: wixStudent.product || (wixStudent.studentType === 'tutoring' ? 'Tutoring' : 'PRA - Core Subject'),
+        Grade: wixStudent.grade || '',
+        School: wixStudent.school || '',
+        ParentName: wixStudent.guardianParentName || wixStudent.parentName || '',
+        ParentEmail: wixStudent.guardianEmail || wixStudent.parentEmail || '',
+        ParentPhone: wixStudent.guardianPhone || wixStudent.parentPhone || '',
+        MedicalInfo: wixStudent.medicalInfo || '',
+        SpecialNeeds: wixStudent.specialNeeds || '',
+        Subject: wixStudent.subject || '',
+        Subjects: wixStudent.subjects ? wixStudent.subjects.join(',') : '',
+        IsAP: wixStudent.isAP ? 'true' : 'false',
+        Send: wixStudent.send || 'No',
+        
+        // AP 学生特有字段
+        Curriculum: wixStudent.curriculum || '',
+        APCourses: wixStudent.apCourses ? wixStudent.apCourses.join(',') : '',
+        GPA: wixStudent.gpa ? wixStudent.gpa.toString() : '',
+        SATScore: wixStudent.satScore ? wixStudent.satScore.toString() : '',
+        ACTScore: wixStudent.actScore ? wixStudent.actScore.toString() : '',
+        Extracurriculars: wixStudent.extracurriculars ? wixStudent.extracurriculars.join(',') : '',
+        CounselorNotes: wixStudent.counselorNotes || '',
+        
+        // EHCP 文件字段
+        EHCPDocument: wixStudent.ehcpDocument || '',
+        EHCPFileName: wixStudent.ehcpFileName || '',
+        EHCPFileSize: wixStudent.ehcpFileSize ? wixStudent.ehcpFileSize.toString() : '',
+        EHCPUploadDate: wixStudent.ehcpUploadDate ? wixStudent.ehcpUploadDate.toISOString() : '',
+        EHCPFileStatus: wixStudent.ehcpFileStatus || '',
+        
+        // Wix 集成字段
+        WixStudentId: wixStudent._id || '', // 保持向后兼容
+        wix_id: wixStudent._id || '',
+        LastSyncDate: new Date().toISOString()
+    };
+}
+
+/**
+ * 从 Lark Base 同步单个学生到 Wix
+ * @param {string} larkRecordId - Lark Base 记录 ID
+ * @returns {Promise<Object>} 同步结果
+ */
+async function syncStudentFromLarkToWix(larkRecordId) {
+    try {
+        // 获取 Lark Base 学生记录
+        const larkStudent = await getLarkBaseStudentRecord(larkRecordId);
+        
+        // 转换为 Wix 格式
+        const wixStudentData = mapLarkToWixStudent(larkStudent);
+        
+        // 检查学生是否已存在
+        const existingStudents = await wixData.query('Students')
+            .eq('larkBaseRecordId', larkRecordId)
+            .find();
+        
+        let result;
+        
+        if (existingStudents.items.length > 0) {
+            // 更新现有学生
+            const existingStudent = existingStudents.items[0];
+            wixStudentData._id = existingStudent._id;
+            
+            result = await wixData.update('Students', wixStudentData);
+            console.log('学生记录已更新:', result._id);
+        } else {
+            // 创建新学生
+            result = await wixData.insert('Students', wixStudentData);
+            console.log('新学生记录已创建:', result._id);
+        }
+        
+        // 记录同步日志
+        await logSyncActivity({
+            direction: 'lark_to_wix',
+            recordId: larkRecordId,
+            wixStudentId: result._id,
+            status: 'success',
+            details: '同步成功'
+        });
+        
+        return {
+            success: true,
+            studentId: result._id,
+            message: '学生数据同步成功'
+        };
+        
+    } catch (error) {
+        console.error('从 Lark Base 同步学生失败:', error);
+        
+        // 记录同步错误
+        await logSyncActivity({
+            direction: 'lark_to_wix',
+            recordId: larkRecordId,
+            status: 'error',
+            details: error.message
+        });
+        
+        return {
+            success: false,
+            error: error.message
+        };
+    }
+}
+
+/**
+ * 从 Wix 同步单个学生到 Lark Base
+ * @param {string} wixStudentId - Wix 学生 ID
+ * @returns {Promise<Object>} 同步结果
+ */
+async function syncStudentFromWixToLark(wixStudentId) {
+    try {
+        // 获取 Wix 学生记录
+        const wixStudent = await wixData.get('Students', wixStudentId);
+        
+        if (!wixStudent) {
+            throw new Error('学生记录不存在');
+        }
+        
+        // 转换为 Lark Base 格式
+        const larkStudentFields = mapWixToLarkStudent(wixStudent);
+        
+        let result;
+        
+        if (wixStudent.larkBaseRecordId) {
+            // 更新现有 Lark Base 记录
+            result = await updateLarkBaseStudentRecord(wixStudent.larkBaseRecordId, larkStudentFields);
+            console.log('Lark Base 学生记录已更新:', result.record_id);
+        } else {
+            // 创建新 Lark Base 记录
+            result = await createLarkBaseStudentRecord(larkStudentFields);
+            console.log('新 Lark Base 学生记录已创建:', result.record_id);
+            
+            // 更新 Wix 学生记录中的 Lark Base 记录 ID
+            await wixData.update('Students', {
+                _id: wixStudentId,
+                wix_id: wixStudentId, // 添加wix_id字段
+                larkBaseRecordId: result.record_id,
+                lastSyncWithLark: new Date(),
+                syncStatus: 'synced',
+                'larkSyncData.lastPushDate': new Date()
+            });
+        }
+        
+        // 记录同步日志
+        await logSyncActivity({
+            direction: 'wix_to_lark',
+            recordId: result.record_id,
+            wixStudentId: wixStudentId, // 保持向后兼容
+            student_name: wixStudent.firstName + ' ' + wixStudent.lastName || '',
+            student_email: wixStudent.email || '',
+            role: wixStudent.role || '',
+            status: 'success',
+            details: '同步成功'
+        });
+        
+        return {
+            success: true,
+            larkRecordId: result.record_id,
+            message: '学生数据同步成功'
+        };
+        
+    } catch (error) {
+        console.error('从 Wix 同步学生到 Lark Base 失败:', error);
+        
+        // 记录同步错误
+        await logSyncActivity({
+            direction: 'wix_to_lark',
+            wixStudentId: wixStudentId, // 保持向后兼容
+            student_name: wixStudent ? (wixStudent.firstName + ' ' + wixStudent.lastName) || '' : '',
+            student_email: wixStudent ? wixStudent.email || '' : '',
+            role: wixStudent ? wixStudent.role || '' : '',
+            status: 'error',
+            details: error.message
+        });
+        
+        return {
+            success: false,
+            error: error.message
+        };
+    }
+}
+
+/**
+ * 批量同步学生数据
+ * @param {string} direction - 同步方向 ('lark_to_wix' 或 'wix_to_lark')
+ * @param {Array} ids - 要同步的 ID 列表
+ * @returns {Promise<Object>} 批量同步结果
+ */
+async function batchSyncStudents(direction, ids) {
+    try {
+        const results = [];
+        let successCount = 0;
+        let failureCount = 0;
+        
+        for (const id of ids) {
+            try {
+                let result;
+                
+                if (direction === 'lark_to_wix') {
+                    result = await syncStudentFromLarkToWix(id);
+                } else if (direction === 'wix_to_lark') {
+                    result = await syncStudentFromWixToLark(id);
+                } else {
+                    throw new Error('无效的同步方向');
+                }
+                
+                results.push(result);
+                
+                if (result.success) {
+                    successCount++;
+                } else {
+                    failureCount++;
+                }
+                
+                // 添加延迟避免 API 限制
+                await new Promise(resolve => setTimeout(resolve, 200));
+                
+            } catch (error) {
+                console.error(`同步 ID ${id} 失败:`, error);
+                results.push({
+                    id: id,
+                    success: false,
+                    error: error.message
+                });
+                failureCount++;
+            }
+        }
+        
+        return {
+            success: true,
+            total: ids.length,
+            successful: successCount,
+            failed: failureCount,
+            results: results
+        };
+        
+    } catch (error) {
+        console.error('批量同步学生失败:', error);
+        return {
+            success: false,
+            error: error.message
+        };
+    }
+}
+
+/**
+ * 记录同步活动日志
+ * @param {Object} logData - 日志数据
+ * @returns {Promise<void>}
+ */
+async function logSyncActivity(logData) {
+    try {
+        const logEntry = {
+            direction: logData.direction,
+            recordId: logData.recordId || null,
+            wixStudentId: logData.wixStudentId || null, // 保持向后兼容
+            wix_id: logData.wixStudentId || null, // 新字段
+            student_name: logData.student_name || null,
+            student_email: logData.student_email || null,
+            role: logData.role || null,
+            status: logData.status,
+            details: logData.details || null,
+            timestamp: new Date(),
+            source: 'lark_base_sync'
+        };
+        
+        await wixData.insert('LarkSyncLogs', logEntry);
+        console.log('同步活动日志已记录');
+        
+    } catch (error) {
+        console.error('记录同步活动日志错误:', error);
+        // 不抛出错误，避免影响主流程
+    }
+}
+
+// ==========================================
+// Web 方法（供前端调用）
+// ==========================================
+
+/**
+ * Web 方法：从 Lark Base 同步单个学生
+ */
+export const syncFromLark = webMethod(
+    permissions.Anyone,
+    async (larkRecordId) => {
+        return await syncStudentFromLarkToWix(larkRecordId);
+    }
+);
+
+/**
+ * Web 方法：同步到 Lark Base
+ */
+export const syncToLark = webMethod(
+    permissions.Anyone,
+    async (wixStudentId) => {
+        return await syncStudentFromWixToLark(wixStudentId);
+    }
+);
+
+/**
+ * Web 方法：批量同步学生
+ */
+export const batchSync = webMethod(
+    permissions.Anyone,
+    async (direction, ids) => {
+        return await batchSyncStudents(direction, ids);
+    }
+);
+
+/**
+ * Web 方法：测试 Lark Base 连接
+ */
+export const testLarkBaseConnection = webMethod(
+    permissions.Anyone,
+    async () => {
+        try {
+            const token = await getLarkAccessToken();
+            const config = await getLarkBaseConfig();
+            
+            // 尝试获取表格元数据
+            const response = await fetch(`https://open.feishu.cn/open-apis/bitable/v1/apps/${config.baseId}/tables/${config.tableId}/metadata`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`连接测试失败: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.code !== 0) {
+                throw new Error(`连接测试错误: ${data.msg}`);
+            }
+            
+            return {
+                success: true,
+                message: 'Lark Base 连接测试成功',
+                details: {
+                    tableName: data.data.table.name,
+                    fieldCount: data.data.fields.length
+                }
+            };
+            
+        } catch (error) {
+            console.error('Lark Base 连接测试错误:', error);
+            return {
+                success: false,
+                message: 'Lark Base 连接测试失败',
+                error: error.message
+            };
+        }
+    }
+);
+
+// ==========================================
+// 导出所有函数
+// ==========================================
+
+export {
+    syncStudentFromLarkToWix,
+    syncStudentFromWixToLark,
+    batchSyncStudents,
+    getLarkBaseStudentRecord,
+    queryLarkBaseStudentRecords
+};

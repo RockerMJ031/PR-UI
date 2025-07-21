@@ -24,7 +24,7 @@ import wixUsers from 'wix-users';
 
 // Global variables
 let currentUser = null;
-let currentStudentType = 'alternative'; // 'alternative' or 'tutoring'
+let currentStudentType = 'alternative'; // 'alternative' or 'tutoring' - 兼容旧代码，新代码应使用product字段
 let studentsData = {
     students: [],
     courses: [],
@@ -559,8 +559,8 @@ function loadStudentForEdit(studentId) {
         $w('#phoneInput').value = student.phone || '';
         $w('#dateOfBirthInput').value = student.dateOfBirth || null;
         $w('#statusSelect').value = student.status || 'active';
-        $w('#parentEmailInput').value = student.parentEmail || '';
-        $w('#parentPhoneInput').value = student.parentPhone || '';
+        $w('#parentEmailInput').value = student.guardianEmail || student.parentEmail || '';
+        $w('#parentPhoneInput').value = student.guardianPhone || student.parentPhone || '';
         $w('#addressInput').value = student.address || '';
         $w('#emergencyContactInput').value = student.emergencyContact || '';
         $w('#academicLevelInput').value = student.academicLevel || '';
@@ -691,8 +691,8 @@ function collectFormData() {
         phone: $w('#phoneInput').value,
         dateOfBirth: $w('#dateOfBirthInput').value,
         status: $w('#statusSelect').value,
-        parentEmail: $w('#parentEmailInput').value,
-        parentPhone: $w('#parentPhoneInput').value,
+        guardianEmail: $w('#parentEmailInput').value,
+        guardianPhone: $w('#parentPhoneInput').value,
         address: $w('#addressInput').value,
         emergencyContact: $w('#emergencyContactInput').value,
         academicLevel: $w('#academicLevelInput').value,
@@ -700,6 +700,7 @@ function collectFormData() {
         notes: $w('#notesInput').value,
         subject: $w('#subjectDropdown').value,
         studentType: currentStudentType,
+        product: currentStudentType === 'tutoring' ? 'Tutoring' : 'PRA - Core Subject',
         enrollmentDate: new Date(),
         lastUpdated: new Date()
     };
@@ -802,8 +803,8 @@ function collectFormData() {
         courseId: $w('#courseSelect').value,
         adminId: $w('#adminSelect').value,
         status: $w('#statusSelect').value,
-        parentEmail: $w('#parentEmailInput').value,
-        parentPhone: $w('#parentPhoneInput').value,
+        guardianEmail: $w('#parentEmailInput').value,
+        guardianPhone: $w('#parentPhoneInput').value,
         address: $w('#addressInput').value,
         emergencyContact: $w('#emergencyContactInput').value,
         academicLevel: $w('#academicLevelInput').value,
@@ -1005,8 +1006,8 @@ function populateStudentDetails(student) {
     $w('#detailAdmin').text = getAdminNameById(student.adminId);
     
     // Contact information
-    $w('#detailParentEmail').text = student.parentEmail || 'N/A';
-    $w('#detailParentPhone').text = student.parentPhone || 'N/A';
+    $w('#detailParentEmail').text = student.guardianEmail || student.parentEmail || 'N/A';
+    $w('#detailParentPhone').text = student.guardianPhone || student.parentPhone || 'N/A';
     $w('#detailAddress').text = student.address || 'N/A';
     $w('#detailEmergencyContact').text = student.emergencyContact || 'N/A';
     
@@ -1359,8 +1360,8 @@ function convertToCSV(students) {
         student.status,
         getCourseNameById(student.courseId),
         getAdminNameById(student.adminId),
-        student.parentEmail || '',
-        student.parentPhone || '',
+        student.guardianEmail || student.parentEmail || '',
+        student.guardianPhone || student.parentPhone || '',
         student.address || '',
         student.emergencyContact || '',
         student.academicLevel || '',

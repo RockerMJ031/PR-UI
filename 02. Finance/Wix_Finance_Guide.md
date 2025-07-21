@@ -42,7 +42,8 @@ This guide provides comprehensive instructions for implementing a finance manage
    - studentId (Primary Key)
    - name (Text)
    - email (Text)
-   - studentType (Text) // "Full Time" or "Part Time"
+   - studentType (Text) // "Full Time" or "Part Time" - 兼容旧代码，新代码应使用product字段
+   - product (Text) // "Tutoring", "PRA - Core Subject", "PRA - All Subject", "PRA - All Subject + Therapy", "Purple Ruler Blueprint"
    - curriculumPackage (Text) // "Core Subjects", "Core Plus", "All Subjects", "Blueprint"
    - status (Text) // "Active", "Inactive", "Graduated"
 

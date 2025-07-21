@@ -1,0 +1,116 @@
+// @ts-check
+
+import { fetch } from 'wix-fetch';
+import wixData from 'wix-data';
+import { getSecret } from 'wix-secrets-backend';
+import { logger } from 'backend/logger';
+
+/**
+ * Lark Base API 配置
+ * 用于与飞书 Lark Base 进行集成
+ */
+
+// 获取 Lark Base API 配置
+async function getLarkBaseConfig() {
+    try {
+        const appId = await getSecret('LARK_APP_ID');
+        const appSecret = await getSecret('LARK_APP_SECRET');
+        const baseId = await getSecret('LARK_BASE_ID');
+        const tableId = await getSecret('LARK_STUDENT_TABLE_ID');
+        
+        return { appId, appSecret, baseId, tableId };
+    } catch (error) {
+        logger.error('获取 Lark Base 配置失败', { error: error.message });
+        throw new Error('获取 Lark Base 配置失败: ' + error.message);
+    }
+}
+
+// 获取 Lark Base 访问令牌
+async function getLarkAccessToken() {
+    try {
+        const { appId, appSecret } = await getLarkBaseConfig();
+        
+        const response = await fetch('https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                app_id: appId,
+                app_secret: appSecret
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.code !== 0) {
+            throw new Error(`获取访问令牌失败: ${data.msg}`);
+        }
+        
+        return data.tenant_access_token;
+    } catch (error) {
+        logger.error('获取 Lark 访问令牌失败', { error: error.message });
+        throw new Error('获取 Lark 访问令牌失败: ' + error.message);
+    }
+}
+
+/**
+ * Lark Base 数据操作函数
+ */
+
+// 从 Lark Base 获取学生记录
+async function getLarkStudentRecord(recordId) {
+    try {
+        const token = await getLarkAccessToken();
+        const { baseId, tableId } = await getLarkBaseConfig();
+        
+        const response = await fetch(`https://open.feishu.cn/open-apis/bitable/v1/apps/${baseId}/tables/${tableId}/records/${recordId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.code !== 0) {
+            throw new Error(`获取 Lark Base 记录失败: ${data.msg}`);
+        }
+        
+        return data.data.record;
+    } catch (error) {
+        logger.error('获取 Lark Base 学生记录失败', { error: error.message, recordId });
+        throw new Error('获取 Lark Base 学生记录失败: ' + error.message);
+    }
+}
+
+// 更新 Lark Base 学生记录
+async function updateLarkStudentRecord(recordId, fields) {
+    try {
+        const token = await getLarkAccessToken();
+        const { baseId, tableId } = await getLarkBaseConfig();
+        
+        const response = await fetch(`https://open.feishu.cn/open-apis/bitable/v1/apps/${baseId}/tables/${tableId}/records/${recordId}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                fields: fields
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.code !== 0) {
+            throw new Error(`更新 Lark Base 记录失败: ${data.msg}`);
+        }
+        
+        return data.data.record;
+    } catch (error) {
+        logger.error('更新 Lark Base 学生记录失败', { error: error.message, recordId });
+        throw new Error('更新 Lark Base 学生记录失败: ' + error.message);
+    }
+}
