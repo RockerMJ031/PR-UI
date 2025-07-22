@@ -210,9 +210,11 @@ Lark Base → HTTP推送 → CMS-4 (学生报告)
 }
 ```
 
-### CMS数据同步日志集合
+### CMS数据同步日志集合 (CMS-5)
 **使用页面**: 系统管理页面、数据同步监控  
 **代码调用**: `wixData.query('DataSyncLogs')`
+
+> 注意：该集合已在Wix CMS中建立，Collection ID为`DataSyncLogs`，可在代码中直接使用。 // This collection has been added to Wix CMS, Collection ID is `DataSyncLogs`, can be used directly in code.
 
 ```javascript
 {
@@ -240,9 +242,11 @@ Lark Base → HTTP推送 → CMS-4 (学生报告)
 
 ## 👥 核心用户集合
 
-### Users 集合
+### Users 集合 (CMS-6)
 **使用页面**: 所有页面（用户认证和权限管理）  
 **代码调用**: `wixData.query('Users')`
+
+> 注意：该集合已在Wix CMS中建立，Collection ID为`Users`，可在代码中直接使用。 // This collection has been added to Wix CMS, Collection ID is `Users`, can be used directly in code.
 
 ```javascript
 {
@@ -274,13 +278,13 @@ Lark Base → HTTP推送 → CMS-4 (学生报告)
 }
 ```
 
-### Admins 集合
+### Admins 集合 - CMS 5
 **使用页面**: 管理员仪表盘、会话管理、学生管理  
 **代码调用**: `wixData.query('Admins')`
 
 ```javascript
 {
-  _id: "string",
+  _id: "string", // CMS5 - Wix原生自带字段
   userId: "string", // 关联Users集合
   adminId: "string", // 管理员编号
   firstName: "string",
@@ -289,7 +293,7 @@ Lark Base → HTTP推送 → CMS-4 (学生报告)
   phone: "string",
   department: "string", // 所属部门
   position: "string", // 职位
-  permissions: ["string"], // 权限列表
+  permissions: ["string"], // 权限列表 - 已在Wix中实现
   status: "string", // active, inactive, on_leave
   lastLogin: "datetime", // 最后登录时间
   managedStudents: "number", // 管理的学生数量
@@ -303,12 +307,14 @@ Lark Base → HTTP推送 → CMS-4 (学生报告)
 
 ## 🧑‍🎓 学生管理集合
 
-### Students 集合（统一版）
+### Students 集合（统一版）(CMS-7)
 **使用页面**: 学生管理页面、导师仪表盘、会话管理、管理员仪表盘  
 **代码调用**: `wixData.query('Students')`  
 **关联CMS**: 与CMS-1、CMS-2关联  
 **Lark集成**: 与Lark Base中的学生记录同步  
 **说明**: 此集合合并了原先的Students和APStudents集合，通过studentType和isAP字段区分不同类型的学生
+
+> 注意：该集合已在Wix CMS中建立，Collection ID为`Students`，可在代码中直接使用。 // This collection has been added to Wix CMS, Collection ID is `Students`, can be used directly in code.
 
 ```javascript
 {
@@ -469,9 +475,12 @@ Lark Base → HTTP推送 → CMS-4 (学生报告)
 **注意**: 此功能已暂时移除，现在使用Lark Base链接进行报表管理。
 -->
 
-### Statistics 集合
+### PR-Statistics 集合 (CMS-8)
 **使用页面**: 导师仪表盘  
-**代码调用**: `wixData.query('Statistics')`
+**代码调用**: `wixData.query('PR-Statistics')`
+
+> **注**: 此集合已在Wix CMS中建立，Collection ID为`PR-Statistics`，可在代码中直接使用。
+> **Note**: This collection has been established in Wix CMS with Collection ID `PR-Statistics` and can be used directly in code.
 
 ```javascript
 {

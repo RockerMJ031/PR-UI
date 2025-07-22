@@ -126,7 +126,7 @@ function loadInitialData() {
 
 // 加载统计数据
 function loadStatistics() {
-    wixData.query("Statistics")
+    wixData.query("PR-Statistics")
         .limit(1)
         .find()
         .then((results) => {
@@ -163,7 +163,7 @@ function createDefaultStatistics() {
         lastUpdated: new Date()
     };
     
-    wixData.insert("Statistics", defaultStats)
+    wixData.insert("PR-Statistics", defaultStats)
         .then((result) => {
             updateStatisticsDisplay(defaultStats);
             console.log('默认统计数据已创建');
@@ -1068,15 +1068,15 @@ function updateStatistics() {
         };
         
         // 在数据库中更新
-        wixData.query("Statistics")
+        wixData.query("PR-Statistics")
             .limit(1)
             .find()
             .then((results) => {
                 if (results.items.length > 0) {
                     updatedStats._id = results.items[0]._id;
-                    return wixData.update("Statistics", updatedStats);
+                    return wixData.update("PR-Statistics", updatedStats);
                 } else {
-                    return wixData.insert("Statistics", updatedStats);
+                    return wixData.insert("PR-Statistics", updatedStats);
                 }
             })
             .then(() => {
