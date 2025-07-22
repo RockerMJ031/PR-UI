@@ -325,15 +325,34 @@ function generatePerformanceReport(parameters, reportId) {
     
     return Promise.all([
         wixData.query('Students').find(),
-        wixData.query('Sessions')
-            .between('sessionDate', startDate, endDate)
+        wixData.query('Import86')
+            .between('scheduledDate', startDate, endDate)
             .find(),
         wixData.query('SessionAttendance')
             .between('attendanceDate', startDate, endDate)
             .find()
     ]).then(([studentsResult, sessionsResult, attendanceResult]) => {
         const students = studentsResult.items;
-        const sessions = sessionsResult.items;
+        // 将Import86集合的数据映射为Sessions格式
+        const sessions = sessionsResult.items.map(item => ({
+            _id: item._id,
+            sessionId: item.scheduleId,
+            title: item.courseId,
+            description: item.agenda || "",
+            adminId: item.instructorId,
+            studentId: "",
+            students: [],
+            courseId: item.courseId,
+            subjectId: item.subject,
+            sessionType: item.courseType,
+            status: item.status,
+            scheduledDate: item.scheduledDate,
+            startTime: item.startTime,
+            endTime: item.endTime,
+            meetingLink: item.onlineClassroomLink,
+            _createdDate: item._createdDate,
+            _updatedDate: item._updatedDate
+        }));
         const attendance = attendanceResult.items;
         
         // Calculate performance metrics
@@ -480,13 +499,32 @@ function generateAttendanceReport(parameters, reportId) {
         wixData.query('SessionAttendance')
             .between('attendanceDate', startDate, endDate)
             .find(),
-        wixData.query('Sessions')
-            .between('sessionDate', startDate, endDate)
+        wixData.query('Import86')
+            .between('scheduledDate', startDate, endDate)
             .find(),
         wixData.query('Students').find()
     ]).then(([attendanceResult, sessionsResult, studentsResult]) => {
         const attendance = attendanceResult.items;
-        const sessions = sessionsResult.items;
+        // 将Import86集合的数据映射为Sessions格式
+        const sessions = sessionsResult.items.map(item => ({
+            _id: item._id,
+            sessionId: item.scheduleId,
+            title: item.courseId,
+            description: item.agenda || "",
+            adminId: item.instructorId,
+            studentId: "",
+            students: [],
+            courseId: item.courseId,
+            subjectId: item.subject,
+            sessionType: item.courseType,
+            status: item.status,
+            scheduledDate: item.scheduledDate,
+            startTime: item.startTime,
+            endTime: item.endTime,
+            meetingLink: item.onlineClassroomLink,
+            _createdDate: item._createdDate,
+            _updatedDate: item._updatedDate
+        }));
         const students = studentsResult.items;
         
         // Calculate attendance metrics

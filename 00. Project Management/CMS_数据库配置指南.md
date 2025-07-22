@@ -438,42 +438,8 @@ Lark Base → HTTP推送 → CMS-4 (学生报告)
 
 ## 📚 课程会话集合
 
-### Sessions 集合
-**使用页面**: 会话管理页面、管理员仪表盘、日历组件  
-**代码调用**: `wixData.query('Sessions')`
+<!-- Sessions集合已被CMS-3（Import86）集合替代 -->
 
-```javascript
-{
-  _id: "string",
-  sessionId: "string", // 会话编号
-  title: "string", // 会话标题
-  description: "text", // 会话描述
-  adminId: "string", // 关联Admins
-  studentId: "string", // 关联Students（单个学生）
-  students: ["string"], // 关联Students（多个学生）
-  courseId: "string", // 关联Courses
-  subjectId: "string", // 关联Subjects
-  sessionType: "string", // individual, group, workshop, assessment
-  status: "string", // scheduled, in_progress, completed, cancelled, rescheduled
-  scheduledDate: "date", // 计划日期
-  startTime: "datetime", // 开始时间
-  endTime: "datetime", // 结束时间
-  actualStartTime: "datetime", // 实际开始时间
-  actualEndTime: "datetime", // 实际结束时间
-  location: "string", // 地点
-  meetingLink: "string", // 在线会议链接
-  agenda: "text", // 议程
-  materials: ["string"], // 教材链接
-  homework: "text", // 作业
-  notes: "text", // 课堂笔记
-  rating: "number", // 评分 1-5
-  feedback: "text", // 反馈
-  cost: "number", // 费用
-  paymentStatus: "string", // pending, paid, overdue
-  _createdDate: "datetime",
-  _updatedDate: "datetime"
-}
-```
 
 <!-- 暂时注释掉此功能，现在使用Lark Base链接
 ### ScheduledReports 集合

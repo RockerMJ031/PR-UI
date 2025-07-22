@@ -239,15 +239,45 @@ function loadSessionsData() {
 function loadSessions() {
     const filters = buildQueryFilters();
     
-    return wixData.query('Sessions')
+    return wixData.query('Import86')
         .limit(100)
         .descending('scheduledDate')
         .find()
         .then((results) => {
-            sessionsData.sessions = results.items;
+            // 将Import86集合的数据映射为Sessions格式
+            sessionsData.sessions = results.items.map(item => ({
+                _id: item._id,
+                sessionId: item.scheduleId,
+                title: item.courseId, // 使用课程名称作为标题
+                description: item.agenda || "", // 使用议程作为描述
+                adminId: item.instructorId, // 使用讲师ID作为管理员ID
+                studentId: "", // Import86没有单个学生ID字段
+                students: [], // Import86没有学生列表字段
+                courseId: item.courseId,
+                subjectId: item.subject, // 使用科目作为科目ID
+                sessionType: item.courseType,
+                status: item.status,
+                scheduledDate: item.scheduledDate,
+                startTime: item.startTime,
+                endTime: item.endTime,
+                actualStartTime: null, // Import86没有实际开始时间字段
+                actualEndTime: null, // Import86没有实际结束时间字段
+                location: "", // Import86没有地点字段
+                meetingLink: item.onlineClassroomLink,
+                agenda: item.agenda,
+                materials: item.courseMaterials || [],
+                homework: "", // Import86没有作业字段
+                notes: "", // Import86没有笔记字段
+                rating: 0, // Import86没有评分字段
+                feedback: "", // Import86没有反馈字段
+                cost: 0, // Import86没有费用字段
+                paymentStatus: "", // Import86没有支付状态字段
+                _createdDate: item._createdDate,
+                _updatedDate: item._updatedDate
+            }));
             updateSessionsDisplay();
             updateCalendarDisplay();
-            return results.items;
+            return sessionsData.sessions;
         });
 }
 
@@ -792,14 +822,87 @@ function updateSessionForm() {
     if (formData && formData.sessionId && validateSessionData(sessionData)) {
         sessionData.lastModified = new Date();
         
-        wixData.update('Sessions', sessionData, formData.sessionId)
+        // 先查询Import86集合中对应的记录
+        wixData.query('Import86')
+            .eq('scheduleId', formData.sessionId)
+            .find()
+            .then((results) => {
+                if (results.items.length > 0) {
+                    const import86Item = results.items[0];
+                    
+                    // 将Sessions格式的数据转换为Import86格式
+                    const import86Data = {
+                        _id: import86Item._id,
+                        scheduleId: sessionData.sessionId,
+                        class_id: sessionData.classId || "",
+                        courseId: sessionData.courseId || sessionData.title,
+                        subject: sessionData.subjectId,
+                        instructorId: sessionData.adminId,
+                        scheduledDate: sessionData.scheduledDate,
+                        startTime: sessionData.startTime,
+                        endTime: sessionData.endTime,
+                        duration: calculateDuration(sessionData.startTime, sessionData.endTime),
+                        courseType: sessionData.sessionType,
+                        maxStudents: sessionData.maxStudents || 1,
+                        enrolledStudents: sessionData.students ? sessionData.students.length : 0,
+                        status: sessionData.status,
+                        onlineClassroomLink: sessionData.meetingLink,
+                        courseMaterials: sessionData.materials || [],
+                        agenda: sessionData.description || "",
+                        _updatedDate: new Date()
+                    };
+                    
+                    return wixData.update('Import86', import86Data);
+                } else {
+                    // 如果在Import86中找不到对应记录，则创建新记录
+                    const import86Data = {
+                        scheduleId: sessionData.sessionId,
+                        class_id: sessionData.classId || "",
+                        courseId: sessionData.courseId || sessionData.title,
+                        subject: sessionData.subjectId,
+                        instructorId: sessionData.adminId,
+                        scheduledDate: sessionData.scheduledDate,
+                        startTime: sessionData.startTime,
+                        endTime: sessionData.endTime,
+                        duration: calculateDuration(sessionData.startTime, sessionData.endTime),
+                        courseType: sessionData.sessionType,
+                        maxStudents: sessionData.maxStudents || 1,
+                        enrolledStudents: sessionData.students ? sessionData.students.length : 0,
+                        status: sessionData.status,
+                        onlineClassroomLink: sessionData.meetingLink,
+                        courseMaterials: sessionData.materials || [],
+                        agenda: sessionData.description || "",
+                        _createdDate: new Date(),
+                        _updatedDate: new Date()
+                    };
+                    
+                    return wixData.insert('Import86', import86Data);
+                }
+            })
             .then((result) => {
                 showMessage('Session updated successfully', 'success');
                 hideAllModals();
                 refreshData();
                 
+                // 构建一个与原Sessions格式兼容的结果对象，用于发送通知
+                const compatibleResult = {
+                    _id: result._id,
+                    sessionId: result.scheduleId,
+                    title: result.courseId,
+                    description: result.agenda,
+                    adminId: result.instructorId,
+                    subjectId: result.subject,
+                    sessionType: result.courseType,
+                    status: result.status,
+                    scheduledDate: result.scheduledDate,
+                    startTime: result.startTime,
+                    endTime: result.endTime,
+                    meetingLink: result.onlineClassroomLink,
+                    materials: result.courseMaterials
+                };
+                
                 // Send update notifications
-                sendSessionNotifications(result, 'updated');
+                sendSessionNotifications(compatibleResult, 'updated');
             })
             .catch((error) => {
                 console.error('Error updating session:', error);
@@ -885,16 +988,69 @@ function createSession(sessionData) {
     if (sessionData.isRecurring) {
         return createRecurringSessions(sessionData);
     } else {
-        return wixData.insert('Sessions', sessionData);
+        // 将Sessions格式的数据转换为Import86格式
+        const import86Data = {
+            scheduleId: sessionData.sessionId,
+            class_id: sessionData.classId || "",
+            courseId: sessionData.courseId || sessionData.title,
+            subject: sessionData.subjectId,
+            instructorName: "", // 需要根据instructorId查询获取
+            instructorId: sessionData.adminId,
+            scheduledDate: sessionData.scheduledDate,
+            startTime: sessionData.startTime,
+            endTime: sessionData.endTime,
+            duration: calculateDuration(sessionData.startTime, sessionData.endTime),
+            courseType: sessionData.sessionType,
+            maxStudents: sessionData.maxStudents || 1,
+            enrolledStudents: sessionData.students ? sessionData.students.length : 0,
+            status: sessionData.status,
+            onlineClassroomLink: sessionData.meetingLink,
+            courseMaterials: sessionData.materials || [],
+            agenda: sessionData.description || "",
+            prerequisites: [],
+            _createdDate: new Date(),
+            _updatedDate: new Date()
+        };
+        return wixData.insert('Import86', import86Data);
     }
+}
+
+// 计算课程时长（分钟）
+function calculateDuration(startTime, endTime) {
+    const start = new Date(`2000-01-01T${startTime}`);
+    const end = new Date(`2000-01-01T${endTime}`);
+    return Math.round((end - start) / 60000); // 转换为分钟
 }
 
 function createRecurringSessions(sessionData) {
     const sessions = generateRecurringSessions(sessionData);
     
-    const insertPromises = sessions.map(session => 
-        wixData.insert('Sessions', session)
-    );
+    const insertPromises = sessions.map(session => {
+        // 将Sessions格式的数据转换为Import86格式
+        const import86Data = {
+            scheduleId: session.sessionId,
+            class_id: session.classId || "",
+            courseId: session.courseId || session.title,
+            subject: session.subjectId,
+            instructorName: "", // 需要根据instructorId查询获取
+            instructorId: session.adminId,
+            scheduledDate: session.scheduledDate,
+            startTime: session.startTime,
+            endTime: session.endTime,
+            duration: calculateDuration(session.startTime, session.endTime),
+            courseType: session.sessionType,
+            maxStudents: session.maxStudents || 1,
+            enrolledStudents: session.students ? session.students.length : 0,
+            status: session.status,
+            onlineClassroomLink: session.meetingLink,
+            courseMaterials: session.materials || [],
+            agenda: session.description || "",
+            prerequisites: [],
+            _createdDate: new Date(),
+            _updatedDate: new Date()
+        };
+        return wixData.insert('Import86', import86Data);
+    });
     
     return Promise.all(insertPromises);
 }
@@ -945,8 +1101,8 @@ function checkSessionConflicts(sessionData) {
     const startTime = new Date(`${sessionDate.toDateString()} ${sessionData.startTime}`);
     const endTime = new Date(`${sessionDate.toDateString()} ${sessionData.endTime}`);
     
-    return wixData.query('Sessions')
-        .eq('mentorId', sessionData.mentorId)
+    return wixData.query('Import86')
+        .eq('instructorId', sessionData.mentorId) // 使用instructorId替代mentorId
         .eq('scheduledDate', sessionDate)
         .ne('status', 'cancelled')
         .find()
@@ -1105,13 +1261,26 @@ function markAllAbsent() {
 // ==========================================
 
 function startSession(sessionId) {
-    const updateData = {
-        status: 'in-progress',
-        actualStartTime: new Date(),
-        lastModified: new Date()
-    };
-    
-    wixData.update('Sessions', updateData, sessionId)
+    // 先查询Import86集合中对应的记录
+    wixData.query('Import86')
+        .eq('scheduleId', sessionId)
+        .find()
+        .then((results) => {
+            if (results.items.length > 0) {
+                const import86Item = results.items[0];
+                
+                // 更新Import86集合中的记录
+                const updateData = {
+                    _id: import86Item._id,
+                    status: 'in-progress',
+                    _updatedDate: new Date()
+                };
+                
+                return wixData.update('Import86', updateData);
+            } else {
+                throw new Error('Session not found');
+            }
+        })
         .then(() => {
             showMessage('Session started', 'success');
             refreshData();
@@ -1126,13 +1295,26 @@ function startSession(sessionId) {
 }
 
 function endSession(sessionId) {
-    const updateData = {
-        status: 'completed',
-        actualEndTime: new Date(),
-        lastModified: new Date()
-    };
-    
-    wixData.update('Sessions', updateData, sessionId)
+    // 先查询Import86集合中对应的记录
+    wixData.query('Import86')
+        .eq('scheduleId', sessionId)
+        .find()
+        .then((results) => {
+            if (results.items.length > 0) {
+                const import86Item = results.items[0];
+                
+                // 更新Import86集合中的记录
+                const updateData = {
+                    _id: import86Item._id,
+                    status: 'completed',
+                    _updatedDate: new Date()
+                };
+                
+                return wixData.update('Import86', updateData);
+            } else {
+                throw new Error('Session not found');
+            }
+        })
         .then(() => {
             showMessage('Session completed', 'success');
             refreshData();
@@ -1150,15 +1332,29 @@ function cancelSession(sessionId) {
     const reason = prompt('Please provide a reason for cancellation:');
     
     if (reason !== null) {
-        const updateData = {
-            status: 'cancelled',
-            cancellationReason: reason,
-            cancelledBy: currentUser.email,
-            cancelledDate: new Date(),
-            lastModified: new Date()
-        };
-        
-        wixData.update('Sessions', updateData, sessionId)
+        // 先查询Import86集合中对应的记录
+        wixData.query('Import86')
+            .eq('scheduleId', sessionId)
+            .find()
+            .then((results) => {
+                if (results.items.length > 0) {
+                    const import86Item = results.items[0];
+                    
+                    // 更新Import86集合中的记录
+                    const updateData = {
+                        _id: import86Item._id,
+                        status: 'cancelled',
+                        cancellationReason: reason,
+                        cancelledBy: currentUser.email,
+                        cancelledDate: new Date(),
+                        _updatedDate: new Date()
+                    };
+                    
+                    return wixData.update('Import86', updateData);
+                } else {
+                    throw new Error('Session not found');
+                }
+            })
             .then(() => {
                 showMessage('Session cancelled', 'success');
                 refreshData();
@@ -1179,28 +1375,39 @@ function rescheduleSession(sessionId) {
 }
 
 function duplicateSession(sessionId) {
-    const session = sessionsData.sessions.find(s => s._id === sessionId);
-    
-    if (session) {
-        const duplicateData = { ...session };
-        delete duplicateData._id;
-        duplicateData.sessionId = generateSessionId();
-        duplicateData.title = `${session.title} (Copy)`;
-        duplicateData.status = 'scheduled';
-        duplicateData.createdDate = new Date();
-        duplicateData.lastModified = new Date();
-        
-        wixData.insert('Sessions', duplicateData)
-            .then(() => {
-                showMessage('Session duplicated successfully', 'success');
-                refreshData();
-            })
-            .catch((error) => {
-                console.error('Error duplicating session:', error);
-                showMessage('Error duplicating session', 'error');
-            });
+    // 先查询Import86集合中对应的记录
+    wixData.query('Import86')
+        .eq('scheduleId', sessionId)
+        .find()
+        .then((results) => {
+            if (results.items.length > 0) {
+                const session = results.items[0];
+                
+                // 创建新的Import86记录
+                const duplicateData = { ...session };
+                delete duplicateData._id;
+                const newSessionId = generateSessionId();
+                duplicateData.scheduleId = newSessionId;
+                duplicateData.courseId = `${session.courseId} (Copy)`;
+                duplicateData.status = 'scheduled';
+                duplicateData._createdDate = new Date();
+                duplicateData._updatedDate = new Date();
+                
+                return wixData.insert('Import86', duplicateData);
+            } else {
+                throw new Error('Session not found');
+            }
+        })
+        .then(() => {
+            showMessage('Session duplicated successfully', 'success');
+            refreshData();
+        })
+        .catch((error) => {
+            console.error('Error duplicating session:', error);
+            showMessage('Error duplicating session', 'error');
+        });
     }
-}
+
 
 // ==========================================
 // SEARCH AND FILTER FUNCTIONS
@@ -1541,10 +1748,52 @@ export function createSession(request) {
         .then(() => {
             sessionData.sessionId = generateSessionId();
             sessionData.createdDate = new Date();
-            return wixData.insert('Sessions', sessionData);
+            
+            // 将Sessions格式的数据转换为Import86格式
+            const import86Data = {
+                scheduleId: sessionData.sessionId,
+                class_id: sessionData.classId || "",
+                courseId: sessionData.courseId || sessionData.title,
+                subject: sessionData.subjectId,
+                instructorName: "", // 需要根据instructorId查询获取
+                instructorId: sessionData.adminId,
+                scheduledDate: sessionData.scheduledDate,
+                startTime: sessionData.startTime,
+                endTime: sessionData.endTime,
+                duration: calculateDuration(sessionData.startTime, sessionData.endTime),
+                courseType: sessionData.sessionType,
+                maxStudents: sessionData.maxStudents || 1,
+                enrolledStudents: sessionData.students ? sessionData.students.length : 0,
+                status: sessionData.status,
+                onlineClassroomLink: sessionData.meetingLink,
+                courseMaterials: sessionData.materials || [],
+                agenda: sessionData.description || "",
+                prerequisites: [],
+                _createdDate: new Date(),
+                _updatedDate: new Date()
+            };
+            
+            return wixData.insert('Import86', import86Data);
         })
         .then((result) => {
-            return sendSessionNotifications(result, 'created');
+            // 构建一个与原Sessions格式兼容的结果对象，用于发送通知
+            const compatibleResult = {
+                _id: result._id,
+                sessionId: result.scheduleId,
+                title: result.courseId,
+                description: result.agenda,
+                adminId: result.instructorId,
+                subjectId: result.subject,
+                sessionType: result.courseType,
+                status: result.status,
+                scheduledDate: result.scheduledDate,
+                startTime: result.startTime,
+                endTime: result.endTime,
+                meetingLink: result.onlineClassroomLink,
+                materials: result.courseMaterials
+            };
+            
+            return sendSessionNotifications(compatibleResult, 'created');
         })
         .then((result) => {
             return ok({ session: result });
@@ -1561,10 +1810,84 @@ export function updateSession(request) {
     return validateSessionData(sessionData)
         .then(() => {
             sessionData.lastModified = new Date();
-            return wixData.update('Sessions', sessionData, sessionId);
+            
+            // 先查询Import86集合中对应的记录
+            return wixData.query('Import86')
+                .eq('scheduleId', sessionId)
+                .find()
+                .then((results) => {
+                    if (results.items.length > 0) {
+                        const import86Item = results.items[0];
+                        
+                        // 将Sessions格式的数据转换为Import86格式
+                        const import86Data = {
+                            _id: import86Item._id,
+                            scheduleId: sessionData.sessionId,
+                            class_id: sessionData.classId || "",
+                            courseId: sessionData.courseId || sessionData.title,
+                            subject: sessionData.subjectId,
+                            instructorId: sessionData.adminId,
+                            scheduledDate: sessionData.scheduledDate,
+                            startTime: sessionData.startTime,
+                            endTime: sessionData.endTime,
+                            duration: calculateDuration(sessionData.startTime, sessionData.endTime),
+                            courseType: sessionData.sessionType,
+                            maxStudents: sessionData.maxStudents || 1,
+                            enrolledStudents: sessionData.students ? sessionData.students.length : 0,
+                            status: sessionData.status,
+                            onlineClassroomLink: sessionData.meetingLink,
+                            courseMaterials: sessionData.materials || [],
+                            agenda: sessionData.description || "",
+                            _updatedDate: new Date()
+                        };
+                        
+                        return wixData.update('Import86', import86Data);
+                    } else {
+                        // 如果在Import86中找不到对应记录，则创建新记录
+                        const import86Data = {
+                            scheduleId: sessionData.sessionId,
+                            class_id: sessionData.classId || "",
+                            courseId: sessionData.courseId || sessionData.title,
+                            subject: sessionData.subjectId,
+                            instructorId: sessionData.adminId,
+                            scheduledDate: sessionData.scheduledDate,
+                            startTime: sessionData.startTime,
+                            endTime: sessionData.endTime,
+                            duration: calculateDuration(sessionData.startTime, sessionData.endTime),
+                            courseType: sessionData.sessionType,
+                            maxStudents: sessionData.maxStudents || 1,
+                            enrolledStudents: sessionData.students ? sessionData.students.length : 0,
+                            status: sessionData.status,
+                            onlineClassroomLink: sessionData.meetingLink,
+                            courseMaterials: sessionData.materials || [],
+                            agenda: sessionData.description || "",
+                            _createdDate: new Date(),
+                            _updatedDate: new Date()
+                        };
+                        
+                        return wixData.insert('Import86', import86Data);
+                    }
+                });
         })
         .then((result) => {
-            return sendSessionNotifications(result, 'updated');
+            // 构建一个与原Sessions格式兼容的结果对象，用于发送通知
+            const compatibleResult = {
+                _id: result._id,
+                sessionId: result.scheduleId,
+                title: result.courseId,
+                description: result.agenda,
+                adminId: result.instructorId,
+                subjectId: result.subject,
+                sessionType: result.courseType,
+                status: result.status,
+                scheduledDate: result.scheduledDate,
+                startTime: result.startTime,
+                endTime: result.endTime,
+                meetingLink: result.onlineClassroomLink,
+                materials: result.courseMaterials
+            };
+            
+            return sendSessionNotifications(compatibleResult, 'updated');
         })
         .then((result) => {
             return ok({ session: result });
@@ -1578,7 +1901,19 @@ export function updateSession(request) {
 export function deleteSession(request) {
     const { sessionId } = request.body;
     
-    return wixData.remove('Sessions', sessionId)
+    // 先查询Import86集合中对应的记录
+    return wixData.query('Import86')
+        .eq('scheduleId', sessionId)
+        .find()
+        .then((results) => {
+            if (results.items.length > 0) {
+                const import86Item = results.items[0];
+                return wixData.remove('Import86', import86Item._id);
+            } else {
+                // 如果在Import86中找不到对应记录，返回成功
+                return Promise.resolve();
+            }
+        })
         .then(() => {
             return ok({ message: 'Session deleted successfully' });
         })
@@ -1591,8 +1926,8 @@ export function deleteSession(request) {
 export function checkSessionConflicts(request) {
     const { mentorId, date, startTime, endTime } = request.body;
     
-    return wixData.query('Sessions')
-        .eq('mentorId', mentorId)
+    return wixData.query('Import86')
+        .eq('instructorId', mentorId) // 使用instructorId替代mentorId
         .eq('scheduledDate', date)
         .ne('status', 'cancelled')
         .find()
