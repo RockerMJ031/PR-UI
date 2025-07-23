@@ -11,7 +11,41 @@ This document details the database collection configuration required for the tut
 
 ## 📋 Table of Contents
 
+### English Contents
+1. [Introduction](#cms-database-configuration-guide)
+2. [Student Management](#student-management-collections)
+   - [CMS-1: Student Registration Information Collection](#cms-1-student-registration-information-collection)
+   - [CMS-2: Student Course Assignment Collection](#cms-2-student-course-assignment-collection)
+   - [CMS-7: Students Collection](#cms-7-students-collection)
+   - [CMS-8: StudentCommunication Collection](#cms-8-studentcommunication-collection)
+3. [Course Management](#course-management)
+   - [CMS-3: Course Information Management Collection](#cms-3-course-information-management-collection)
+4. [Reporting](#reporting)
+   - [CMS-4: Student Report Collection](#cms-4-student-report-collection)
+   - [CMS-9: PR-Statistics Collection](#cms-9-pr-statistics-collection)
+5. [Administration](#administration)
+   - [CMS-5: CMS Data Sync Log Collection](#cms-5-cms-data-sync-log-collection)
+   - [CMS-6: Admins Collection](#cms-6-admins-collection)
+   - [CMS-10: Tickets Collection](#cms-10-tickets-collection)
+6. [Data Flow Diagram](#data-flow-diagram)
 
+### 中文目录
+1. [介绍](#cms-database-configuration-guide)
+2. [学生管理](#student-management-collections)
+   - [CMS-1: 学生注册信息集合](#cms-1-student-registration-information-collection)
+   - [CMS-2: 学生课程分配集合](#cms-2-student-course-assignment-collection)
+   - [CMS-7: 学生集合](#cms-7-students-collection)
+   - [CMS-8: 学生沟通集合](#cms-8-studentcommunication-collection)
+3. [课程管理](#course-management)
+   - [CMS-3: 课程信息管理集合](#cms-3-course-information-management-collection)
+4. [报告](#reporting)
+   - [CMS-4: 学生报告集合](#cms-4-student-report-collection)
+   - [CMS-9: PR-统计集合](#cms-9-pr-statistics-collection)
+5. [管理](#administration)
+   - [CMS-5: CMS数据同步日志集合](#cms-5-cms-data-sync-log-collection)
+   - [CMS-6: 管理员集合](#cms-6-admins-collection)
+   - [CMS-10: 工单集合](#cms-10-tickets-collection)
+6. [数据流程图](#data-flow-diagram)
 
 
 ### CMS-1: Student Registration Information Collection
@@ -133,6 +167,8 @@ This document details the database collection configuration required for the tut
 }
 ```
 
+## Course Management
+
 ### CMS-3: Course Information Management Collection
 **Used on Pages**: Course Management Page, Schedule Management  
 **Code Call**: `wixData.query('Import86')`
@@ -182,6 +218,8 @@ This document details the database collection configuration required for the tut
 }
 ```
 
+## Reporting
+
 ### CMS-4: Student Report Collection
 **Used on Pages**: Student Report Page, Parent Portal  
 **Code Call**: `wixData.query('StudentReports')`
@@ -191,14 +229,12 @@ This document details the database collection configuration required for the tut
 **数据流程**：
 - 数据由Lark的PRT Operation的R2通过HTTP请求写入CMS-4集合
 - 当教师在Lark的PRT Operation的R2中提交学生报告时，数据会通过HTTP请求发送到Wix系统
-- 系统接收到数据后，会进行验证并保存到`Import92`集合中作为临时存储
 - 然后，数据会被处理并写入到`StudentReports`集合中
 - 每次数据同步时，系统会记录同步状态和时间
 
 **Data Flow**:
 - Data is written to the CMS-4 collection from Lark's PRT Operation R2 via HTTP requests
 - When teachers submit student reports in Lark's PRT Operation R2, the data is sent to the Wix system via HTTP requests
-- Upon receiving the data, the system validates it and saves it to the `Import92` collection as temporary storage
 - The data is then processed and written to the `StudentReports` collection
 - The system records the synchronization status and time with each data sync
 
@@ -247,6 +283,8 @@ This document details the database collection configuration required for the tut
 }
 ```
 
+## Administration
+
 ### CMS-5 :CMS Data Sync Log Collection
 **Used on Pages**: System Management Page, Data Sync Monitoring  
 **Code Call**: `wixData.query('DataSyncLogs')`
@@ -293,7 +331,26 @@ This document details the database collection configuration required for the tut
 
 ### CMS-6: Admins Collection
 **Used on Pages**: Admin Dashboard, Session Management, Student Management  
-**Code Call**: `wixData.query('Admins')`
+**Code Call**: `wixData.query('Admins')`  
+**Lark Integration**: Synchronized with admin data in Lark Base, report links and student counts from C01.Client Info
+
+/* Data Flow Description:
+ * 数据流程说明：
+ * 1. 管理员信息首先保存在CMS-6（Admins集合）中。
+ * 2. 当新学生注册并在Lark的ST0 Website Enrollment中创建记录后，系统会检查ST0 Student SCR中是否有相同clientId和Email的记录。
+ * 3. 如果找到匹配记录，系统识别为同一学生，并将CMS中学生状态更新为pending。
+ * 4. 然后系统会在Lark的C01.Client Info中更新相应管理员管理的学生数量。
+ * 5. 最后，更新的学生数量会同步到CMS-6的managedStudents字段中。
+ * 6. 报告链接和密码信息也从Lark的PRT Operation的C01.Client Info更新到CMS-6中。
+ * 
+ * Data Flow Description:
+ * 1. Admin information is first saved in CMS-6 (Admins collection).
+ * 2. When a new student registers and a record is created in ST0 Website Enrollment in Lark, the system checks if there is a record with the same clientId and Email in ST0 Student SCR.
+ * 3. If a matching record is found, the system identifies it as the same student and updates the student status in CMS to pending.
+ * 4. Then the system updates the number of students managed by the respective admin in C01.Client Info in Lark.
+ * 5. Finally, the updated student count is synchronized to the managedStudents field in CMS-6.
+ * 6. Report links and password information are also updated from C01.Client Info in Lark PRT Operation to CMS-6.
+ */
 
 ```javascript
 {
@@ -347,6 +404,26 @@ This document details the database collection configuration required for the tut
 **Related CMS**: Related to CMS-1, CMS-2  
 **Lark Integration**: Synchronized with student records in Lark Base  
 **Description**: This collection merges the original Students and APStudents collections, distinguishing different types of students through studentType and isAP fields
+
+/* Data Flow Description:
+ * 数据流程说明：
+ * 1. 新学生注册数据首先保存在CMS-1（StudentRegistrations集合）中。
+ * 2. 注册数据同步到Lark的ST0 Website Enrollment。
+ * 3. 系统检查Lark的ST0 Student SCR中是否有相同clientId和Email的记录。
+ * 4. 如果找到匹配记录，系统将其识别为同一学生，并在CMS-7中创建或更新学生记录，状态设为pending。
+ * 5. 学生数据从ST0 Student SCR同步到CMS-7，包括个人信息、学习信息和其他相关字段。
+ * 6. 同步完成后，系统更新Lark的C01.Client Info中相应管理员的学生数量。
+ * 7. 最后，更新的学生数量同步到CMS-6的managedStudents字段。
+ * 
+ * Data Flow Description:
+ * 1. New student registration data is first saved in CMS-1 (StudentRegistrations collection).
+ * 2. Registration data is synchronized to ST0 Website Enrollment in Lark.
+ * 3. The system checks if there is a record with the same clientId and Email in ST0 Student SCR in Lark.
+ * 4. If a matching record is found, the system identifies it as the same student and creates or updates a student record in CMS-7 with status set to pending.
+ * 5. Student data is synchronized from ST0 Student SCR to CMS-7, including personal information, learning information, and other relevant fields.
+ * 6. After synchronization, the system updates the number of students managed by the respective admin in C01.Client Info in Lark.
+ * 7. Finally, the updated student count is synchronized to the managedStudents field in CMS-6.
+ */
 
 > Note: This collection has been established in Wix CMS, Collection ID is `Students`, can be used directly in code.
 
@@ -446,11 +523,17 @@ This document details the database collection configuration required for the tut
 ```
 
 ---
-### CMS-10: PR-Statistics Collection
+### CMS-9: PR-Statistics Collection
 **Used on Pages**: Mentor Dashboard  
 **Code Call**: `wixData.query('PR-Statistics')`
+**Lark Integration**: Data synchronized from Lark's C01.Client Info via HTTP request
 
 > **Note**: This collection has been established in Wix CMS with Collection ID `PR-Statistics` and can be used directly in code.
+
+**Data Flow**:
+- Statistics data is synchronized from Lark's C01.Client Info through HTTP requests
+- When changes occur in Lark, the system automatically updates this collection
+- The synchronization process ensures real-time statistics are available on the Mentor Dashboard
 
 ```javascript
 {
@@ -469,9 +552,25 @@ This document details the database collection configuration required for the tut
 }
 ```
 
-### CMS-11: Tickets Collection
+### CMS-10: Tickets Collection
 **Used on Pages**: Admin Dashboard, System Management  
 **Code Call**: `wixData.query('Tickets')`
+**Lark Integration**: Data synchronized from Lark's C01.Client Info via HTTP request
+**UI Components**: Includes student dropdown menu for admin selection
+
+**Data Flow**:
+
+1. 当用户创建新工单时，系统首先将工单信息保存到CMS-10 Tickets Collection中。
+2. 保存后，系统会通过后端API将工单的关键信息（包括client_id、name、Email等）同步到Lark的PRT-UI的T01.Ticket System表格中。
+3. 同步过程通过`backend_larkIntegration.jsw`中的`syncTicketToLark`函数实现。
+4. 同步完成后，系统会更新CMS-10中工单的`larkSyncStatus`和`larkSyncTime`字段，记录同步状态和时间。
+5. 当工单状态发生变化时（如解决、关闭等），系统会再次触发同步，确保Lark中的数据与CMS保持一致。
+
+1. When a user creates a new ticket, the system first saves the ticket information to CMS-10 Tickets Collection.
+2. After saving, the system synchronizes key ticket information (including client_id, name, Email, etc.) to Lark's PRT-UI T01.Ticket System table through the backend API.
+3. The synchronization is implemented through the `syncTicketToLark` function in `backend_larkIntegration.jsw`.
+4. After synchronization, the system updates the `larkSyncStatus` and `larkSyncTime` fields in CMS-10 to record the synchronization status and time.
+5. When the ticket status changes (such as resolved, closed, etc.), the system triggers synchronization again to ensure that the data in Lark remains consistent with the CMS.
 
 ```javascript
 {
@@ -484,6 +583,9 @@ This document details the database collection configuration required for the tut
   status: "text", // open, in_progress, resolved, closed
   submittedBy: "text", // Submitter ID
   assignedTo: "text", // Assigned to (Admin ID)
+  client_id: "text", // Client ID for Lark synchronization
+  name: "text", // Client name
+  email: "text", // Client email
   submittedDate: "text", // Submission time
   resolvedDate: "text", // Resolution time
   resolution: "text", // Solution
@@ -494,7 +596,116 @@ This document details the database collection configuration required for the tut
     comment: "text",
     timestamp: "text"
   }],
+  larkSyncStatus: "text", // Synchronization status with Lark
+  larkSyncTime: "text", // Last synchronization time with Lark
   _createdDate: "text",
   _updatedDate: "text"
 }
 ```
+
+## Data Flow Diagram
+
+The following diagram illustrates the data flow between Wix CMS collections and Lark Base:
+
+```
++---------------------+    +----------------------+    +----------------------+
+|                     |    |                      |    |                      |
+|  CMS-1: Student     |<-->|  Lark: ST0 Website   |<-->|  CMS-7: Students     |
+|  Registration       |    |  Enrollment          |    |  Collection          |
+|                     |    |                      |    |                      |
++---------------------+    +----------------------+    +----------------------+
+         |                           |                          |
+         |                           v                          |
+         |                  +----------------------+            |
+         |                  |                      |            |
+         |                  |  Lark: ST0 Student   |------------+
+         |                  |  SCR                 |
+         |                  |                      |
+         |                  +----------------------+
+         |                           |
+         |                           v
++---------------------+    +----------------------+    +----------------------+
+|                     |    |                      |    |                      |
+|  CMS-6: Admins      |<-->|  Lark: C01.Client    |<-->|  CMS-9: PR-Statistics|
+|  Collection         |    |  Info                |    |  Collection          |
+|                     |    |                      |    |                      |
++---------------------+    +----------------------+    +----------------------+
+                                     ^                          ^
+                                     |                          |
++---------------------+    +----------------------+    +----------------------+
+|                     |    |                      |    |                      |
+|  CMS-2: Student     |<-->|  Lark: PRT Operation |<-->|  CMS-4: Student      |
+|  Course Assignment  |    |  ST1 & R2            |    |  Report Collection   |
+|                     |    |                      |    |                      |
++---------------------+    +----------------------+    +----------------------+
+                                     ^                          
+                                     |                          
++---------------------+    +----------------------+    +----------------------+
+|                     |    |                      |    |                      |
+|  CMS-3: Course      |<-->|  Lark: PRT Logistic  |<-->|  CMS-10: Tickets     |
+|  Information        |    |  C4                  |    |  Collection          |
+|                     |    |                      |    |                      |
++---------------------+    +----------------------+    +----------------------+
+                                                                ^
+                                                                |
+                                                      +----------------------+
+                                                      |                      |
+                                                      |  Lark: PRT-UI        |
+                                                      |  T01.Ticket System   |
+                                                      |                      |
+                                                      +----------------------+
+```
+
+### Data Flow Description
+
+#### English Description
+
+The system's data flow follows these key patterns:
+
+1. **Student Registration Flow**:
+   - Student data enters through CMS-1 (Registration)
+   - Syncs to Lark's ST0 Website Enrollment
+   - Processed in ST0 Student SCR
+   - Creates/updates records in CMS-7 (Students)
+
+2. **Course Management Flow**:
+   - Course data from Lark's PRT Logistic C4 syncs to CMS-3
+   - Student course assignments from Lark's ST1 sync to CMS-2
+
+3. **Reporting Flow**:
+   - Student reports from Lark's R2 sync to CMS-4
+   - Statistics from C01.Client Info sync to CMS-9
+
+4. **Admin Management Flow**:
+   - Admin data in CMS-6 receives student counts from C01.Client Info
+   - Admin report links sync from Lark to CMS-6
+
+5. **Support Ticket Flow**:
+   - Tickets in CMS-10 sync with Lark's T01.Ticket System
+   - Bidirectional updates maintain consistency
+
+#### 中文描述
+
+系统的数据流遵循以下关键模式：
+
+1. **学生注册流程**：
+   - 学生数据通过CMS-1（注册）输入
+   - 同步到Lark的ST0 Website Enrollment
+   - 在ST0 Student SCR中处理
+   - 在CMS-7（学生）中创建/更新记录
+
+2. **课程管理流程**：
+   - 来自Lark的PRT Logistic C4的课程数据同步到CMS-3
+   - 来自Lark的ST1的学生课程分配同步到CMS-2
+
+3. **报告流程**：
+   - 来自Lark的R2的学生报告同步到CMS-4
+   - 来自C01.Client Info的统计数据同步到CMS-9
+
+4. **管理员管理流程**：
+   - CMS-6中的管理员数据从C01.Client Info接收学生数量
+   - 管理员报告链接从Lark同步到CMS-6
+
+5. **支持工单流程**：
+   - CMS-10中的工单与Lark的T01.Ticket System同步
+   - 双向更新保持一致性
