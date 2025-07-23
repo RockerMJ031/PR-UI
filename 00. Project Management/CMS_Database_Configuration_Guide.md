@@ -52,10 +52,11 @@ This document details the database collection configuration required for the tut
    *    数据首先保存到CMS-1（StudentRegistrations集合）。
    * 2. 保存成功后，系统会直接同步到Lark Base。
    * 3. 系统调用backend_larkBaseSync.jsw中的syncStudentFromWixToLark函数，
-   *    将学生数据转换为Lark格式并发送到Lark Base。
+   *    将学生数据转换为Lark格式并通过HTTP请求发送到Lark Anycross。
    * 4. 同步状态和结果会更新到CMS-1的larkTransferStatus和相关字段中。
-   * 5. 同步日志记录在LarkSyncLogs集合中，用于追踪和调试。
-   * 6. 在Lark Base中，会创建一条记录，跟踪数据是从哪个CMS ID同步过来的，
+   * 5. 同步历史记录在Development Kit V1.0的Wix Sync Record中。
+   * 6. 具体数据更新在PRT Operation的ST0 Website Enrollment中。
+   * 7. 在Lark Base中，会创建一条记录，跟踪数据是从哪个CMS ID同步过来的，
    *    记录同步成功和失败的情况。
    * 
    * Data Flow Description:
@@ -63,10 +64,11 @@ This document details the database collection configuration required for the tut
    *    data is first saved to CMS-1 (StudentRegistrations collection).
    * 2. After successful saving, the system directly synchronizes to Lark Base.
    * 3. The system calls the syncStudentFromWixToLark function in backend_larkBaseSync.jsw,
-   *    converts student data to Lark format and sends it to Lark Base.
+   *    converts student data to Lark format and sends it to Lark Anycross via HTTP request.
    * 4. Synchronization status and results are updated to larkTransferStatus and related fields in CMS-1.
-   * 5. Synchronization logs are recorded in the LarkSyncLogs collection for tracking and debugging.
-   * 6. In Lark Base, a record is created that tracks which CMS ID the data was synchronized from,
+   * 5. Synchronization history is recorded in the Wix Sync Record of Development Kit V1.0.
+   * 6. The actual data is updated in ST0 Website Enrollment of PRT Operation.
+   * 7. In Lark Base, a record is created that tracks which CMS ID the data was synchronized from,
    *    recording both successful and failed synchronizations.
    */
   
@@ -86,6 +88,20 @@ This document details the database collection configuration required for the tut
 ### CMS-2: Student Course Assignment Collection
 **Used in Pages**: Course Assignment Page, Student Management Page  
 **Code Call**: `wixData.query('Import74')`
+
+/* Data Flow Description:
+ * 数据流程说明：
+ * 1. Lark中的PRT Operation的ST1通过HTTP请求将数据写入此CMS-2集合。
+ * 2. 数据从Lark发送后，通过API端点接收并处理请求。
+ * 3. 系统验证数据格式和必填字段后，将数据保存到Import74集合中。
+ * 4. 同步状态记录在syncStatus字段中，最后同步时间记录在lastSyncWithLark字段中。
+ * 
+ * Data Flow Description:
+ * 1. Data from ST1 in PRT Operation of Lark is written to this CMS-2 collection via HTTP request.
+ * 2. After data is sent from Lark, it is received and processed through an API endpoint.
+ * 3. The system validates the data format and required fields before saving it to the Import74 collection.
+ * 4. Synchronization status is recorded in the syncStatus field, and the last synchronization time is recorded in the lastSyncWithLark field.
+ */
 
 ```javascript
 {
@@ -123,6 +139,20 @@ This document details the database collection configuration required for the tut
 
 > Note: This collection has been established in Wix, Collection ID is `Import86`, can be used directly in code.
 
+/* Data Flow Description:
+ * 数据流程说明：
+ * 1. Lark的PRT Logistic的C4通过HTTP请求将数据写入此CMS-3集合。
+ * 2. 数据从Lark发送后，通过专用API端点接收并处理请求。
+ * 3. 系统验证课程信息的完整性和有效性后，将数据保存到Import86集合中。
+ * 4. 课程信息更新后，相关的课程安排和教师分配也会相应更新。
+ * 
+ * Data Flow Description:
+ * 1. Data from C4 in PRT Logistic of Lark is written to this CMS-3 collection via HTTP request.
+ * 2. After data is sent from Lark, it is received and processed through a dedicated API endpoint.
+ * 3. The system validates the completeness and validity of course information before saving it to the Import86 collection.
+ * 4. After course information is updated, related course schedules and instructor assignments are also updated accordingly.
+ */
+
 ```javascript
 {
   _id: "text",
@@ -157,6 +187,20 @@ This document details the database collection configuration required for the tut
 **Code Call**: `wixData.query('StudentReports')`
 
 > Note: This collection has been established in Wix CMS, Collection ID is `StudentReports`, can be used directly in code.
+
+**数据流程**：
+- 数据由Lark的PRT Operation的R2通过HTTP请求写入CMS-4集合
+- 当教师在Lark的PRT Operation的R2中提交学生报告时，数据会通过HTTP请求发送到Wix系统
+- 系统接收到数据后，会进行验证并保存到`Import92`集合中作为临时存储
+- 然后，数据会被处理并写入到`StudentReports`集合中
+- 每次数据同步时，系统会记录同步状态和时间
+
+**Data Flow**:
+- Data is written to the CMS-4 collection from Lark's PRT Operation R2 via HTTP requests
+- When teachers submit student reports in Lark's PRT Operation R2, the data is sent to the Wix system via HTTP requests
+- Upon receiving the data, the system validates it and saves it to the `Import92` collection as temporary storage
+- The data is then processed and written to the `StudentReports` collection
+- The system records the synchronization status and time with each data sync
 
 ```javascript
 {
@@ -207,16 +251,30 @@ This document details the database collection configuration required for the tut
 **Used on Pages**: System Management Page, Data Sync Monitoring  
 **Code Call**: `wixData.query('DataSyncLogs')`
 
-> Note: This collection has been established in Wix CMS, Collection ID is `DataSyncLogs`, can be used directly in code.
+> Note: This collection has been established in Wix CMS, Collection ID is `DataSyncLogs`, can be used directly in code. 此集合主要用于记录Wix向Lark写入数据的日志，不包含Lark到Wix的数据流程。
+
+**数据流程**：
+- 当Wix系统向Lark发送数据时（如学生注册、课程分配、课程安排、学生报告等），会自动记录同步日志
+- 每次数据同步操作都会创建一条新的日志记录，包含同步类型、方向、源系统、目标系统等信息
+- 系统会记录请求数据、响应数据、同步状态以及任何错误信息
+- 如果同步失败，系统会记录错误信息并可能尝试重新同步
+- 日志记录还包括同步开始时间、结束时间和持续时间，用于性能监控和问题排查
+
+**Data Flow**:
+- When the Wix system sends data to Lark (such as student registrations, course assignments, course schedules, student reports, etc.), synchronization logs are automatically recorded
+- Each data synchronization operation creates a new log entry, including sync type, direction, source system, target system, and other information
+- The system records request data, response data, sync status, and any error messages
+- If synchronization fails, the system records error information and may attempt to resynchronize
+- Log entries also include sync start time, end time, and duration for performance monitoring and troubleshooting
 
 ```javascript
 {
   _id: "text",
   logId: "text", // Log number
   syncType: "text", // student_registration, course_assignment, course_schedule, student_report
-  direction: "text", // wix_to_lark, lark_to_wix
-  sourceSystem: "text", // wix, lark
-  targetSystem: "text", // wix, lark
+  direction: "text", // wix_to_lark（仅记录Wix到Lark的数据同步）
+  sourceSystem: "text", // wix（源系统始终为Wix）
+  targetSystem: "text", // lark（目标系统始终为Lark）
   recordId: "text", // Related record ID
   syncStatus: "text", // success, failed, pending, retrying
   requestData: "text", // Request data in JSON format
@@ -233,43 +291,7 @@ This document details the database collection configuration required for the tut
 
 ---
 
-### CMS-6: Users Collection
-**Used on Pages**: All pages (User Authentication and Permission Management)  
-**Code Call**: `wixData.query('Users')`
-
-> Note: This collection has been established in Wix CMS, Collection ID is `Users`, can be used directly in code.
-
-```javascript
-{
-  _id: "text", // Auto-generated
-  firstName: "text", // First name
-  lastName: "text", // Last name
-  email: "text", // Email address
-  phone: "text", // Phone number
-  role: "text", // Role: admin, student, parent, staff
-  avatar: "text", // Avatar URL
-  preferences: {
-    theme: "text", // light, dark
-    language: "text", // en, zh, fr
-    notifications: {
-      email: "boolean",
-      push: "boolean",
-      sms: "boolean"
-    },
-    dashboard: {
-      layout: "text", // default, compact, detailed
-      widgets: ["text"] // List of displayed widgets
-    }
-  },
-  lastLogin: "text", // Last login time
-  isActive: "boolean", // Whether activated
-  createdDate: "text", // Creation time
-  _createdDate: "text", // Wix automatic field
-  _updatedDate: "text" // Wix automatic field
-}
-```
-
-### CMS-7: Admins Collection
+### CMS-6: Admins Collection
 **Used on Pages**: Admin Dashboard, Session Management, Student Management  
 **Code Call**: `wixData.query('Admins')`
 
@@ -289,6 +311,27 @@ This document details the database collection configuration required for the tut
   lastLogin: "text", // Last login time
   managedStudents: "number", // Number of managed students
   joinDate: "text", // Join date
+  
+  // Report links and passwords - Updated from Lark PRT Operation C01.Client Info
+  studentSessionReportUrl: "text", // Student Session Report URL
+  studentSessionReportPassword: "text", // Default: StudentSession2024
+  
+  attendanceReportUrl: "text", // Attendance Report URL
+  attendanceReportPassword: "text", // Default: Attendance2024
+  
+  safeguardingReportUrl: "text", // Safeguarding Report URL
+  safeguardingReportPassword: "text", // Default: Safeguarding2024
+  
+  studentTermlyReportUrl: "text", // Student Termly Report URL
+  studentTermlyReportPassword: "text", // Default: Termly2024
+  
+  behaviourReportUrl: "text", // Behaviour Report URL
+  behaviourReportPassword: "text", // Default: Behaviour2024
+  
+  teacherSCRReportUrl: "text", // Teacher SCR Report URL
+  teacherSCRReportPassword: "text", // Default: TeacherSCR2024
+  
+  
   _createdDate: "text",
   _updatedDate: "text"
 }
@@ -298,7 +341,7 @@ This document details the database collection configuration required for the tut
 
 ## 🧑‍🎓 Student Management Collections
 
-### CMS-8: Students Collection (Unified Version)
+### CMS-7: Students Collection
 **Used on Pages**: Student Management Page, Mentor Dashboard, Session Management, Admin Dashboard  
 **Code Call**: `wixData.query('Students')`  
 **Related CMS**: Related to CMS-1, CMS-2  
@@ -379,7 +422,7 @@ This document details the database collection configuration required for the tut
 }
 ```
 
-### CMS-9: StudentCommunication Collection
+### CMS-8: StudentCommunication Collection
 **Used on Pages**: Student Management Page  
 **Code Call**: `wixData.query('StudentCommunication')`
 
