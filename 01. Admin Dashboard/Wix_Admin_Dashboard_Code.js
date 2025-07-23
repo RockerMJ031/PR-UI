@@ -825,71 +825,388 @@ function verifyUploadedFile(studentId, fileData) {
         });
 }
 
-// 用户友好的错误提示
-function showUserFriendlyError(error) {
-    const errorMessages = {
-        'FILE_TOO_LARGE': '文件大小不能超过 5MB',
+// 全局错误处理器
+class ErrorHandler {
+    static errorMessages = {
+        'FILE_TOO_LARGE': '文件大小不能超过 10MB',
         'INVALID_FILE_TYPE': '请上传 PDF、Word 文档或图片文件',
         'UPLOAD_FAILED': '文件上传失败，请重试',
         'VERIFICATION_FAILED': '文件验证失败，请检查文件格式',
         'PERMISSION_DENIED': '没有权限执行此操作',
-        'NETWORK_ERROR': '网络连接错误，请检查网络后重试'
+        'NETWORK_ERROR': '网络连接错误，请检查网络后重试',
+        'VALIDATION_ERROR': '输入数据验证失败',
+        'DATABASE_ERROR': '数据库操作失败',
+        'AUTH_ERROR': '身份验证失败',
+        'TIMEOUT_ERROR': '操作超时，请重试',
+        'UNKNOWN_ERROR': '未知错误，请联系管理员'
     };
     
-    const message = errorMessages[error.code] || '操作失败，请重试';
-    showErrorMessage(message);
+    static handle(error, context = '') {
+        console.error(`错误 [${context}]:`, error);
+        
+        let errorCode = 'UNKNOWN_ERROR';
+        let errorMessage = error.message || '未知错误';
+        
+        // 根据错误类型确定错误代码
+        if (error.type) {
+            errorCode = error.type;
+        } else if (error.message) {
+            if (error.message.includes('网络') || error.message.includes('network')) {
+                errorCode = 'NETWORK_ERROR';
+            } else if (error.message.includes('权限') || error.message.includes('permission')) {
+                errorCode = 'PERMISSION_DENIED';
+            } else if (error.message.includes('验证') || error.message.includes('validation')) {
+                errorCode = 'VALIDATION_ERROR';
+            } else if (error.message.includes('超时') || error.message.includes('timeout')) {
+                errorCode = 'TIMEOUT_ERROR';
+            }
+        }
+        
+        const userMessage = this.errorMessages[errorCode] || errorMessage;
+        this.showError(userMessage, errorCode);
+        
+        // 记录错误日志
+        this.logError({
+            code: errorCode,
+            message: errorMessage,
+            context: context,
+            timestamp: new Date().toISOString(),
+            userAgent: navigator.userAgent
+        });
+        
+        return { code: errorCode, message: userMessage };
+    }
+    
+    static showError(message, code = '') {
+        showErrorMessage(message);
+        
+        // 如果是严重错误，显示更明显的提示
+        if (['DATABASE_ERROR', 'AUTH_ERROR', 'UNKNOWN_ERROR'].includes(code)) {
+            console.error('严重错误:', message);
+        }
+    }
+    
+    static async logError(errorData) {
+        try {
+            await wixData.insert('ErrorLogs', {
+                ...errorData,
+                userId: wixUsers.currentUser.id || 'anonymous',
+                page: wixLocation.url
+            });
+        } catch (logError) {
+            console.error('记录错误日志失败:', logError);
+        }
+    }
 }
 
-// 增强的文件安全验证
+// 用户友好的错误提示（保持向后兼容）
+function showUserFriendlyError(error) {
+    ErrorHandler.handle(error, 'User Action');
+}
+
+// 数据验证工具类
+class DataValidator {
+    // 文件验证配置
+    static FILE_CONFIG = {
+        MAX_SIZE: 10 * 1024 * 1024, // 10MB
+        MIN_SIZE: 1024, // 1KB
+        ALLOWED_TYPES: [
+            'application/pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'image/jpeg',
+            'image/png',
+            'image/gif',
+            'text/plain'
+        ],
+        ALLOWED_EXTENSIONS: ['.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png', '.gif', '.txt']
+    };
+    
+    // 验证文件
+    static validateFile(file) {
+        if (!file) {
+            throw { type: 'VALIDATION_ERROR', message: '请选择文件' };
+        }
+        
+        // 检查文件大小
+        if (file.size > this.FILE_CONFIG.MAX_SIZE) {
+            throw { type: 'FILE_TOO_LARGE', message: `文件大小不能超过 ${this.FILE_CONFIG.MAX_SIZE / (1024 * 1024)}MB` };
+        }
+        
+        if (file.size < this.FILE_CONFIG.MIN_SIZE) {
+            throw { type: 'VALIDATION_ERROR', message: '文件大小不能小于 1KB' };
+        }
+        
+        // 检查文件类型
+        if (!this.FILE_CONFIG.ALLOWED_TYPES.includes(file.type)) {
+            throw { type: 'INVALID_FILE_TYPE', message: '不支持的文件类型' };
+        }
+        
+        // 检查文件扩展名
+        const fileName = file.name.toLowerCase();
+        const hasValidExtension = this.FILE_CONFIG.ALLOWED_EXTENSIONS.some(ext => 
+            fileName.endsWith(ext)
+        );
+        
+        if (!hasValidExtension) {
+            throw { type: 'INVALID_FILE_TYPE', message: '不支持的文件扩展名' };
+        }
+        
+        // 检查文件名安全性
+        if (!/^[a-zA-Z0-9._\-\u4e00-\u9fa5\s]+$/.test(file.name)) {
+            throw { type: 'VALIDATION_ERROR', message: '文件名包含非法字符' };
+        }
+        
+        return true;
+    }
+    
+    // 验证字符串输入
+    static validateString(value, fieldName, options = {}) {
+        const { minLength = 1, maxLength = 255, required = true, pattern = null } = options;
+        
+        if (required && (!value || value.trim().length === 0)) {
+            throw { type: 'VALIDATION_ERROR', message: `${fieldName}不能为空` };
+        }
+        
+        if (value && value.length < minLength) {
+            throw { type: 'VALIDATION_ERROR', message: `${fieldName}长度不能少于${minLength}个字符` };
+        }
+        
+        if (value && value.length > maxLength) {
+            throw { type: 'VALIDATION_ERROR', message: `${fieldName}长度不能超过${maxLength}个字符` };
+        }
+        
+        if (value && pattern && !pattern.test(value)) {
+            throw { type: 'VALIDATION_ERROR', message: `${fieldName}格式不正确` };
+        }
+        
+        return true;
+    }
+    
+    // 验证邮箱
+    static validateEmail(email) {
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(email)) {
+            throw { type: 'VALIDATION_ERROR', message: '邮箱格式不正确' };
+        }
+        return true;
+    }
+    
+    // 验证手机号
+    static validatePhone(phone) {
+        const phonePattern = /^1[3-9]\d{9}$/;
+        if (!phonePattern.test(phone)) {
+            throw { type: 'VALIDATION_ERROR', message: '手机号格式不正确' };
+        }
+        return true;
+    }
+    
+    // 验证学生数据
+    static validateStudentData(data) {
+        this.validateString(data.name, '姓名', { minLength: 2, maxLength: 50 });
+        this.validateEmail(data.email);
+        
+        if (data.phone) {
+            this.validatePhone(data.phone);
+        }
+        
+        if (data.studentId) {
+            this.validateString(data.studentId, '学号', { minLength: 6, maxLength: 20 });
+        }
+        
+        return true;
+    }
+}
+
+// 增强的文件安全验证（保持向后兼容）
 function validateFileSecurely(file) {
-    const allowedTypes = [
-        'application/pdf',
-        'application/msword',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'image/jpeg',
-        'image/png'
-    ];
-    
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    
-    if (!allowedTypes.includes(file.type)) {
-        throw new Error('INVALID_FILE_TYPE');
+    try {
+        return DataValidator.validateFile(file);
+    } catch (error) {
+        throw new Error(error.type || 'VALIDATION_ERROR');
     }
-    
-    if (file.size > maxSize) {
-        throw new Error('FILE_TOO_LARGE');
-    }
-    
-    return true;
 }
 
-// 发送数据到 Lark
+// 性能优化和缓存管理类
+class PerformanceManager {
+    static cache = new Map();
+    static CACHE_DURATION = 5 * 60 * 1000; // 5分钟缓存
+    
+    // 缓存数据
+    static setCache(key, data) {
+        this.cache.set(key, {
+            data: data,
+            timestamp: Date.now()
+        });
+    }
+    
+    // 获取缓存数据
+    static getCache(key) {
+        const cached = this.cache.get(key);
+        if (!cached) return null;
+        
+        // 检查缓存是否过期
+        if (Date.now() - cached.timestamp > this.CACHE_DURATION) {
+            this.cache.delete(key);
+            return null;
+        }
+        
+        return cached.data;
+    }
+    
+    // 清除缓存
+    static clearCache(key = null) {
+        if (key) {
+            this.cache.delete(key);
+        } else {
+            this.cache.clear();
+        }
+    }
+    
+    // 防抖函数
+    static debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+    
+    // 节流函数
+    static throttle(func, limit) {
+        let inThrottle;
+        return function() {
+            const args = arguments;
+            const context = this;
+            if (!inThrottle) {
+                func.apply(context, args);
+                inThrottle = true;
+                setTimeout(() => inThrottle = false, limit);
+            }
+        };
+    }
+}
+
+// 异步操作管理类
+class AsyncManager {
+    static pendingRequests = new Map();
+    static requestQueue = [];
+    static MAX_CONCURRENT = 3;
+    static activeRequests = 0;
+    
+    // 执行异步操作
+    static async executeAsync(operation, key = null) {
+        try {
+            // 如果有相同的请求正在进行，等待其完成
+            if (key && this.pendingRequests.has(key)) {
+                return await this.pendingRequests.get(key);
+            }
+            
+            const promise = this.processRequest(operation);
+            
+            if (key) {
+                this.pendingRequests.set(key, promise);
+                promise.finally(() => {
+                    this.pendingRequests.delete(key);
+                });
+            }
+            
+            return await promise;
+        } catch (error) {
+            ErrorHandler.handle(error, 'Async Operation');
+            throw error;
+        }
+    }
+    
+    // 处理请求队列
+    static async processRequest(operation) {
+        if (this.activeRequests >= this.MAX_CONCURRENT) {
+            return new Promise((resolve, reject) => {
+                this.requestQueue.push({ operation, resolve, reject });
+            });
+        }
+        
+        this.activeRequests++;
+        
+        try {
+            const result = await operation();
+            this.processQueue();
+            return result;
+        } catch (error) {
+            this.processQueue();
+            throw error;
+        } finally {
+            this.activeRequests--;
+        }
+    }
+    
+    // 处理队列中的下一个请求
+    static processQueue() {
+        if (this.requestQueue.length > 0 && this.activeRequests < this.MAX_CONCURRENT) {
+            const { operation, resolve, reject } = this.requestQueue.shift();
+            this.processRequest(operation).then(resolve).catch(reject);
+        }
+    }
+}
+
+// 发送数据到 Lark（增强版）
 function sendToLark(data) {
-    // 调用后端函数发送到 Lark
-    import('backend_larkIntegration')
-        .then((larkModule) => {
-            return larkModule.sendNotificationToLark(data);
-        })
-        .then((result) => {
-            console.log('Lark 通知已发送:', result);
-        })
-        .catch((error) => {
-            console.error('发送到 Lark 错误:', error);
-        });
+    try {
+        // 验证数据
+        if (!data || typeof data !== 'object') {
+            throw { type: 'VALIDATION_ERROR', message: '无效的通知数据' };
+        }
+        
+        const operation = async () => {
+            const larkModule = await import('backend_larkIntegration');
+            return await larkModule.sendNotificationToLark(data);
+        };
+        
+        return AsyncManager.executeAsync(operation, `lark_notification_${JSON.stringify(data).substring(0, 50)}`)
+            .then((result) => {
+                console.log('Lark 通知已发送:', result);
+                return result;
+            })
+            .catch((error) => {
+                ErrorHandler.handle(error, 'Send to Lark');
+                throw error;
+            });
+    } catch (error) {
+        ErrorHandler.handle(error, 'Send to Lark Validation');
+        return Promise.reject(error);
+    }
 }
 
-// 发送 Lark 通知的简化函数
+// 发送 Lark 通知的简化函数（增强版）
 function sendLarkNotification(data) {
-    import('backend_larkIntegration')
-        .then((larkModule) => {
-            return larkModule.sendLarkNotification(data);
-        })
-        .then((result) => {
-            console.log('Lark 通知发送成功:', result);
-        })
-        .catch((error) => {
-            console.error('Lark 通知发送失败:', error);
-        });
+    try {
+        // 验证数据
+        if (!data || typeof data !== 'object') {
+            throw { type: 'VALIDATION_ERROR', message: '无效的通知数据' };
+        }
+        
+        const operation = async () => {
+            const larkModule = await import('backend_larkIntegration');
+            return await larkModule.sendLarkNotification(data);
+        };
+        
+        return AsyncManager.executeAsync(operation, `lark_simple_${Date.now()}`)
+            .then((result) => {
+                console.log('Lark 通知发送成功:', result);
+                return result;
+            })
+            .catch((error) => {
+                ErrorHandler.handle(error, 'Send Lark Notification');
+                throw error;
+            });
+    } catch (error) {
+        ErrorHandler.handle(error, 'Send Lark Notification Validation');
+        return Promise.reject(error);
+    }
 }
 
 // 显示成功消息
@@ -941,68 +1258,261 @@ function hideAllModals() {
     }
 }
 
-// 检查用户权限
-function checkUserPermissions(action = null) {
-    // 使用已导入的 wixUsers 模块
-    if (!wixUsers.currentUser.loggedIn) {
-        return Promise.resolve(false);
+// 权限管理类
+class PermissionManager {
+    static PERMISSIONS = {
+        'admin': {
+            actions: ['add_student', 'remove_student', 'register_ap_student', 'manage_courses', 'view_reports', 'manage_users', 'system_config'],
+            level: 100
+        },
+        'supervisor': {
+            actions: ['add_student', 'register_ap_student', 'view_reports', 'manage_courses'],
+            level: 50
+        },
+        'teacher': {
+            actions: ['view_reports', 'add_student'],
+            level: 30
+        },
+        'assistant': {
+            actions: ['view_reports'],
+            level: 10
+        }
+    };
+    
+    static userRoleCache = new Map();
+    
+    // 获取用户角色（带缓存）
+    static async getUserRole(userId = null) {
+        const currentUserId = userId || wixUsers.currentUser.id;
+        
+        if (!currentUserId) {
+            throw { type: 'AUTH_ERROR', message: '用户未登录' };
+        }
+        
+        // 检查缓存
+        const cacheKey = `user_role_${currentUserId}`;
+        const cached = PerformanceManager.getCache(cacheKey);
+        if (cached) {
+            return cached;
+        }
+        
+        try {
+            const results = await wixData.query('UserRoles')
+                .eq('userId', currentUserId)
+                .find();
+            
+            let userRole = 'assistant'; // 默认角色
+            
+            if (results.items.length > 0) {
+                userRole = results.items[0].role;
+            }
+            
+            // 缓存结果
+            PerformanceManager.setCache(cacheKey, userRole);
+            
+            return userRole;
+        } catch (error) {
+            ErrorHandler.handle(error, 'Get User Role');
+            return 'assistant'; // 默认角色
+        }
     }
     
-    return Promise.resolve(true)
-        .then(() => {
-            // 继续权限检查逻辑
+    // 检查用户权限
+    static async checkPermission(action, userId = null) {
+        try {
+            if (!wixUsers.currentUser.loggedIn) {
+                return false;
+            }
             
-            // 获取当前用户角色
-            return wixData.query('UserRoles')
-                .eq('userId', wixUsers.currentUser.id)
-                .find()
-                .then((results) => {
-                    if (results.items.length === 0) {
-                        return false;
-                    }
-                    
-                    const userRole = results.items[0];
-                    
-                    // 检查特定操作权限
-                    if (action) {
-                        return checkActionPermission(userRole.role, action);
-                    }
-                    
-                    // 检查基本访问权限
-                    return ['admin', 'supervisor'].includes(userRole.role);
-                });
-        })
+            const userRole = await this.getUserRole(userId);
+            return this.hasPermission(userRole, action);
+        } catch (error) {
+            ErrorHandler.handle(error, 'Check Permission');
+            return false;
+        }
+    }
+    
+    // 检查角色是否有特定权限
+    static hasPermission(userRole, action) {
+        const rolePermissions = this.PERMISSIONS[userRole];
+        if (!rolePermissions) {
+            return false;
+        }
+        
+        return rolePermissions.actions.includes(action);
+    }
+    
+    // 检查权限级别
+    static hasPermissionLevel(userRole, requiredLevel) {
+        const rolePermissions = this.PERMISSIONS[userRole];
+        if (!rolePermissions) {
+            return false;
+        }
+        
+        return rolePermissions.level >= requiredLevel;
+    }
+    
+    // 清除用户权限缓存
+    static clearUserCache(userId = null) {
+        if (userId) {
+            PerformanceManager.clearCache(`user_role_${userId}`);
+        } else {
+            // 清除所有用户角色缓存
+            for (const [key] of PerformanceManager.cache) {
+                if (key.startsWith('user_role_')) {
+                    PerformanceManager.clearCache(key);
+                }
+            }
+        }
+    }
+}
+
+// 检查用户权限（保持向后兼容）
+function checkUserPermissions(action = null) {
+    return PermissionManager.checkPermission(action)
         .catch((error) => {
-            console.error('权限检查错误:', error);
+            ErrorHandler.handle(error, 'Check User Permissions');
             return false;
         });
 }
 
-// 检查操作权限
+// 检查操作权限（保持向后兼容）
 function checkActionPermission(userRole, action) {
-    const permissions = {
-        'admin': ['add_student', 'remove_student', 'register_ap_student', 'manage_courses', 'view_reports'],
-        'supervisor': ['add_student', 'register_ap_student', 'view_reports'],
-        'admin': ['add_student', 'view_reports', 'manage_users', 'system_config']
-    };
-    
-    return permissions[userRole] && permissions[userRole].includes(action);
+    return PermissionManager.hasPermission(userRole, action);
 }
 
-// 设置用户信息
-function setupUserInfo() {
-    // 从本地存储或数据库获取用户信息
-    const userInfo = local.getItem('adminInfo');
-    
-    if (userInfo) {
-        const user = JSON.parse(userInfo);
-        $w('#userName').text = user.name || '导师姓名';
-        $w('#userRole').text = user.role || '高级导师';
-        
-        if (user.avatar) {
-            $w('#userAvatar').src = user.avatar;
+// 用户信息管理类
+class UserInfoManager {
+    static async setupUserInfo() {
+        try {
+            if (!wixUsers.currentUser.loggedIn) {
+                throw { type: 'AUTH_ERROR', message: '用户未登录' };
+            }
+            
+            // 从数据库获取用户信息
+            const userRole = await PermissionManager.getUserRole();
+            const userInfo = await this.getUserDetails();
+            
+            // 更新UI显示
+            this.updateUserDisplay(userInfo, userRole);
+            
+            return { userInfo, userRole };
+        } catch (error) {
+            ErrorHandler.handle(error, 'Setup User Info');
+            this.setDefaultUserInfo();
         }
     }
+    
+    static async getUserDetails() {
+        try {
+            const results = await wixData.query('UserProfiles')
+                .eq('userId', wixUsers.currentUser.id)
+                .find();
+            
+            if (results.items.length > 0) {
+                return results.items[0];
+            }
+            
+            // 如果没有找到用户资料，创建默认资料
+            return await this.createDefaultProfile();
+        } catch (error) {
+            ErrorHandler.handle(error, 'Get User Details');
+            return this.getDefaultUserInfo();
+        }
+    }
+    
+    static async createDefaultProfile() {
+        const defaultProfile = {
+            userId: wixUsers.currentUser.id,
+            name: wixUsers.currentUser.email || '用户',
+            email: wixUsers.currentUser.email,
+            avatar: '',
+            createdAt: new Date(),
+            lastLogin: new Date()
+        };
+        
+        try {
+            const result = await wixData.insert('UserProfiles', defaultProfile);
+            return result;
+        } catch (error) {
+            ErrorHandler.handle(error, 'Create Default Profile');
+            return defaultProfile;
+        }
+    }
+    
+    static updateUserDisplay(userInfo, userRole) {
+        try {
+            // 更新用户名显示
+            if ($w('#userName')) {
+                $w('#userName').text = userInfo.name || '用户';
+            }
+            
+            // 更新角色显示
+            if ($w('#userRole')) {
+                const roleNames = {
+                    'admin': '系统管理员',
+                    'supervisor': '主管',
+                    'teacher': '教师',
+                    'assistant': '助理'
+                };
+                $w('#userRole').text = roleNames[userRole] || '用户';
+            }
+            
+            // 更新头像
+            if ($w('#userAvatar') && userInfo.avatar) {
+                $w('#userAvatar').src = userInfo.avatar;
+            }
+            
+            // 更新最后登录时间
+            this.updateLastLogin();
+        } catch (error) {
+            ErrorHandler.handle(error, 'Update User Display');
+        }
+    }
+    
+    static async updateLastLogin() {
+        try {
+            await wixData.query('UserProfiles')
+                .eq('userId', wixUsers.currentUser.id)
+                .find()
+                .then(results => {
+                    if (results.items.length > 0) {
+                        const profile = results.items[0];
+                        profile.lastLogin = new Date();
+                        return wixData.update('UserProfiles', profile);
+                    }
+                });
+        } catch (error) {
+            ErrorHandler.handle(error, 'Update Last Login');
+        }
+    }
+    
+    static setDefaultUserInfo() {
+        try {
+            if ($w('#userName')) {
+                $w('#userName').text = '用户';
+            }
+            if ($w('#userRole')) {
+                $w('#userRole').text = '访客';
+            }
+        } catch (error) {
+            console.error('设置默认用户信息失败:', error);
+        }
+    }
+    
+    static getDefaultUserInfo() {
+        return {
+            name: '用户',
+            email: '',
+            avatar: '',
+            createdAt: new Date()
+        };
+    }
+}
+
+// 设置用户信息（保持向后兼容）
+function setupUserInfo() {
+    return UserInfoManager.setupUserInfo();
 }
 
 // 设置响应式设计
@@ -1071,42 +1581,199 @@ function adjustDesktopLayout() {
     console.log('桌面端布局已应用');
 }
 
-// 更新统计数据
-function updateStatistics() {
-    // 重新计算统计数据
-    Promise.all([
-        wixData.query("Students").count(),
-        wixData.query("Students").eq("status", "active").count()
-    ])
-    .then(([totalCount, activeCount]) => {
-        const updatedStats = {
-            totalStudents: totalCount,
-            activeStudents: activeCount,
-            securityAlerts: 0, // 根据需要更新
-            pendingInvoices: 0, // 根据需要更新
-            lastUpdated: new Date()
-        };
-        
-        // 在数据库中更新
-        wixData.query("PR-Statistics")
-            .limit(1)
-            .find()
-            .then((results) => {
-                if (results.items.length > 0) {
-                    updatedStats._id = results.items[0]._id;
-                    return wixData.update("PR-Statistics", updatedStats);
-                } else {
-                    return wixData.insert("PR-Statistics", updatedStats);
+// 统计数据管理类
+class StatisticsManager {
+    static CACHE_KEY = 'dashboard_statistics';
+    static UPDATE_INTERVAL = 30000; // 30秒更新间隔
+    static updateTimer = null;
+    
+    // 更新统计数据
+    static async updateStatistics(forceUpdate = false) {
+        try {
+            // 检查缓存
+            if (!forceUpdate) {
+                const cached = PerformanceManager.getCache(this.CACHE_KEY);
+                if (cached) {
+                    this.updateStatisticsDisplay(cached);
+                    return cached;
                 }
-            })
-            .then(() => {
-                updateStatisticsDisplay(updatedStats);
-                console.log('统计数据更新成功');
-            });
-    })
-    .catch((error) => {
-        console.error('更新统计数据错误:', error);
-    });
+            }
+            
+            // 并行获取统计数据
+            const [studentStats, courseStats, systemStats] = await Promise.all([
+                this.getStudentStatistics(),
+                this.getCourseStatistics(),
+                this.getSystemStatistics()
+            ]);
+            
+            const updatedStats = {
+                ...studentStats,
+                ...courseStats,
+                ...systemStats,
+                lastUpdated: new Date()
+            };
+            
+            // 保存到数据库
+            await this.saveStatistics(updatedStats);
+            
+            // 缓存结果
+            PerformanceManager.setCache(this.CACHE_KEY, updatedStats);
+            
+            // 更新显示
+            this.updateStatisticsDisplay(updatedStats);
+            
+            console.log('统计数据更新成功:', updatedStats);
+            return updatedStats;
+        } catch (error) {
+            ErrorHandler.handle(error, 'Update Statistics');
+            throw error;
+        }
+    }
+    
+    // 获取学生统计数据
+    static async getStudentStatistics() {
+        try {
+            const [totalCount, activeCount, pendingCount] = await Promise.all([
+                wixData.query('Students').count(),
+                wixData.query('Students').eq('status', 'active').count(),
+                wixData.query('Students').eq('status', 'pending').count()
+            ]);
+            
+            return {
+                totalStudents: totalCount,
+                activeStudents: activeCount,
+                pendingStudents: pendingCount
+            };
+        } catch (error) {
+            ErrorHandler.handle(error, 'Get Student Statistics');
+            return {
+                totalStudents: 0,
+                activeStudents: 0,
+                pendingStudents: 0
+            };
+        }
+    }
+    
+    // 获取课程统计数据
+    static async getCourseStatistics() {
+        try {
+            const [totalCourses, activeCourses] = await Promise.all([
+                wixData.query('Courses').count(),
+                wixData.query('Courses').eq('status', 'active').count()
+            ]);
+            
+            return {
+                totalCourses: totalCourses,
+                activeCourses: activeCourses
+            };
+        } catch (error) {
+            ErrorHandler.handle(error, 'Get Course Statistics');
+            return {
+                totalCourses: 0,
+                activeCourses: 0
+            };
+        }
+    }
+    
+    // 获取系统统计数据
+    static async getSystemStatistics() {
+        try {
+            const [errorCount, pendingInvoices] = await Promise.all([
+                wixData.query('ErrorLogs')
+                    .ge('timestamp', new Date(Date.now() - 24 * 60 * 60 * 1000))
+                    .count(),
+                wixData.query('Invoices').eq('status', 'pending').count()
+            ]);
+            
+            return {
+                securityAlerts: errorCount,
+                pendingInvoices: pendingInvoices
+            };
+        } catch (error) {
+            ErrorHandler.handle(error, 'Get System Statistics');
+            return {
+                securityAlerts: 0,
+                pendingInvoices: 0
+            };
+        }
+    }
+    
+    // 保存统计数据到数据库
+    static async saveStatistics(stats) {
+        try {
+            const results = await wixData.query('PR-Statistics')
+                .limit(1)
+                .find();
+            
+            if (results.items.length > 0) {
+                stats._id = results.items[0]._id;
+                return await wixData.update('PR-Statistics', stats);
+            } else {
+                return await wixData.insert('PR-Statistics', stats);
+            }
+        } catch (error) {
+            ErrorHandler.handle(error, 'Save Statistics');
+            throw error;
+        }
+    }
+    
+    // 更新统计数据显示
+    static updateStatisticsDisplay(stats) {
+        try {
+            // 更新学生统计
+            if ($w('#totalStudentsText')) {
+                $w('#totalStudentsText').text = stats.totalStudents?.toString() || '0';
+            }
+            if ($w('#activeStudentsText')) {
+                $w('#activeStudentsText').text = stats.activeStudents?.toString() || '0';
+            }
+            
+            // 更新课程统计
+            if ($w('#totalCoursesText')) {
+                $w('#totalCoursesText').text = stats.totalCourses?.toString() || '0';
+            }
+            
+            // 更新系统统计
+            if ($w('#securityAlertsText')) {
+                $w('#securityAlertsText').text = stats.securityAlerts?.toString() || '0';
+            }
+            if ($w('#pendingInvoicesText')) {
+                $w('#pendingInvoicesText').text = stats.pendingInvoices?.toString() || '0';
+            }
+            
+            // 更新最后更新时间
+            if ($w('#lastUpdatedText') && stats.lastUpdated) {
+                const updateTime = new Date(stats.lastUpdated).toLocaleString('zh-CN');
+                $w('#lastUpdatedText').text = `最后更新: ${updateTime}`;
+            }
+        } catch (error) {
+            ErrorHandler.handle(error, 'Update Statistics Display');
+        }
+    }
+    
+    // 启动自动更新
+    static startAutoUpdate() {
+        if (this.updateTimer) {
+            clearInterval(this.updateTimer);
+        }
+        
+        this.updateTimer = setInterval(() => {
+            this.updateStatistics(false);
+        }, this.UPDATE_INTERVAL);
+    }
+    
+    // 停止自动更新
+    static stopAutoUpdate() {
+        if (this.updateTimer) {
+            clearInterval(this.updateTimer);
+            this.updateTimer = null;
+        }
+    }
+}
+
+// 更新统计数据（保持向后兼容）
+function updateStatistics() {
+    return StatisticsManager.updateStatistics(true);
 }
 
 // 过滤课程

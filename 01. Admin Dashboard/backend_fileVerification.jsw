@@ -20,9 +20,25 @@ export async function verifyUploadedFile(studentId, fileData) {
     try {
         console.log(`开始验证文件，学生 ID: ${studentId}`);
         
-        // 1. 验证输入参数
-        if (!studentId || !fileData || !fileData.url) {
-            throw new Error('缺少必要的参数');
+        // 1. 严格验证输入参数
+        if (!studentId || typeof studentId !== 'string' || studentId.trim() === '') {
+            throw new Error('学生ID无效或为空');
+        }
+        
+        if (!fileData || typeof fileData !== 'object') {
+            throw new Error('文件数据无效');
+        }
+        
+        if (!fileData.url || typeof fileData.url !== 'string' || fileData.url.trim() === '') {
+            throw new Error('文件URL无效或为空');
+        }
+        
+        if (!fileData.name || typeof fileData.name !== 'string' || fileData.name.trim() === '') {
+            throw new Error('文件名无效或为空');
+        }
+        
+        if (!fileData.size || typeof fileData.size !== 'number' || fileData.size <= 0) {
+            throw new Error('文件大小无效');
         }
         
         // 2. 验证文件扩展名和 MIME 类型
@@ -46,9 +62,15 @@ export async function verifyUploadedFile(studentId, fileData) {
         }
         
         // 3. 验证文件大小（统一为 10MB）
-        const maxSize = 10 * 1024 * 1024; // 10MB
-        if (fileData.size > maxSize) {
-            throw new Error(`文件大小超过限制: ${Math.round(fileData.size / 1024 / 1024)}MB，最大允许 10MB`);
+        const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB - 使用常量避免魔法数字
+        if (fileData.size > MAX_FILE_SIZE) {
+            throw new Error(`文件大小超过限制: ${Math.round(fileData.size / 1024 / 1024)}MB，最大允许 ${Math.round(MAX_FILE_SIZE / 1024 / 1024)}MB`);
+        }
+        
+        // 验证文件大小下限
+        const MIN_FILE_SIZE = 100; // 100 bytes
+        if (fileData.size < MIN_FILE_SIZE) {
+            throw new Error('文件过小，可能已损坏或为空文件');
         }
         
         // 4. 高级安全检查
@@ -293,29 +315,56 @@ export async function deleteStudentFile(studentId, requesterId) {
  */
 async function verifyUserPermission(userId, permission) {
     try {
-        // 这里需要根据实际的用户权限系统来实现
-        // 示例实现：检查用户角色
-        
-        // 方法1：从 Members 集合获取用户信息
-        const user = await wixData.get("Members", userId);
-        if (!user) {
+        // 严格验证输入参数
+        if (!userId || typeof userId !== 'string' || userId.trim() === '') {
+            console.error('用户ID无效');
             return false;
         }
         
-        // 检查用户角色
-        const allowedRoles = {
-            'file_access': ['admin', 'supervisor'],
+        if (!permission || typeof permission !== 'string' || permission.trim() === '') {
+            console.error('权限类型无效');
+            return false;
+        }
+        
+        // 从 Members 集合获取用户信息
+        const user = await wixData.get("Members", userId);
+        if (!user) {
+            console.error(`用户不存在: ${userId}`);
+            return false;
+        }
+        
+        // 检查用户状态
+        if (user.status !== 'active') {
+            console.error(`用户状态不活跃: ${userId}`);
+            return false;
+        }
+        
+        // 定义权限映射 - 使用常量避免硬编码
+        const PERMISSION_ROLES = {
+            'file_access': ['admin', 'supervisor', 'teacher'],
             'file_delete': ['admin', 'supervisor'],
-            'file_verify': ['admin', 'supervisor']
+            'file_verify': ['admin', 'supervisor'],
+            'file_upload': ['admin', 'supervisor', 'teacher']
         };
         
         const userRole = user.role || 'user';
-        const requiredRoles = allowedRoles[permission] || [];
+        const requiredRoles = PERMISSION_ROLES[permission];
         
-        return requiredRoles.includes(userRole);
+        if (!requiredRoles) {
+            console.error(`未知权限类型: ${permission}`);
+            return false;
+        }
+        
+        const hasPermission = requiredRoles.includes(userRole);
+        
+        // 记录权限检查日志
+        console.log(`权限检查 - 用户: ${userId}, 角色: ${userRole}, 权限: ${permission}, 结果: ${hasPermission}`);
+        
+        return hasPermission;
         
     } catch (error) {
         console.error('权限验证错误:', error);
+        // 安全起见，出错时拒绝访问
         return false;
     }
 }

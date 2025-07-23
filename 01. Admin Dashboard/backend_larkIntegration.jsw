@@ -8,26 +8,144 @@ import { permissions, webMethod } from 'wix-web-module';
 import wixData from 'wix-data';
 
 // ==========================================
+// 配置和常量
+// ==========================================
+
+const LARK_CONFIG = {
+    timeout: 30000, // 30秒超时
+    maxRetries: 3,
+    retryDelay: 1000, // 1秒重试延迟
+    batchDelay: 100 // 批量发送间隔
+};
+
+// 错误类型定义
+const ERROR_TYPES = {
+    NETWORK_ERROR: 'NETWORK_ERROR',
+    VALIDATION_ERROR: 'VALIDATION_ERROR',
+    CONFIG_ERROR: 'CONFIG_ERROR',
+    API_ERROR: 'API_ERROR',
+    TIMEOUT_ERROR: 'TIMEOUT_ERROR'
+};
+
+// 自定义错误类
+class LarkIntegrationError extends Error {
+    constructor(message, type, originalError = null) {
+        super(message);
+        this.name = 'LarkIntegrationError';
+        this.type = type;
+        this.originalError = originalError;
+        this.timestamp = new Date().toISOString();
+    }
+}
+
+// ==========================================
 // Lark 通知相关函数
 // ==========================================
+
+/**
+ * 验证通知数据
+ */
+function validateNotificationData(data) {
+    if (!data || typeof data !== 'object') {
+        throw new LarkIntegrationError('通知数据无效', ERROR_TYPES.VALIDATION_ERROR);
+    }
+    
+    if (!data.type || typeof data.type !== 'string' || data.type.trim() === '') {
+        throw new LarkIntegrationError('通知类型无效或缺失', ERROR_TYPES.VALIDATION_ERROR);
+    }
+    
+    // 根据不同类型验证必要字段
+    const requiredFields = {
+        'ap_student_registration': ['studentName', 'studentEmail'],
+        'student_added': ['studentName', 'studentEmail'],
+        'file_uploaded': ['studentName', 'fileName', 'fileSize'],
+        'file_verified': ['studentName', 'fileName'],
+        'system_alert': ['alertType', 'message']
+    };
+    
+    const required = requiredFields[data.type];
+    if (required) {
+        const missing = required.filter(field => !data[field] || (typeof data[field] === 'string' && data[field].trim() === ''));
+        if (missing.length > 0) {
+            throw new LarkIntegrationError(
+                `通知数据缺少必要字段: ${missing.join(', ')}`,
+                ERROR_TYPES.VALIDATION_ERROR
+            );
+        }
+    }
+    
+    return true;
+}
+
+/**
+ * 带重试机制的 HTTP 请求
+ */
+async function makeRequestWithRetry(url, options, retries = LARK_CONFIG.maxRetries) {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), LARK_CONFIG.timeout);
+            
+            const response = await fetch(url, {
+                ...options,
+                signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
+            
+            if (!response.ok) {
+                throw new LarkIntegrationError(
+                    `HTTP ${response.status}: ${response.statusText}`,
+                    ERROR_TYPES.API_ERROR
+                );
+            }
+            
+            return response;
+            
+        } catch (error) {
+            console.error(`Lark 请求失败 (尝试 ${attempt}/${retries}):`, error);
+            
+            if (attempt === retries) {
+                if (error.name === 'AbortError') {
+                    throw new LarkIntegrationError('请求超时', ERROR_TYPES.TIMEOUT_ERROR, error);
+                }
+                throw error;
+            }
+            
+            // 等待后重试
+            await new Promise(resolve => setTimeout(resolve, LARK_CONFIG.retryDelay * attempt));
+        }
+    }
+}
 
 /**
  * 从环境变量获取 Lark webhook URL
  * @returns {Promise<string>} Webhook URL
  */
-const getLarkWebhookUrl = () => {
-    return getSecret('LARK_WEBHOOK_URL')
-        .then(url => {
-            if (!url) {
-                throw new Error('LARK_WEBHOOK_URL 环境变量未设置');
-            }
-            return url;
-        })
-        .catch(error => {
-            console.error('获取 Lark Webhook URL 失败:', error);
-            // 返回默认值或抛出错误
-            throw new Error('Lark 配置错误');
-        });
+const getLarkWebhookUrl = async () => {
+    try {
+        const url = await getSecret('LARK_WEBHOOK_URL');
+        
+        if (!url || typeof url !== 'string' || url.trim() === '') {
+            throw new LarkIntegrationError('LARK_WEBHOOK_URL 环境变量未设置或为空', ERROR_TYPES.CONFIG_ERROR);
+        }
+        
+        // 验证 URL 格式
+        try {
+            new URL(url);
+        } catch (urlError) {
+            throw new LarkIntegrationError('LARK_WEBHOOK_URL 格式无效', ERROR_TYPES.CONFIG_ERROR, urlError);
+        }
+        
+        return url.trim();
+        
+    } catch (error) {
+        console.error('获取 Lark Webhook URL 失败:', error);
+        if (error instanceof LarkIntegrationError) {
+            throw error;
+        }
+        throw new LarkIntegrationError('Lark 配置错误', ERROR_TYPES.CONFIG_ERROR, error);
+    }
 };
 
 /**
@@ -39,14 +157,17 @@ export async function sendLarkNotification(data) {
     try {
         console.log('准备发送 Lark 通知:', data);
         
+        // 验证输入数据
+        validateNotificationData(data);
+        
         // 获取 Webhook URL
         const webhookUrl = await getLarkWebhookUrl();
         
         // 格式化消息
         const message = formatLarkMessage(data);
         
-        // 发送请求
-        const response = await fetch(webhookUrl, {
+        // 发送请求（带重试机制）
+        const response = await makeRequestWithRetry(webhookUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -54,36 +175,59 @@ export async function sendLarkNotification(data) {
             body: JSON.stringify(message)
         });
         
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
         const result = await response.json();
+        
+        // 验证响应
+        if (result.code && result.code !== 0) {
+            throw new LarkIntegrationError(
+                `Lark API 错误: ${result.msg || '未知错误'}`,
+                ERROR_TYPES.API_ERROR
+            );
+        }
         
         // 记录发送日志
         await logLarkActivity({
             type: data.type,
             status: 'success',
             message: message.content.text,
-            response: result
+            response: result,
+            timestamp: new Date()
         });
         
         console.log('Lark 通知发送成功:', result);
-        return { success: true, result };
+        return { success: true, result, timestamp: new Date().toISOString() };
         
     } catch (error) {
         console.error('发送 Lark 通知错误:', error);
         
         // 记录错误日志
         await logLarkActivity({
-            type: data.type || 'unknown',
+            type: data?.type || 'unknown',
             status: 'error',
             message: error.message,
-            error: error.message
+            error: error.message,
+            errorType: error.type || 'UNKNOWN_ERROR',
+            timestamp: new Date()
         });
         
-        return { success: false, error: error.message };
+        return { 
+            success: false, 
+            error: error.message,
+            errorType: error.type || 'UNKNOWN_ERROR',
+            timestamp: new Date().toISOString()
+        };
     }
+}
+
+/**
+ * 安全地获取字段值
+ */
+function safeGetField(data, field, defaultValue = '未提供') {
+    const value = data[field];
+    if (value === null || value === undefined || (typeof value === 'string' && value.trim() === '')) {
+        return defaultValue;
+    }
+    return String(value).trim();
 }
 
 /**
@@ -92,59 +236,103 @@ export async function sendLarkNotification(data) {
  * @returns {Object} 格式化的消息
  */
 function formatLarkMessage(data) {
-    let messageText = '';
-    
-    switch (data.type) {
-        case 'ap_student_registration':
-            messageText = `⭐ 新 AP 学生注册\n\n` +
-                        `👤 姓名: ${data.studentName}\n` +
-                        `📧 邮箱: ${data.studentEmail}\n` +
-                        `📱 电话: ${data.studentPhone}\n` +
-                        `📄 EHCP 文件: ${data.hasEHCPFile ? '✅ 已上传' : '❌ 未上传'}\n` +
-                        `🕐 时间: ${new Date().toLocaleString('zh-CN')}`;
-            break;
-            
-        case 'student_added':
-            messageText = `🎓 新学生添加\n\n` +
-                        `👤 姓名: ${data.studentName}\n` +
-                        `📧 邮箱: ${data.studentEmail}\n` +
-                        `📱 电话: ${data.studentPhone || '未提供'}\n` +
-                        `🕐 时间: ${new Date().toLocaleString('zh-CN')}`;
-            break;
-            
-        case 'file_uploaded':
-            messageText = `📁 文件上传通知\n\n` +
-                        `👤 学生: ${data.studentName}\n` +
-                        `📄 文件: ${data.fileName}\n` +
-                        `📊 大小: ${formatFileSize(data.fileSize)}\n` +
-                        `🕐 时间: ${new Date().toLocaleString('zh-CN')}`;
-            break;
-            
-        case 'file_verified':
-            messageText = `✅ 文件验证完成\n\n` +
-                        `👤 学生: ${data.studentName}\n` +
-                        `📄 文件: ${data.fileName}\n` +
-                        `✅ 状态: 验证通过\n` +
-                        `🕐 时间: ${new Date().toLocaleString('zh-CN')}`;
-            break;
-            
-        case 'system_alert':
-            messageText = `⚠️ 系统警告\n\n` +
-                        `📋 类型: ${data.alertType}\n` +
-                        `📝 消息: ${data.message}\n` +
-                        `🕐 时间: ${new Date().toLocaleString('zh-CN')}`;
-            break;
-            
-        default:
-            messageText = `📊 系统通知\n\n${JSON.stringify(data, null, 2)}`;
-    }
-    
-    return {
-        msg_type: 'text',
-        content: {
-            text: messageText
+    try {
+        let messageText = '';
+        const timestamp = new Date().toLocaleString('zh-CN', {
+            timeZone: 'Asia/Shanghai',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+        
+        switch (data.type) {
+            case 'ap_student_registration':
+                messageText = `⭐ 新 AP 学生注册\n\n` +
+                            `👤 姓名: ${safeGetField(data, 'studentName')}\n` +
+                            `📧 邮箱: ${safeGetField(data, 'studentEmail')}\n` +
+                            `📱 电话: ${safeGetField(data, 'studentPhone')}\n` +
+                            `📄 EHCP 文件: ${data.hasEHCPFile ? '✅ 已上传' : '❌ 未上传'}\n`;
+                
+                // 添加附加信息字段
+                if (data.additionalInfo) {
+                    messageText += `📝 附加信息: ${safeGetField(data, 'additionalInfo')}\n`;
+                }
+                
+                messageText += `🕐 时间: ${timestamp}`;
+                break;
+                
+            case 'student_added':
+                messageText = `🎓 新学生添加\n\n` +
+                            `👤 姓名: ${safeGetField(data, 'studentName')}\n` +
+                            `📧 邮箱: ${safeGetField(data, 'studentEmail')}\n` +
+                            `📱 电话: ${safeGetField(data, 'studentPhone')}\n` +
+                            `🕐 时间: ${timestamp}`;
+                break;
+                
+            case 'file_uploaded':
+                messageText = `📁 文件上传通知\n\n` +
+                            `👤 学生: ${safeGetField(data, 'studentName')}\n` +
+                            `📄 文件: ${safeGetField(data, 'fileName')}\n` +
+                            `📊 大小: ${formatFileSize(data.fileSize)}\n` +
+                            `🕐 时间: ${timestamp}`;
+                break;
+                
+            case 'file_verified':
+                messageText = `✅ 文件验证完成\n\n` +
+                            `👤 学生: ${safeGetField(data, 'studentName')}\n` +
+                            `📄 文件: ${safeGetField(data, 'fileName')}\n` +
+                            `✅ 状态: ${data.verificationStatus || '验证通过'}\n` +
+                            `🕐 时间: ${timestamp}`;
+                break;
+                
+            case 'system_alert':
+                const alertLevel = data.alertLevel || 'info';
+                const alertIcon = {
+                    'error': '🚨',
+                    'warning': '⚠️',
+                    'info': 'ℹ️',
+                    'success': '✅'
+                }[alertLevel] || '📊';
+                
+                messageText = `${alertIcon} 系统${alertLevel === 'error' ? '错误' : alertLevel === 'warning' ? '警告' : '通知'}\n\n` +
+                            `📋 类型: ${safeGetField(data, 'alertType')}\n` +
+                            `📝 消息: ${safeGetField(data, 'message')}\n` +
+                            `🕐 时间: ${timestamp}`;
+                break;
+                
+            default:
+                messageText = `📊 系统通知\n\n` +
+                            `📋 类型: ${data.type}\n` +
+                            `📝 数据: ${JSON.stringify(data, null, 2)}\n` +
+                            `🕐 时间: ${timestamp}`;
         }
-    };
+        
+        // 限制消息长度，避免过长
+        const MAX_MESSAGE_LENGTH = 4000;
+        if (messageText.length > MAX_MESSAGE_LENGTH) {
+            messageText = messageText.substring(0, MAX_MESSAGE_LENGTH - 50) + '\n\n... (消息已截断)';
+        }
+        
+        return {
+            msg_type: 'text',
+            content: {
+                text: messageText
+            }
+        };
+        
+    } catch (error) {
+        console.error('格式化 Lark 消息错误:', error);
+        // 返回基本的错误消息
+        return {
+            msg_type: 'text',
+            content: {
+                text: `📊 系统通知\n\n消息格式化失败: ${error.message}\n🕐 时间: ${new Date().toLocaleString('zh-CN')}`
+            }
+        };
+    }
 }
 
 /**

@@ -11,6 +11,79 @@ import wixData from 'wix-data';
 // Lark Base API 配置
 // ==========================================
 
+// Lark Base API 配置 - 使用常量避免硬编码
+const LARK_CONFIG = {
+    baseUrl: 'https://open.feishu.cn/open-apis',
+    tokenUrl: '/auth/v3/tenant_access_token/internal',
+    baseApiUrl: '/bitable/v1/apps',
+    timeout: 30000, // 30秒超时
+    maxRetries: 3,
+    retryDelay: 1000 // 1秒重试延迟
+};
+
+/**
+ * 带重试机制的 HTTP 请求函数
+ */
+async function makeRequestWithRetry(url, options, retries = LARK_CONFIG.maxRetries) {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), LARK_CONFIG.timeout);
+            
+            const response = await fetch(url, {
+                ...options,
+                signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
+            
+            if (!response.ok) {
+                throw new LarkApiError(
+                    `HTTP ${response.status}: ${response.statusText}`,
+                    ERROR_TYPES.API_ERROR,
+                    response.status
+                );
+            }
+            
+            return response;
+            
+        } catch (error) {
+            console.error(`请求失败 (尝试 ${attempt}/${retries}):`, error);
+            
+            if (attempt === retries) {
+                if (error.name === 'AbortError') {
+                    throw new LarkApiError('请求超时', ERROR_TYPES.TIMEOUT_ERROR, null, error);
+                }
+                throw error;
+            }
+            
+            // 等待后重试
+            await new Promise(resolve => setTimeout(resolve, LARK_CONFIG.retryDelay * attempt));
+        }
+    }
+}
+
+// 错误类型定义
+const ERROR_TYPES = {
+    NETWORK_ERROR: 'NETWORK_ERROR',
+    AUTH_ERROR: 'AUTH_ERROR',
+    VALIDATION_ERROR: 'VALIDATION_ERROR',
+    API_ERROR: 'API_ERROR',
+    TIMEOUT_ERROR: 'TIMEOUT_ERROR'
+};
+
+// 自定义错误类
+class LarkApiError extends Error {
+    constructor(message, type, statusCode = null, originalError = null) {
+        super(message);
+        this.name = 'LarkApiError';
+        this.type = type;
+        this.statusCode = statusCode;
+        this.originalError = originalError;
+        this.timestamp = new Date().toISOString();
+    }
+}
+
 /**
  * 获取 Lark Base API 配置
  * @returns {Promise<Object>} API 配置
@@ -46,7 +119,11 @@ async function getLarkAccessToken() {
     try {
         const config = await getLarkBaseConfig();
         
-        const response = await fetch('https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal', {
+        if (!config.appId || !config.appSecret) {
+            throw new LarkApiError('Lark API 配置缺失', ERROR_TYPES.VALIDATION_ERROR);
+        }
+        
+        const response = await makeRequestWithRetry(`${LARK_CONFIG.baseUrl}${LARK_CONFIG.tokenUrl}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -57,16 +134,13 @@ async function getLarkAccessToken() {
             })
         });
         
-        if (!response.ok) {
-            throw new Error(`获取访问令牌失败: ${response.status}`);
-        }
-        
         const data = await response.json();
         
         if (data.code !== 0) {
-            throw new Error(`获取访问令牌错误: ${data.msg}`);
+            throw new LarkApiError(`获取访问令牌失败: ${data.msg}`, ERROR_TYPES.AUTH_ERROR, data.code);
         }
         
+        console.log('成功获取 Lark 访问令牌');
         return data.tenant_access_token;
     } catch (error) {
         console.error('获取 Lark 访问令牌失败:', error);
@@ -79,16 +153,51 @@ async function getLarkAccessToken() {
 // ==========================================
 
 /**
+ * 验证学生数据
+ */
+function validateStudentData(studentData) {
+    const requiredFields = ['firstName', 'lastName', 'email'];
+    const missingFields = [];
+    
+    for (const field of requiredFields) {
+        if (!studentData[field] || (typeof studentData[field] === 'string' && studentData[field].trim() === '')) {
+            missingFields.push(field);
+        }
+    }
+    
+    if (missingFields.length > 0) {
+        throw new LarkApiError(
+            `学生数据缺少必要字段: ${missingFields.join(', ')}`,
+            ERROR_TYPES.VALIDATION_ERROR
+        );
+    }
+    
+    // 验证邮箱格式
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(studentData.email)) {
+        throw new LarkApiError('邮箱格式无效', ERROR_TYPES.VALIDATION_ERROR);
+    }
+    
+    return true;
+}
+
+/**
  * 从 Lark Base 获取学生记录
  * @param {string} recordId - Lark Base 记录 ID
  * @returns {Promise<Object>} 学生记录
  */
 async function getLarkBaseStudentRecord(recordId) {
     try {
+        // 验证输入参数
+        if (!recordId || typeof recordId !== 'string' || recordId.trim() === '') {
+            throw new LarkApiError('记录ID无效', ERROR_TYPES.VALIDATION_ERROR);
+        }
+        
         const token = await getLarkAccessToken();
         const config = await getLarkBaseConfig();
         
-        const response = await fetch(`https://open.feishu.cn/open-apis/bitable/v1/apps/${config.baseId}/tables/${config.tableId}/records/${recordId}`, {
+        const url = `${LARK_CONFIG.baseUrl}${LARK_CONFIG.baseApiUrl}/${config.baseId}/tables/${config.tableId}/records/${recordId.trim()}`;
+        const response = await makeRequestWithRetry(url, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -96,16 +205,13 @@ async function getLarkBaseStudentRecord(recordId) {
             }
         });
         
-        if (!response.ok) {
-            throw new Error(`获取学生记录失败: ${response.status}`);
-        }
-        
         const data = await response.json();
         
         if (data.code !== 0) {
-            throw new Error(`获取学生记录错误: ${data.msg}`);
+            throw new LarkApiError(`获取学生记录错误: ${data.msg}`, ERROR_TYPES.API_ERROR, data.code);
         }
         
+        console.log(`获取学生记录成功 - ID: ${recordId}`);
         return data.data.record;
     } catch (error) {
         console.error('获取 Lark Base 学生记录失败:', error);
@@ -121,10 +227,20 @@ async function getLarkBaseStudentRecord(recordId) {
  */
 async function updateLarkBaseStudentRecord(recordId, fields) {
     try {
+        // 验证输入参数
+        if (!recordId || typeof recordId !== 'string' || recordId.trim() === '') {
+            throw new LarkApiError('记录ID无效', ERROR_TYPES.VALIDATION_ERROR);
+        }
+        
+        if (!fields || typeof fields !== 'object' || Object.keys(fields).length === 0) {
+            throw new LarkApiError('更新字段不能为空', ERROR_TYPES.VALIDATION_ERROR);
+        }
+        
         const token = await getLarkAccessToken();
         const config = await getLarkBaseConfig();
         
-        const response = await fetch(`https://open.feishu.cn/open-apis/bitable/v1/apps/${config.baseId}/tables/${config.tableId}/records/${recordId}`, {
+        const url = `${LARK_CONFIG.baseUrl}${LARK_CONFIG.baseApiUrl}/${config.baseId}/tables/${config.tableId}/records/${recordId.trim()}`;
+        const response = await makeRequestWithRetry(url, {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -135,16 +251,13 @@ async function updateLarkBaseStudentRecord(recordId, fields) {
             })
         });
         
-        if (!response.ok) {
-            throw new Error(`更新学生记录失败: ${response.status}`);
-        }
-        
         const data = await response.json();
         
         if (data.code !== 0) {
-            throw new Error(`更新学生记录错误: ${data.msg}`);
+            throw new LarkApiError(`更新学生记录错误: ${data.msg}`, ERROR_TYPES.API_ERROR, data.code);
         }
         
+        console.log(`更新学生记录成功 - ID: ${recordId}`);
         return data.data.record;
     } catch (error) {
         console.error('更新 Lark Base 学生记录失败:', error);
@@ -159,10 +272,27 @@ async function updateLarkBaseStudentRecord(recordId, fields) {
  */
 async function createLarkBaseStudentRecord(fields) {
     try {
+        // 验证输入参数
+        if (!fields || typeof fields !== 'object' || Object.keys(fields).length === 0) {
+            throw new LarkApiError('学生字段不能为空', ERROR_TYPES.VALIDATION_ERROR);
+        }
+        
+        // 验证必要字段
+        const requiredFields = ['FirstName', 'LastName', 'Email'];
+        const missingFields = requiredFields.filter(field => !fields[field] || fields[field].trim() === '');
+        
+        if (missingFields.length > 0) {
+            throw new LarkApiError(
+                `缺少必要字段: ${missingFields.join(', ')}`,
+                ERROR_TYPES.VALIDATION_ERROR
+            );
+        }
+        
         const token = await getLarkAccessToken();
         const config = await getLarkBaseConfig();
         
-        const response = await fetch(`https://open.feishu.cn/open-apis/bitable/v1/apps/${config.baseId}/tables/${config.tableId}/records`, {
+        const url = `${LARK_CONFIG.baseUrl}${LARK_CONFIG.baseApiUrl}/${config.baseId}/tables/${config.tableId}/records`;
+        const response = await makeRequestWithRetry(url, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -173,16 +303,13 @@ async function createLarkBaseStudentRecord(fields) {
             })
         });
         
-        if (!response.ok) {
-            throw new Error(`创建学生记录失败: ${response.status}`);
-        }
-        
         const data = await response.json();
         
         if (data.code !== 0) {
-            throw new Error(`创建学生记录错误: ${data.msg}`);
+            throw new LarkApiError(`创建学生记录错误: ${data.msg}`, ERROR_TYPES.API_ERROR, data.code);
         }
         
+        console.log(`创建学生记录成功 - 姓名: ${fields.FirstName} ${fields.LastName}`);
         return data.data.record;
     } catch (error) {
         console.error('创建 Lark Base 学生记录失败:', error);
@@ -197,30 +324,36 @@ async function createLarkBaseStudentRecord(fields) {
  */
 async function queryLarkBaseStudentRecords(filter) {
     try {
+        // 验证输入参数
+        if (filter && typeof filter !== 'string') {
+            throw new LarkApiError('查询过滤条件必须是字符串', ERROR_TYPES.VALIDATION_ERROR);
+        }
+        
         const token = await getLarkAccessToken();
         const config = await getLarkBaseConfig();
         
-        const response = await fetch(`https://open.feishu.cn/open-apis/bitable/v1/apps/${config.baseId}/tables/${config.tableId}/records/query`, {
+        const requestBody = {};
+        if (filter) {
+            requestBody.filter_by_formula = filter;
+        }
+        
+        const url = `${LARK_CONFIG.baseUrl}${LARK_CONFIG.baseApiUrl}/${config.baseId}/tables/${config.tableId}/records/query`;
+        const response = await makeRequestWithRetry(url, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                filter_by_formula: filter
-            })
+            body: JSON.stringify(requestBody)
         });
-        
-        if (!response.ok) {
-            throw new Error(`查询学生记录失败: ${response.status}`);
-        }
         
         const data = await response.json();
         
         if (data.code !== 0) {
-            throw new Error(`查询学生记录错误: ${data.msg}`);
+            throw new LarkApiError(`查询学生记录错误: ${data.msg}`, ERROR_TYPES.API_ERROR, data.code);
         }
         
+        console.log(`查询学生记录成功 - 找到 ${data.data.items.length} 条记录`);
         return data.data.items;
     } catch (error) {
         console.error('查询 Lark Base 学生记录失败:', error);
