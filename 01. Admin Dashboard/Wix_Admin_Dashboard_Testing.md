@@ -213,8 +213,8 @@ This document outlines the comprehensive testing strategy for the Wix Admin Dash
 **Objective:** Test EHCP file upload functionality comprehensively
 **Steps:**
 1. Test valid file upload (PDF, DOC, DOCX)
-2. Test file size limits (max 10MB) - 统一文件大小限制
-3. Test invalid file types (TXT, EXE, JPG, PNG 等非文档格式)
+2. Test file size limits (max 10MB) - Unified file size limit
+3. Test invalid file types (TXT, EXE, JPG, PNG and other non-document formats)
 4. Test file name validation
 5. Verify file is stored in Wix Media Manager
 6. Test file association with student record
@@ -652,10 +652,10 @@ This document outlines the comprehensive testing strategy for the Wix Admin Dash
 #### Test Case F1: Valid File Upload
 **Objective:** Verify successful upload of valid EHCP files
 **Test Data:** 
-- PDF file (2MB) - EHCP 文档示例
-- DOC file (1.5MB) - EHCP 文档示例
-- DOCX file (3MB) - EHCP 文档示例
-- 注意：仅支持 PDF、DOC、DOCX 格式，不再支持图片格式
+- PDF file (2MB) - EHCP document example
+- DOC file (1.5MB) - EHCP document example
+- DOCX file (3MB) - EHCP document example
+- Note: Only PDF, DOC, DOCX formats are supported, image formats are no longer supported
 
 **Steps:**
 1. Navigate to AP Student Registration form
@@ -711,7 +711,7 @@ This document outlines the comprehensive testing strategy for the Wix Admin Dash
 **Pass/Fail:** ___
 
 #### Test Case F3: File Size Limit Testing
-**Objective:** Test file size validation (统一为 10MB)
+**Objective:** Test file size validation (Unified limit of 10MB)
 **Test Data:**
 - 1MB PDF file (should pass)
 - 5MB DOCX file (should pass)

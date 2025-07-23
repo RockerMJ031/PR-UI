@@ -47,12 +47,12 @@ This guide will help you create a comprehensive admin dashboard in Wix with the 
     educationBackground: "text",
     educationPlan: "text",
     
-    // EHCP文件相关字段
-    ehcpFileUrl: "text",        // EHCP文件URL
-    ehcpFileName: "text",      // 原始文件名
-    ehcpFileSize: "number",      // 文件大小（字节）
-    ehcpUploadDate: "text",  // 上传日期
-    ehcpFileStatus: "text",    // 文件状态：none, uploaded, verified, rejected
+    // EHCP File Related Fields
+    ehcpFileUrl: "text",        // EHCP file URL
+    ehcpFileName: "text",      // Original filename
+    ehcpFileSize: "number",      // File size (bytes)
+    ehcpUploadDate: "text",  // Upload date
+    ehcpFileStatus: "text",    // File status: none, uploaded, verified, rejected
     
     isAP: "boolean",
     status: "text",
@@ -61,34 +61,34 @@ This guide will help you create a comprehensive admin dashboard in Wix with the 
 }
 ```
 
-### FileActivityLogs Collection (新增)
+### FileActivityLogs Collection (New)
 ```javascript
 {
     _id: "text",
-    studentId: "text",         // 关联的学生ID
-    fileName: "text",          // 文件名
-    fileUrl: "text",           // 文件URL
-    action: "text",            // 操作类型：upload, access, delete, verify
-    actionBy: "text",          // 操作者ID
-    actionDate: "text",      // 操作时间
-    ipAddress: "text",         // IP地址
-    userAgent: "text",         // 用户代理
-    result: "text",            // 操作结果：success, failed
-    errorMessage: "text"       // 错误信息（如果有）
+    studentId: "text",         // Associated student ID
+    fileName: "text",          // Filename
+    fileUrl: "text",           // File URL
+    action: "text",            // Action type: upload, access, delete, verify
+    actionBy: "text",          // Actor ID
+    actionDate: "text",      // Action timestamp
+    ipAddress: "text",         // IP address
+    userAgent: "text",         // User agent
+    result: "text",            // Operation result: success, failed
+    errorMessage: "text"       // Error message (if any)
 }
 ```
 
-### FileCleanupReports Collection (新增)
+### FileCleanupReports Collection (New)
 ```javascript
 {
     _id: "text",
-    reportDate: "text",      // 报告日期
-    totalFilesChecked: "number", // 检查的文件总数
-    orphanFiles: "array",        // 孤儿文件列表
-    deletedFiles: "array",       // 已删除的文件列表
-    cleanupStatus: "text",     // 清理状态：completed, failed, partial
-    executionTime: "number",     // 执行时间（毫秒）
-    notes: "text"              // 备注
+    reportDate: "text",      // Report date
+    totalFilesChecked: "number", // Total files checked
+    orphanFiles: "array",        // Orphaned files list
+    deletedFiles: "array",       // Deleted files list
+    cleanupStatus: "text",     // Cleanup status: completed, failed, partial
+    executionTime: "number",     // Execution time (milliseconds)
+    notes: "text"              // Notes
 }
 ```
 
