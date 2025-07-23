@@ -52,65 +52,65 @@ The Sessions Management Dashboard provides comprehensive session scheduling, tra
 #### Sessions Collection
 ```javascript
 {
-  _id: "string",
-  sessionId: "string", // Unique session identifier
-  title: "string",
+  _id: "text",
+  sessionId: "text", // Unique session identifier
+  title: "text",
   description: "text",
-  mentorId: "string", // Reference to Mentors collection
-  studentId: "string", // Reference to Students collection
-  subjectId: "string", // Reference to Subjects collection
-  sessionType: "string", // individual, group, workshop
-  status: "string", // scheduled, in-progress, completed, cancelled
-  scheduledDate: "date",
-  startTime: "datetime",
-  endTime: "datetime",
+  mentorId: "text", // Reference to Mentors collection
+  studentId: "text", // Reference to Students collection
+  subjectId: "text", // Reference to Subjects collection
+  sessionType: "text", // individual, group, workshop
+  status: "text", // scheduled, in-progress, completed, cancelled
+  scheduledDate: "text",
+  startTime: "text",
+  endTime: "text",
   duration: "number", // in minutes
-  location: "string", // physical or virtual
-  meetingLink: "string", // for virtual sessions
+  location: "text", // physical or virtual
+  meetingLink: "text", // for virtual sessions
   maxParticipants: "number",
   currentParticipants: "number",
   isRecurring: "boolean",
-  recurrencePattern: "string", // daily, weekly, monthly
-  recurrenceEnd: "date",
+  recurrencePattern: "text", // daily, weekly, monthly
+  recurrenceEnd: "text",
   sessionNotes: "text",
   materials: "array", // uploaded files
   attendance: "array", // attendance records
   rating: "number",
   feedback: "text",
   cost: "number",
-  paymentStatus: "string",
-  createdDate: "datetime",
-  lastModified: "datetime",
-  createdBy: "string"
+  paymentStatus: "text",
+  createdDate: "text",
+  lastModified: "text",
+  createdBy: "text"
 }
 ```
 
 #### SessionAttendance Collection
 ```javascript
 {
-  _id: "string",
-  sessionId: "string",
-  studentId: "string",
-  attendanceStatus: "string", // present, absent, late, excused
-  checkInTime: "datetime",
-  checkOutTime: "datetime",
+  _id: "text",
+  sessionId: "text",
+  studentId: "text",
+  attendanceStatus: "text", // present, absent, late, excused
+  checkInTime: "text",
+  checkOutTime: "text",
   notes: "text",
-  recordedBy: "string",
-  timestamp: "datetime"
+  recordedBy: "text",
+  timestamp: "text"
 }
 ```
 
 #### SessionMaterials Collection
 ```javascript
 {
-  _id: "string",
-  sessionId: "string",
-  fileName: "string",
-  fileUrl: "string",
-  fileType: "string",
+  _id: "text",
+  sessionId: "text",
+  fileName: "text",
+  fileUrl: "text",
+  fileType: "text",
   fileSize: "number",
-  uploadedBy: "string",
-  uploadDate: "datetime",
+  uploadedBy: "text",
+  uploadDate: "text",
   description: "text"
 }
 ```
@@ -118,14 +118,14 @@ The Sessions Management Dashboard provides comprehensive session scheduling, tra
 #### SessionFeedback Collection
 ```javascript
 {
-  _id: "string",
-  sessionId: "string",
-  studentId: "string",
-  mentorId: "string",
+  _id: "text",
+  sessionId: "text",
+  studentId: "text",
+  mentorId: "text",
   rating: "number", // 1-5 scale
   feedback: "text",
   categories: "object", // detailed ratings
-  submittedDate: "datetime"
+  submittedDate: "text"
 }
 ```
 

@@ -55,8 +55,8 @@ The Students Management Dashboard is a comprehensive system for managing student
   lastName: "text",
   email: "text",
   phone: "text",
-  dateOfBirth: "date",
-  enrollmentDate: "date",
+  dateOfBirth: "text",
+  enrollmentDate: "text",
   status: "text", // active, inactive, graduated, suspended
   studentType: "text", // "alternative" (AP学生) 或 "tutoring" (普通辅导学生) - 兼容旧代码，新代码应使用product字段
   product: "text", // "Tutoring", "PRA - Core Subject", "PRA - All Subject", "PRA - All Subject + Therapy", "Purple Ruler Blueprint"
@@ -76,8 +76,8 @@ The Students Management Dashboard is a comprehensive system for managing student
   subject: "text", // 单个科目（普通学生）或课程分类（AP学生）
   subjects: "text", // JSON array - 兼容性保留
   notes: "text",
-  createdDate: "date",
-  lastModified: "date"
+  createdDate: "text",
+  lastModified: "text"
 }
 ```
 
@@ -91,7 +91,7 @@ The Students Management Dashboard is a comprehensive system for managing student
   completionPercentage: "number",
   grade: "text",
   assessmentScores: "text", // JSON array
-  lastActivity: "date",
+  lastActivity: "text",
   timeSpent: "number", // in minutes
   status: "text" // not_started, in_progress, completed
 }
@@ -107,7 +107,7 @@ The Students Management Dashboard is a comprehensive system for managing student
   message: "text",
   sender: "text",
   recipient: "text",
-  timestamp: "date",
+  timestamp: "text",
   status: "text", // sent, delivered, read, replied
   attachments: "text" // JSON array
 }

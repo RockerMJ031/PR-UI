@@ -305,7 +305,7 @@
 
 
 ### Database & Architecture
-- **CMS Database Configuration**: `00. Project Management/CMS_数据库配置指南.md`
+- **CMS Database Configuration**: `00. Project Management/CMS_Database_Configuration_Guide.md`
 - **Project Management Plan**: `00. Project Management/Project_Management_Plan.md`
 
 ### External Resources

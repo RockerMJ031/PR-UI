@@ -36,59 +36,59 @@ This guide will help you create a comprehensive admin dashboard in Wix with the 
 ### Students Collection
 ```javascript
 {
-    _id: "string",
-    name: "string",
+    _id: "text",
+    name: "text",
     age: "number",
-    sendStatus: "string",
-    guardianName: "string",
-    guardianPhone: "string",
-    guardianEmail: "string",
-    medicalInfo: "string",
-    educationBackground: "string",
-    educationPlan: "string",
+    sendStatus: "text",
+    guardianName: "text",
+    guardianPhone: "text",
+    guardianEmail: "text",
+    medicalInfo: "text",
+    educationBackground: "text",
+    educationPlan: "text",
     
     // EHCP文件相关字段
-    ehcpFileUrl: "string",        // EHCP文件URL
-    ehcpFileName: "string",      // 原始文件名
+    ehcpFileUrl: "text",        // EHCP文件URL
+    ehcpFileName: "text",      // 原始文件名
     ehcpFileSize: "number",      // 文件大小（字节）
-    ehcpUploadDate: "datetime",  // 上传日期
-    ehcpFileStatus: "string",    // 文件状态：none, uploaded, verified, rejected
+    ehcpUploadDate: "text",  // 上传日期
+    ehcpFileStatus: "text",    // 文件状态：none, uploaded, verified, rejected
     
     isAP: "boolean",
-    status: "string",
-    dateAdded: "datetime",
-    lastActive: "datetime"
+    status: "text",
+    dateAdded: "text",
+    lastActive: "text"
 }
 ```
 
 ### FileActivityLogs Collection (新增)
 ```javascript
 {
-    _id: "string",
-    studentId: "string",         // 关联的学生ID
-    fileName: "string",          // 文件名
-    fileUrl: "string",           // 文件URL
-    action: "string",            // 操作类型：upload, access, delete, verify
-    actionBy: "string",          // 操作者ID
-    actionDate: "datetime",      // 操作时间
-    ipAddress: "string",         // IP地址
-    userAgent: "string",         // 用户代理
-    result: "string",            // 操作结果：success, failed
-    errorMessage: "string"       // 错误信息（如果有）
+    _id: "text",
+    studentId: "text",         // 关联的学生ID
+    fileName: "text",          // 文件名
+    fileUrl: "text",           // 文件URL
+    action: "text",            // 操作类型：upload, access, delete, verify
+    actionBy: "text",          // 操作者ID
+    actionDate: "text",      // 操作时间
+    ipAddress: "text",         // IP地址
+    userAgent: "text",         // 用户代理
+    result: "text",            // 操作结果：success, failed
+    errorMessage: "text"       // 错误信息（如果有）
 }
 ```
 
 ### FileCleanupReports Collection (新增)
 ```javascript
 {
-    _id: "string",
-    reportDate: "datetime",      // 报告日期
+    _id: "text",
+    reportDate: "text",      // 报告日期
     totalFilesChecked: "number", // 检查的文件总数
     orphanFiles: "array",        // 孤儿文件列表
     deletedFiles: "array",       // 已删除的文件列表
-    cleanupStatus: "string",     // 清理状态：completed, failed, partial
+    cleanupStatus: "text",     // 清理状态：completed, failed, partial
     executionTime: "number",     // 执行时间（毫秒）
-    notes: "string"              // 备注
+    notes: "text"              // 备注
 }
 ```
 
@@ -443,11 +443,11 @@ Create complete form in AP Student Lightbox:
 
 #### Step 10.3: Database Schema Updates
 1. **Update Students Collection**
-   - Add `ehcpFileUrl` field (string)
-   - Add `ehcpFileName` field (string)
+   - Add `ehcpFileUrl` field (text)
+   - Add `ehcpFileName` field (text)
    - Add `ehcpFileSize` field (number)
-   - Add `ehcpUploadDate` field (datetime)
-   - Add `ehcpFileStatus` field (string)
+   - Add `ehcpUploadDate` field (text)
+   - Add `ehcpFileStatus` field (text)
 
 2. **Create FileActivityLogs Collection**
    - Set up audit trail for file operations
