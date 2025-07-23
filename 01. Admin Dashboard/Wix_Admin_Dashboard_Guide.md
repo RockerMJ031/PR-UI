@@ -34,63 +34,16 @@ This guide will help you create a comprehensive admin dashboard in Wix with the 
 ## Database Schema
 
 ### Students Collection
-```javascript
-{
-    _id: "text",
-    name: "text",
-    age: "number",
-    sendStatus: "text",
-    guardianName: "text",
-    guardianPhone: "text",
-    guardianEmail: "text",
-    medicalInfo: "text",
-    educationBackground: "text",
-    educationPlan: "text",
-    
-    // EHCP File Related Fields
-    ehcpFileUrl: "text",        // EHCP file URL
-    ehcpFileName: "text",      // Original filename
-    ehcpFileSize: "number",      // File size (bytes)
-    ehcpUploadDate: "text",  // Upload date
-    ehcpFileStatus: "text",    // File status: none, uploaded, verified, rejected
-    
-    isAP: "boolean",
-    status: "text",
-    dateAdded: "text",
-    lastActive: "text"
-}
-```
+- Contains all student information including personal details, guardian information, and EHCP file data
+- Includes fields for tracking student status and activity
 
 ### FileActivityLogs Collection (New)
-```javascript
-{
-    _id: "text",
-    studentId: "text",         // Associated student ID
-    fileName: "text",          // Filename
-    fileUrl: "text",           // File URL
-    action: "text",            // Action type: upload, access, delete, verify
-    actionBy: "text",          // Actor ID
-    actionDate: "text",      // Action timestamp
-    ipAddress: "text",         // IP address
-    userAgent: "text",         // User agent
-    result: "text",            // Operation result: success, failed
-    errorMessage: "text"       // Error message (if any)
-}
-```
+- Tracks all file-related activities for audit and security purposes
+- Records user actions, timestamps, and operation results
 
 ### FileCleanupReports Collection (New)
-```javascript
-{
-    _id: "text",
-    reportDate: "text",      // Report date
-    totalFilesChecked: "number", // Total files checked
-    orphanFiles: "array",        // Orphaned files list
-    deletedFiles: "array",       // Deleted files list
-    cleanupStatus: "text",     // Cleanup status: completed, failed, partial
-    executionTime: "number",     // Execution time (milliseconds)
-    notes: "text"              // Notes
-}
-```
+- Stores reports from file cleanup operations
+- Tracks orphaned files, deleted files, and cleanup status
 
 ## Required Wix Elements
 
@@ -437,13 +390,10 @@ Create complete form in AP Student Lightbox:
    - `uploadedFileName` - Display uploaded file name
 
 2. **Implement Upload Monitoring**
-   ```javascript
-   // File upload event handler
-   $w('#ehcpFileUpload').onChange((event) => {
-     const file = event.target.files[0];
-     validateAndUploadFile(file);
-   });
-   ```
+   - Add file upload event handler
+   - Implement file validation function
+   - Create upload progress tracking
+   - Add error handling for failed uploads
 
 #### Step 10.3: Database Schema Updates
 1. **Update Students Collection**
