@@ -406,6 +406,10 @@ Create complete form in AP Student Lightbox:
 - `educationPlanDropdown` - Education Plan
 - `ehcpFileUpload` - EHCP File Upload
 
+**Additional Information Section:**
+- `homeLessonsWithoutSupervisionDropdown` - Will your student(s) be accessing the lessons at home without adult supervision most of the time? (Yes/No)
+- `supportLongerThanFourWeeksDropdown` - Is Purple Ruler expected to support the learner longer than four weeks? (Yes/No)
+
 **Buttons:**
 - `registerAPStudentBtn` - Register
 - `cancelAPRegistrationBtn` - Cancel
@@ -452,6 +456,16 @@ Create complete form in AP Student Lightbox:
 2. **Create FileActivityLogs Collection**
    - Set up audit trail for file operations
    - Configure automatic logging
+
+#### Step 10.4: Additional Information Fields
+1. **Update Students Collection with Additional Fields**
+   - Add `homeLessonsWithoutSupervision` field (text) - Whether student can have home lessons without supervision (Yes/No)
+   - Add `supportLongerThanFourWeeks` field (text) - Whether student needs support longer than four weeks (Yes/No)
+
+2. **Configure Field Properties**
+   - Set appropriate field types and validations
+   - Configure search indexing for relevant fields
+   - Set up field permissions
 
 ### Phase 11: Responsive Design (45 minutes)
 

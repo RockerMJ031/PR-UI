@@ -278,6 +278,10 @@ function mapLarkToWixStudent(larkStudent) {
         ehcpUploadDate: fields.EHCPUploadDate ? new Date(fields.EHCPUploadDate) : null,
         ehcpFileStatus: fields.EHCPFileStatus || '',
         
+        // 额外问题字段 - Additional Information
+        homeLessonsWithoutSupervision: fields.HomeLessonsWithoutSupervision || '',
+        supportLongerThanFourWeeks: fields.SupportLongerThanFourWeeks || '',
+        
         // Lark 集成字段
         larkStudentId: fields.LarkStudentId || '',
         larkBaseRecordId: larkStudent.record_id,
@@ -334,6 +338,10 @@ function mapWixToLarkStudent(wixStudent) {
         EHCPFileSize: wixStudent.ehcpFileSize ? wixStudent.ehcpFileSize.toString() : '',
         EHCPUploadDate: wixStudent.ehcpUploadDate ? wixStudent.ehcpUploadDate.toISOString() : '',
         EHCPFileStatus: wixStudent.ehcpFileStatus || '',
+        
+        // 额外问题字段 - Additional Information
+        HomeLessonsWithoutSupervision: wixStudent.homeLessonsWithoutSupervision || '',
+        SupportLongerThanFourWeeks: wixStudent.supportLongerThanFourWeeks || '',
         
         // Wix 集成字段
         WixStudentId: wixStudent._id || '', // 保持向后兼容

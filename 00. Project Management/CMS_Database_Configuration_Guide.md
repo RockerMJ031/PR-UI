@@ -475,6 +475,10 @@ This document details the database collection configuration required for the tut
   counselorNotes: "text", // Counselor notes
   ehcpDocument: "text", // EHCP document URL
   
+  // Additional Information fields
+  homeLessonsWithoutSupervision: "text", // Whether student can have home lessons without supervision (Yes/No)
+  supportLongerThanFourWeeks: "text", // Whether student needs support longer than four weeks (Yes/No)
+  
   // Management and statistics fields
   currentAdmin: "text", // Current admin ID
   totalSessions: "number", // Total number of sessions

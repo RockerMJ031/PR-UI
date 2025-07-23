@@ -529,6 +529,10 @@ function processAPStudentRegistration() {
         ehcpUploadDate: ehcpFileData.uploadDate,
         ehcpFileStatus: ehcpFileData.status,
         
+        // 额外问题字段 - 更新为新的 Additional Information 字段
+        homeLessonsWithoutSupervision: $w('#homeLessonsWithoutSupervisionDropdown').value,
+        supportLongerThanFourWeeks: $w('#supportLongerThanFourWeeksDropdown').value,
+        
         // 学生类型和状态
         isAP: true,
         studentType: 'alternative',
@@ -662,6 +666,17 @@ function validateAPStudentData(data) {
         return false;
     }
     
+    // 验证额外问题字段
+    if (!data.homeLessonsWithoutSupervision) {
+        showErrorMessage('请回答是否可以在没有监督的情况下进行家庭课程');
+        return false;
+    }
+    
+    if (!data.supportLongerThanFourWeeks) {
+        showErrorMessage('请回答是否需要超过四周的支持');
+        return false;
+    }
+    
     return true;
 }
 
@@ -686,6 +701,11 @@ function clearAPStudentForm() {
     $w('#medicalInfoTextarea').value = '';
     $w('#educationBackgroundTextarea').value = '';
     $w('#subjectsDropdown').selectedIndex = 0;
+    
+    // 清空额外问题字段
+    $w('#homeLessonsWithoutSupervisionDropdown').selectedIndex = 0;
+    $w('#supportLongerThanFourWeeksDropdown').selectedIndex = 0;
+    
     $w('#apRegistrationMessage').hide();
     $w('#fileUploadMessage').hide();
 }

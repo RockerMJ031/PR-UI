@@ -641,7 +641,296 @@
                 grid-template-columns: 1fr;
             }
         }
+        
+        /* Excel-style checkbox dropdown styles */
+        .multi-select-container {
+            position: relative;
+            width: 100%;
+        }
+        
+        .excel-select-dropdown {
+            position: relative;
+            width: 100%;
+        }
+        
+        .excel-select-dropdown .dropdown-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .excel-select-dropdown .dropdown-btn:after {
+            content: '\25BC';
+            font-size: 0.8rem;
+        }
+        
+        .excel-select-dropdown .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .excel-select-dropdown .dropdown-content.show {
+            display: block;
+        }
+        
+        .excel-select-dropdown .dropdown-item {
+            padding: 8px 10px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .excel-select-dropdown .dropdown-item:hover {
+            background-color: rgba(102, 51, 153, 0.1);
+        }
+        
+        .excel-select-dropdown .dropdown-item input[type="checkbox"] {
+            margin-right: 10px;
+            width: 16px;
+            height: 16px;
+            vertical-align: middle;
+        }
+        
+        .excel-select-dropdown .selected-options {
+            margin-top: 5px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        
+        .excel-select-dropdown .selected-option {
+            background-color: var(--primary-light);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            font-size: 0.8rem;
+        }
+        
+        .excel-select-dropdown .selected-option .remove {
+            margin-left: 5px;
+            cursor: pointer;
+        }
+        
+        /* 保留原有的多选样式作为后备 */
+        .multi-select-container select[multiple] {
+            display: none; /* 隐藏原始的select元素 */
+        }
+        
+        .help-text {
+            display: block;
+            margin-top: 5px;
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
     </style>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 将所有多选下拉框转换为Excel样式
+        convertMultiSelectsToExcelStyle();
+    });
+    
+    // 将所有多选下拉框转换为Excel样式的函数
+    function convertMultiSelectsToExcelStyle() {
+        const multiSelects = document.querySelectorAll('.multi-select-container select[multiple]');
+        
+        multiSelects.forEach(select => {
+            // 创建Excel样式下拉框的容器
+            const container = document.createElement('div');
+            container.className = 'excel-select-dropdown';
+            
+            // 创建下拉按钮
+            const button = document.createElement('button');
+            button.className = 'dropdown-btn';
+            button.type = 'button';
+            button.textContent = 'Select options';
+            
+            // 创建下拉内容容器
+            const dropdownContent = document.createElement('div');
+            dropdownContent.className = 'dropdown-content';
+            
+            // 创建已选选项显示区域
+            const selectedOptions = document.createElement('div');
+            selectedOptions.className = 'selected-options';
+            
+            // 将原始select元素的选项添加到下拉内容中
+            Array.from(select.options).forEach(option => {
+                const item = document.createElement('div');
+                item.className = 'dropdown-item';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.value = option.value;
+                checkbox.id = 'excel-option-' + option.value;
+                
+                const label = document.createElement('label');
+                label.htmlFor = 'excel-option-' + option.value;
+                label.style.display = 'flex';
+                label.style.alignItems = 'center';
+                label.style.marginBottom = '0';
+                // 改进选项文本格式，确保代码和描述之间有适当的空格
+                const optionText = option.textContent;
+                const parts = optionText.split(' - ');
+                if (parts.length === 2) {
+                    // 如果文本格式为"CODE - Description"，确保有适当的空格
+                    label.textContent = parts[0] + ' - ' + parts[1];
+                } else {
+                    label.textContent = optionText;
+                }
+                
+                item.appendChild(checkbox);
+                item.appendChild(label);
+                
+                // 添加点击事件
+                item.addEventListener('click', function(e) {
+                    // 防止点击项目时关闭下拉菜单
+                    e.stopPropagation();
+                    
+                    // 切换复选框状态
+                    checkbox.checked = !checkbox.checked;
+                    
+                    // 更新已选选项
+                    updateSelectedOptions(select, selectedOptions, button);
+                    
+                    // 更新原始select的值
+                    Array.from(select.options).forEach(opt => {
+                        if (opt.value === checkbox.value) {
+                            opt.selected = checkbox.checked;
+                        }
+                    });
+                    
+                    // 触发change事件
+                    const event = new Event('change', { bubbles: true });
+                    select.dispatchEvent(event);
+                });
+                
+                dropdownContent.appendChild(item);
+            });
+            
+            // 添加点击事件以显示/隐藏下拉内容
+            button.addEventListener('click', function() {
+                dropdownContent.classList.toggle('show');
+            });
+            
+            // 点击页面其他地方时关闭下拉菜单
+            document.addEventListener('click', function(e) {
+                if (!container.contains(e.target)) {
+                    dropdownContent.classList.remove('show');
+                }
+            });
+            
+            // 将元素添加到容器中
+            container.appendChild(button);
+            container.appendChild(dropdownContent);
+            container.appendChild(selectedOptions);
+            
+            // 将容器插入到原始select元素之前
+            select.parentNode.insertBefore(container, select);
+            
+            // 隐藏原始select元素
+            select.style.display = 'none';
+            
+            // 如果select已经有选中的选项，更新显示
+            updateSelectedOptions(select, selectedOptions, button);
+        });
+    }
+    
+    // 更新已选选项的显示
+    function updateSelectedOptions(select, selectedOptionsContainer, button) {
+        // 清空已选选项容器
+        selectedOptionsContainer.innerHTML = '';
+        
+        // 获取所有选中的选项
+        const selectedOpts = Array.from(select.selectedOptions);
+        
+        // 更新按钮文本
+        if (selectedOpts.length > 0) {
+            button.textContent = selectedOpts.length + ' items selected';
+        } else {
+            button.textContent = 'Select options';
+        }
+        
+        // 为每个选中的选项创建标签
+        selectedOpts.forEach(option => {
+            const tag = document.createElement('div');
+            tag.className = 'selected-option';
+            // 改进选项文本格式，确保代码和描述之间有适当的空格
+            const optionText = option.textContent;
+            const parts = optionText.split(' - ');
+            if (parts.length === 2) {
+                // 如果文本格式为"CODE - Description"，确保有适当的空格
+                tag.textContent = parts[0] + ' - ' + parts[1];
+            } else {
+                tag.textContent = optionText;
+            }
+            
+            // 添加删除按钮
+            const removeBtn = document.createElement('span');
+            removeBtn.className = 'remove';
+            removeBtn.innerHTML = '&times;';
+            removeBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                
+                // 更新复选框状态
+                const checkbox = document.getElementById('excel-option-' + option.value);
+                if (checkbox) checkbox.checked = false;
+                
+                // 更新select元素
+                option.selected = false;
+                
+                // 移除标签
+                tag.remove();
+                
+                // 更新按钮文本
+                const remainingOpts = Array.from(select.selectedOptions);
+                if (remainingOpts.length > 0) {
+                    button.textContent = remainingOpts.length + ' items selected';
+                } else {
+                    button.textContent = 'Select options';
+                }
+                
+                // 触发change事件
+                const event = new Event('change', { bubbles: true });
+                select.dispatchEvent(event);
+            });
+            
+            tag.appendChild(removeBtn);
+            selectedOptionsContainer.appendChild(tag);
+        });
+    }
+    
+    // 修改registerAPStudent函数以适应新的下拉菜单
+    const originalRegisterAPStudent = window.registerAPStudent;
+    window.registerAPStudent = function() {
+        // 确保原始函数存在
+        if (typeof originalRegisterAPStudent !== 'function') {
+            console.error('原始registerAPStudent函数不存在');
+            return;
+        }
+        
+        // 调用原始函数
+        originalRegisterAPStudent();
+    };
+    </script>
 </head>
 <body>
     <div class="container">
@@ -844,10 +1133,10 @@
                             <div class="pricing-amount">£135</div>
                             <div class="pricing-period">per week per student</div>
                             <ul class="pricing-features">
-                                <li>Purple Ruler Academy online school</li>
-                                <li>Individual tutoring sessions</li>
-                                <li>Core subjects support</li>
+                                <li>Purple Ruler Academy 15 Hours A Week</li>
+                                <li>English, Maths, and Science</li>
                                 <li>Personalized learning plans</li>
+                                <li>Group sizes up to 6 from schools across the country</li>
                                 <li>Progress tracking</li>
                                 <li>Regular assessments</li>
                             </ul>
@@ -868,12 +1157,10 @@
                             <div class="pricing-amount">£162</div>
                             <div class="pricing-period">per week per student</div>
                             <ul class="pricing-features">
-                                <li>Purple Ruler Academy online school</li>
-                                <li>Comprehensive tutoring program</li>
-                                <li>All core subjects</li>
-                                <li>PSHE and Careers guidance</li>
-                                <li>Physical Education support</li>
-                                <li>Art tutoring sessions</li>
+                                <li>Purple Ruler Academy 18 Hours A Week</li>
+                                <li>English, Maths, and Science, PE, Art, Electives, Languages, Careers Advice and Guidance</li>
+                                <li>Personalized learning plans</li>
+                                <li>Group sizes up to 6 from schools across the country</li>
                             </ul>
                         </div>
                         <div class="curriculum-section">
@@ -892,12 +1179,12 @@
                             <div class="pricing-amount">£207</div>
                             <div class="pricing-period">per week per student</div>
                             <ul class="pricing-features">
+                                <li>18 Hours per week per student + 1 Hour a week of Therapy or Counselling</li>
                                 <li>Purple Ruler Academy online school</li>
                                 <li>Complete tutoring package</li>
                                 <li>All academic subjects</li>
                                 <li>Therapeutic support sessions</li>
-                                <li>Mental health resources</li>
-                                <li>Specialized interventions</li>
+                                <li>Group sizes up to 6 from schools across the country</li>
                             </ul>
                         </div>
                         <div class="curriculum-section">
@@ -918,12 +1205,10 @@
                             <div class="pricing-period">per hour</div>
                             <div class="student-capacity">1-6 students per session</div>
                             <ul class="pricing-features">
-                                <li>Uses your school's curriculum</li>
-                                <li>Student reintegration support</li>
-                                <li>Curriculum alignment support</li>
-                                <li>Teacher training resources</li>
-                                <li>Progress monitoring tools</li>
-                                <li>Flexible group sessions</li>
+                                <li>1-6 students per session</li>
+                                <li>Built around your school's curriculum</li>
+                                <li>Mapped to your Schemes of Study</li>
+                                <li>Your Bespoke Schedule</li>
                             </ul>
                         </div>
                         <div class="curriculum-section">
@@ -977,12 +1262,12 @@
                             <label>👤 Student Basic Information</label>
                             <input type="text" placeholder="First Name" class="form-input" title="👤 Student's first name" required>
                             <input type="text" placeholder="Last Name" class="form-input" title="👤 Student's last name" required>
-                            <div class="form-input-label">🎂 Date of Birth</div>
-                            <input type="date" placeholder="Date of Birth" class="form-input" title="🎂 Student's date of birth" required>
+                            <div class="form-input-label">🎂 Student's Date of Birth</div>
+                            <input type="date" placeholder="Student's Date of Birth" class="form-input" title="🎂 Student's date of birth" required>
+                            <div class="form-input-label">📧 Student's Email Address</div>
                             <input type="email" placeholder="Email Address" class="form-input" title="📧 Student's email address" required>
-                            <input type="tel" placeholder="Contact Phone (Optional)" class="form-input" title="📞 Contact phone number">
-                            <div class="form-input-label">📚 Class Start Date (When lessons begin)</div>
-                            <input type="date" placeholder="Class Start Date" class="form-input" title="📚 Date when student's first lesson starts" required>
+                            <div class="form-input-label">📚 When Do You Want This Student To Start Learning</div>
+                            <input type="date" placeholder="Start Learning Date" class="form-input" title="📚 Date when student starts to learn" required>
                         </div>
                         
                         <div class="form-group">
@@ -995,7 +1280,23 @@
                                 <option value="AS-STY-Y7-DG-MATHS">AS-STY-Y7-DG-MATHS</option>
                             </select>
                             <input type="text" placeholder="Current Grade/Level" class="form-input">
-                            <input type="text" placeholder="SEND Code" class="form-input">
+                            <div class="form-input-label">SEND Status</div>
+                            <div class="multi-select-container">
+                                <select class="form-select" name="sendCode[]" multiple>
+                                    <option value="SpLD">SpLD - Specific Learning Difficulties</option>
+                                    <option value="SLCN">SLCN - Speech, Language and Communication Needs</option>
+                                    <option value="SEMH">SEMH - Social, Emotional and Mental Health</option>
+                                    <option value="ASD">ASD - Autistic Spectrum Disorder</option>
+                                    <option value="VI">VI - Visual Impairment</option>
+                                    <option value="HI">HI - Hearing Impairment</option>
+                                    <option value="MSI">MSI - Multisensory Impairment</option>
+                                    <option value="PD">PD - Physical Disability</option>
+                                    <option value="NSA">NSA - SEN support but no specialist assessment of type need</option>
+                                    <option value="OTH">OTH - Other Difficulty/Disorder</option>
+                                    <option value="DS">DS - Down Syndrome</option>
+                                </select>
+                                <!-- 删除帮助文本 -->
+                            </div>
                             <select class="form-select">
                                 <option value="">Select Exam Board</option>
                                 <option value="AQA">AQA</option>
@@ -1124,29 +1425,43 @@
                         <input type="text" id="studentLastName" name="studentLastName" required title="Student's last name">
                     </div>
                     <div class="form-group">
-                        <label for="studentDateOfBirth">🎂 Date of Birth *</label>
+                        <label for="studentDateOfBirth">🎂 Student's Date of Birth *</label>
                         <input type="date" id="studentDateOfBirth" name="studentDateOfBirth" required title="Student's date of birth">
                     </div>
                     <div class="form-group">
-                        <label for="classStartDate">📚 Class Start Date (First Lesson) *</label>
-                        <input type="date" id="classStartDate" name="classStartDate" required title="Date when student's first lesson starts">
+                        <label for="studentEmail">📧 Student's Email Address *</label>
+                        <input type="email" id="studentEmail" name="studentEmail" required title="Student's email address">
+                    </div>
+                    <div class="form-group">
+                        <label for="classStartDate">📚 When Do You Want This Student To Start Learning *</label>
+                        <input type="date" id="classStartDate" name="classStartDate" required title="Date when student starts to learn">
                     </div>
                     <div class="form-group">
                         <label for="sendStatus">SEND Status *</label>
-                        <select id="sendStatus" name="sendStatus" required>
-                            <option value="">Select SEND Status</option>
-                            <option value="none">No SEND</option>
-                            <option value="support">SEN Support</option>
-                            <option value="ehcp">EHCP</option>
-                        </select>
+                        <div class="multi-select-container">
+                            <select id="sendStatus" name="sendStatus[]" multiple required>
+                                <option value="SpLD">SpLD - Specific Learning Difficulties</option>
+                                <option value="SLCN">SLCN - Speech, Language and Communication Needs</option>
+                                <option value="SEMH">SEMH - Social, Emotional and Mental Health</option>
+                                <option value="ASD">ASD - Autistic Spectrum Disorder</option>
+                                <option value="VI">VI - Visual Impairment</option>
+                                <option value="HI">HI - Hearing Impairment</option>
+                                <option value="MSI">MSI - Multisensory Impairment</option>
+                                <option value="PD">PD - Physical Disability</option>
+                                <option value="NSA">NSA - SEN support but no specialist assessment of type need</option>
+                                <option value="OTH">OTH - Other Difficulty/Disorder</option>
+                                <option value="DS">DS - Down Syndrome</option>
+                            </select>
+                            <!-- 删除中文提示文本 -->
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label for="ehcpFile">EHCP Document Upload</label>
+                        <label for="ehcpFile">SEND Document Upload</label>
                         <div class="file-upload-container">
                             <input type="file" id="ehcpFile" name="ehcpFile" accept=".pdf,.doc,.docx,.txt" class="file-input">
                             <label for="ehcpFile" class="file-upload-label">
                                 <i class="fas fa-cloud-upload-alt"></i>
-                                <span class="file-upload-text">Choose EHCP document or drag and drop</span>
+                                <span class="file-upload-text">Choose SEND document or drag and drop</span>
                             </label>
                             <div class="file-upload-info">
                                 <small>Supported formats: PDF, DOC, DOCX, TXT (Max 10MB)</small>
@@ -1154,8 +1469,8 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="ehcpDetails">EHCP Details</label>
-                        <textarea id="ehcpDetails" name="ehcpDetails" placeholder="Please provide EHCP details if applicable, including specific needs and provisions"></textarea>
+                        <label for="ehcpDetails">SEND Details</label>
+                        <textarea id="ehcpDetails" name="ehcpDetails" placeholder="Please provide SEND details if applicable, including specific needs and provisions"></textarea>
                     </div>
                     <div class="form-group">
                         <label for="caseworkerName">Caseworker Name</label>
@@ -1207,6 +1522,31 @@
                             <option value="all-subjects">All Subjects + Therapy</option>
                             <option value="blueprint">Purple Ruler Blueprint</option>
                         </select>
+                    </div>
+                </div>
+                
+                <!-- Additional Questions Section -->
+                <div class="additional-questions-section">
+                    <h3>Additional Information</h3>
+                    <p class="modal-description">Please provide the following information to help us better understand the student's needs.</p>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="homeLessonsWithoutSupervision">Will your student(s) be accessing the lessons at home without adult supervision most of the time?</label>
+                            <select id="homeLessonsWithoutSupervision" name="homeLessonsWithoutSupervision">
+                                <option value="">Please select</option>
+                                <option value="yes">Yes</option>
+                                <option value="no">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="supportLongerThanFourWeeks">Is Purple Ruler expected to support the learner longer than four weeks?</label>
+                            <select id="supportLongerThanFourWeeks" name="supportLongerThanFourWeeks">
+                                <option value="">Please select</option>
+                                <option value="yes">Yes</option>
+                                <option value="no">No</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 
@@ -1740,24 +2080,104 @@
         function closeAPStudentModal() {
             document.getElementById('apStudentModal').style.display = 'none';
             // Reset form
-            document.getElementById('apStudentModal').querySelectorAll('input, select, textarea').forEach(field => {
+            document.getElementById('apStudentModal').querySelectorAll('input, textarea').forEach(field => {
                 field.value = '';
+            });
+            
+            // 重置普通下拉菜单
+            document.getElementById('apStudentModal').querySelectorAll('select:not([multiple])').forEach(select => {
+                select.selectedIndex = 0;
+            });
+            
+            // 重置多选下拉菜单
+            document.getElementById('apStudentModal').querySelectorAll('select[multiple]').forEach(select => {
+                Array.from(select.options).forEach(option => {
+                    option.selected = false;
+                });
             });
         }
         
         function registerAPStudent() {
-            const studentName = document.getElementById('studentName').value;
+            // 获取基本信息
+            const studentFirstName = document.getElementById('studentFirstName').value;
+            const studentLastName = document.getElementById('studentLastName').value;
+            const studentName = studentFirstName + (studentLastName ? ' ' + studentLastName : '');
+            const studentEmail = document.getElementById('studentEmail').value;
             const selectedPlan = document.getElementById('selectedPlan').value;
             
-            if (!studentName || !selectedPlan) {
+            // 获取多选的 SEND Status 值
+            const sendStatusSelect = document.getElementById('sendStatus');
+            const selectedSendStatus = Array.from(sendStatusSelect.selectedOptions).map(option => option.value);
+            
+            // 获取额外信息
+            const homeLessonsWithoutSupervision = document.getElementById('homeLessonsWithoutSupervision').value;
+            const supportLongerThanFourWeeks = document.getElementById('supportLongerThanFourWeeks').value;
+            
+            // 必填字段验证
+            if (!studentFirstName || !studentLastName || !studentEmail || !selectedPlan || selectedSendStatus.length === 0) {
                 alert('Please fill in all required fields');
                 return;
             }
             
+            // 额外验证不再需要
+            
+            // 更新AP学生计数
             apStudentCount++;
             updateAPStudentCount();
             
-            alert(`AP Student ${studentName} registered successfully with ${getPlanDisplayName(selectedPlan)} plan!`);
+            // 将选中的 SEND Status 转换为可读文本，并确保格式美观
+            const sendStatusOptions = Array.from(sendStatusSelect.options).filter(opt => selectedSendStatus.includes(opt.value));
+            const formattedOptions = sendStatusOptions.map(opt => {
+                const parts = opt.textContent.split(' - ');
+                if (parts.length === 2) {
+                    return parts[0] + ' - ' + parts[1];
+                }
+                return opt.textContent;
+            });
+            const sendStatusText = formattedOptions.join(', ');
+            
+            // 获取 EHCP 文件信息
+            const ehcpFile = document.getElementById('ehcpFile').files[0];
+            let ehcpFileData = {
+                url: '',
+                fileName: '',
+                fileSize: 0,
+                uploadDate: null,
+                status: 'none'
+            };
+            
+            if (ehcpFile) {
+                ehcpFileData = {
+                    url: URL.createObjectURL(ehcpFile), // 在实际应用中，这会是上传后的URL
+                    fileName: ehcpFile.name,
+                    fileSize: ehcpFile.size,
+                    uploadDate: new Date(),
+                    status: 'uploaded'
+                };
+            }
+            
+            // 在实际应用中，你会将这些数据发送到后端
+            console.log('Registering AP Student:', {
+                // 基本信息
+                firstName: studentFirstName,
+                lastName: studentLastName,
+                email: studentEmail,
+                plan: selectedPlan,
+                sendStatus: selectedSendStatus,
+                
+                // EHCP 文件信息
+                ehcpDocument: ehcpFileData.url,
+                ehcpFileName: ehcpFileData.fileName,
+                ehcpFileSize: ehcpFileData.fileSize,
+                ehcpUploadDate: ehcpFileData.uploadDate,
+                ehcpFileStatus: ehcpFileData.status,
+                
+                // 额外信息
+                homeLessonsWithoutSupervision: homeLessonsWithoutSupervision,
+                supportLongerThanFourWeeks: supportLongerThanFourWeeks
+            });
+            
+            alert(`AP Student ${studentFirstName} ${studentLastName} registered successfully with ${getPlanDisplayName(selectedPlan)} plan!\nSEND Status: ${sendStatusText}`);
             closeAPStudentModal();
         }
         
@@ -2350,7 +2770,8 @@
             min-height: 80px;
         }
 
-        .plan-selection-section {
+        .plan-selection-section,
+        .additional-questions-section {
             background: linear-gradient(135deg, #f8f9ff, #fff);
             padding: 25px;
             border-radius: 12px;
@@ -2358,10 +2779,33 @@
             margin: 25px 0;
         }
 
-        .plan-selection-section h3 {
+        .plan-selection-section h3,
+        .additional-questions-section h3 {
             color: var(--primary-color);
             margin-bottom: 15px;
             font-size: 1.2rem;
+        }
+        
+        /* Multi-select container styles */
+        .multi-select-container {
+            position: relative;
+        }
+        
+        .multi-select-container select[multiple] {
+            min-height: 120px;
+            padding: 8px;
+        }
+        
+        .multi-select-container select[multiple] option {
+            padding: 6px 8px;
+            margin-bottom: 2px;
+            border-radius: 3px;
+        }
+        
+        .multi-select-container select[multiple] option:checked {
+            background-color: rgba(102, 51, 153, 0.1);
+            color: var(--primary-color);
+            font-weight: 500;
         }
 
         .form-actions {
