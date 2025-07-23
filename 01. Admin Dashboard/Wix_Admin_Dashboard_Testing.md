@@ -73,11 +73,12 @@ This document outlines the comprehensive testing strategy for the Wix Admin Dash
 **Steps:**
 1. Open AP student registration lightbox
 2. Fill all sections (student, guardian, other info)
-3. Upload EHCP file
-4. Submit form
-5. Verify all data is saved correctly
+3. Select values for additional information fields (homeLessonsWithoutSupervision, supportLongerThanFourWeeks)
+4. Upload EHCP file
+5. Submit form
+6. Verify all data is saved correctly
 
-**Expected Result:** Complete registration successful, file uploaded, data saved
+**Expected Result:** Complete registration successful, file uploaded, additional information saved, data saved
 **Pass/Fail:** ___
 
 #### Test Case 6: Form Validation
@@ -87,8 +88,24 @@ This document outlines the comprehensive testing strategy for the Wix Admin Dash
 2. Test email format validation
 3. Test phone number format validation
 4. Test file upload restrictions
+5. Test additional information fields validation (homeLessonsWithoutSupervision, supportLongerThanFourWeeks)
 
 **Expected Result:** Validation errors shown, invalid submissions prevented
+**Pass/Fail:** ___
+
+#### Test Case 6a: Additional Information Fields Validation
+**Objective:** Test validation of AP student additional information fields
+**Steps:**
+1. Open AP student registration lightbox
+2. Fill all required fields except additional information fields
+3. Try to submit the form without selecting values for homeLessonsWithoutSupervision and supportLongerThanFourWeeks
+4. Verify error messages appear for these fields
+5. Select values for these fields and submit again
+
+**Expected Result:** 
+- Form submission prevented when additional information fields are empty
+- Clear error messages shown for each empty field
+- Form submits successfully when all fields are filled
 **Pass/Fail:** ___
 
 ### UI Testing
@@ -170,8 +187,26 @@ This document outlines the comprehensive testing strategy for the Wix Admin Dash
 2. Check if Lark notification is sent
 3. Verify notification content
 4. Test error handling for failed notifications
+5. Verify additional information fields (homeLessonsWithoutSupervision, supportLongerThanFourWeeks) are included in notifications
 
-**Expected Result:** Notifications sent successfully, content accurate
+**Expected Result:** Notifications sent successfully, content accurate, additional information included
+**Pass/Fail:** ___
+
+#### Test Case 13a: Lark Data Synchronization
+**Objective:** Test synchronization of additional information fields with Lark
+**Steps:**
+1. Register AP student with specific values for additional information fields
+2. Verify data is synchronized to Lark Base
+3. Update additional information fields in Wix
+4. Verify changes are synchronized to Lark
+5. Update additional information fields in Lark
+6. Verify changes are synchronized back to Wix
+
+**Expected Result:**
+- Additional information fields correctly synchronized to Lark
+- Changes in Wix reflected in Lark
+- Changes in Lark reflected in Wix
+- Data consistency maintained between systems
 **Pass/Fail:** ___
 
 #### Test Case 14: EHCP File Upload
@@ -555,7 +590,9 @@ This document outlines the comprehensive testing strategy for the Wix Admin Dash
 
 #### Pre-Launch Testing
 - [ ] All forms validate correctly
+- [ ] Additional information fields (homeLessonsWithoutSupervision, supportLongerThanFourWeeks) validate correctly
 - [ ] Database operations work properly
+- [ ] Additional information fields save to database correctly
 - [ ] Lightboxes open and close correctly
 - [ ] Navigation functions properly
 - [ ] Statistics display accurately
@@ -563,6 +600,7 @@ This document outlines the comprehensive testing strategy for the Wix Admin Dash
 - [ ] Tablet layout is optimized
 - [ ] Desktop layout is perfect
 - [ ] Lark integration works
+- [ ] Additional information fields sync with Lark correctly
 - [ ] File uploads function correctly
 - [ ] Error handling is implemented
 - [ ] Performance is acceptable
@@ -765,6 +803,7 @@ This document outlines the comprehensive testing strategy for the Wix Admin Dash
 6. Verify Document field contains file URL
 7. Test file accessibility through URL
 8. Check file metadata storage
+9. Verify additional information fields (homeLessonsWithoutSupervision, supportLongerThanFourWeeks) are saved correctly
 
 **Expected Result:**
 - All file metadata saved correctly
@@ -772,6 +811,26 @@ This document outlines the comprehensive testing strategy for the Wix Admin Dash
 - Data relationships maintained
 - Document field properly populated
 - File metadata complete and accurate
+- Additional information fields saved with correct values
+
+**Pass/Fail:** ___
+
+#### Test Case I1a: Additional Information Database Integration
+**Objective:** Verify additional information fields integration with database
+**Steps:**
+1. Complete AP student registration with specific values for homeLessonsWithoutSupervision and supportLongerThanFourWeeks
+2. Query database for student record
+3. Verify additional information fields are populated with correct values
+4. Update these fields through the edit form
+5. Verify changes are saved to database
+6. Test filtering and searching based on these fields
+
+**Expected Result:**
+- Additional information fields saved correctly in database
+- Field values match form input
+- Updates to fields reflected in database
+- Fields can be used for filtering and searching
+- Data integrity maintained
 
 **Pass/Fail:** ___
 
