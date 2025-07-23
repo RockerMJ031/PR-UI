@@ -138,10 +138,15 @@ This guide will help you create a comprehensive admin dashboard in Wix with the 
 ### Phase 3: Navigation Setup (30 minutes)
 
 #### Step 3.1: Add User Info Area
-1. **At top of sidebar add:**
-   - **User Avatar Image:** `userAvatar` (60x60px, circular)
-   - **Username Text:** `userName` (Font: 16px, bold)
-   - **User Role Text:** `userRole` (Font: 14px, color: #6c757d)
+1. **Click:** Add Elements → User → Member Profile
+2. **Configure Member Profile:**
+   - **Position:** Top of sidebar
+   - **Layout:** Vertical (avatar above text)
+   - **Avatar Size:** 60x60px, circular
+   - **Display Fields:**
+     - Username (Font: 16px, bold)
+     - Role (Font: 14px, color: #6c757d)
+   - **Connect to:** Current logged-in user
 
 #### Step 3.2: Add Navigation Buttons
 1. **Below user info add navigation buttons:**
