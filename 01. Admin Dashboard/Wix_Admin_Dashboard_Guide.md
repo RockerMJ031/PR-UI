@@ -19,17 +19,16 @@ This guide will help you create a comprehensive admin dashboard in Wix with the 
 - **Pricing Plans**: Four-tier curriculum selection for AP students
 - **Lark Integration**: External form integration for course enrollment and tickets
 
-**Important Note:** The original HTML file (`admin-dashboard.html`) uses traditional HTML modals and CSS/JavaScript. In Wix, these popups will be implemented using **Wix Lightbox components** instead of custom HTML modals. This provides better integration with Wix's responsive design system and built-in functionality.
+**Important Note:** In Wix, popups will be implemented using **Wix Lightbox components** instead of traditional HTML modals. This provides better integration with Wix's responsive design system and built-in functionality.
 
 **Key Implementation Differences:**
-- HTML `<div class="modal">` → Wix **Lightbox** element
-- CSS modal styles → Wix built-in lightbox styles and custom modifications
-- JavaScript `modal.style.display = 'block'` → Wix `$w('#lightboxId').show()`
-- JavaScript `modal.style.display = 'none'` → Wix `$w('#lightboxId').hide()`
+- Use Wix **Lightbox** elements for all popup windows
+- Apply Wix built-in lightbox styles and custom modifications
+- Configure lightbox show/hide behavior through Wix element properties
 
 **Estimated Time:** 4-6 hours
 **Difficulty Level:** Intermediate
-**Required Wix Plan:** Business and eCommerce (for database functionality)
+**Required Wix Plan:** Business and eCommerce (for CMS database functionality)
 
 ## Database Schema
 
@@ -38,12 +37,12 @@ This guide will help you create a comprehensive admin dashboard in Wix with the 
 - Includes fields for tracking student status and activity
 
 ### FileActivityLogs Collection (New)
-- Tracks all file-related activities for audit and security purposes
-- Records user actions, timestamps, and operation results
+- Tracks all file-related activities for monitoring purposes
+- Records user actions and timestamps
 
 ### FileCleanupReports Collection (New)
 - Stores reports from file cleanup operations
-- Tracks orphaned files, deleted files, and cleanup status
+- Tracks file management status
 
 ## Required Wix Elements
 
@@ -329,6 +328,30 @@ Create three pricing plan cards, each containing:
 3. **Title:** "AP Student Registration"
 4. **Content:** Complete AP student registration form
 
+#### Step 8.4: Remove AP Student Modal
+**New Feature:** Remove AP Student functionality
+1. **Add:** Elements → Popups & Lightboxes → Lightbox
+2. **Lightbox ID:** `removeAPStudentLightbox`
+3. **Title:** "Remove AP Student"
+4. **Content:**
+   - Header with title and close button
+   - Instructions text: "Select a student to remove:"
+   - Warning text: "Click on any student below to remove them from the AP program. This action cannot be undone."
+   - Dynamic student list container: `apStudentsListContainer`
+   - Each student item should include:
+     - Student name and details
+     - Status badge (Active/Paused)
+     - Remove button with confirmation
+
+**Student List Item Structure:**
+- Container: `studentItemContainer`
+- Student Info Section:
+  - Student Name: `studentNameText` (Font: 16px, bold)
+  - Student Details: `studentDetailsText` (Grade | Course, Font: 14px, color: #666)
+- Student Actions Section:
+  - Status Badge: `statusBadge` (Active: green, Paused: orange)
+  - Remove Button: `removeStudentButton` (Red background, white text)
+
 ### Phase 9: Form Creation (90 minutes)
 
 #### Step 9.1: Add Student Form
@@ -372,47 +395,139 @@ Create complete form in AP Student Lightbox:
 - `registerAPStudentBtn` - Register
 - `cancelAPRegistrationBtn` - Cancel
 
-### Phase 10: EHCP File Upload Implementation (60 minutes)
+### Phase 10: Remove AP Student Setup (30 minutes)
 
-#### Step 10.1: Backend Security Setup
-1. **Create Backend Module**
-   - Create `backend/fileVerification.jsw`
-   - Add file type validation functions
-   - Implement secure file access controls
-   - Set up audit logging
+#### Step 10.1: Prepare Student Data Structure
+**Set up data connection for AP students:**
 
-2. **Configure File Upload Security**
+**Note:** The system will use common UK student names to reflect the target demographic.
+
+1. **Connect to Database Collection:**
+   - Go to Database Manager in Wix
+   - Create or connect to "Students" collection
+   - Ensure fields include: id, name, grade, course, status
+   - Add sample data with UK student names:
+     - Oliver Thompson, Emily Johnson, Harry Williams, Sophie Brown
+     - Jack Davies, Charlotte Wilson, George Evans, Amelia Taylor
+     - Thomas Anderson, Isabella Clark
+
+#### Step 10.2: Configure Remove AP Student Button
+**Set up the Remove AP Student button functionality:**
+
+1. **Select the Remove AP Student Button:**
+   - Click on the "Remove AP Student" button in the AP Student card
+   - Go to Properties Panel → Events
+   - Add onClick event
+   - Name the event: `removeAPStudentBtn_click`
+
+2. **Button Behavior Setup:**
+   - The button should open the Remove AP Student lightbox
+   - The lightbox should populate with current AP students from database
+   - Each student should display with their information and status
+
+#### Step 10.3: Design Student List Display
+**Configure how students appear in the removal modal:**
+
+1. **Student List Container:**
+   - Add a container element inside the lightbox
+   - Name it: `apStudentsListContainer`
+   - Set it to display students in a vertical list format
+
+2. **Student Item Layout:**
+   - Each student should display in a card format
+   - Left side: Student name and details (Grade | Course)
+   - Right side: Status badge and Remove button
+   - Use consistent spacing and styling
+
+3. **Status Badge Styling:**
+   - Active status: Green background (#28a745)
+   - Paused status: Orange background (#ffc107)
+   - White text, small font size, rounded corners
+
+4. **Remove Button Styling:**
+   - Red background (#dc3545)
+   - White text
+   - Small size, rounded corners
+   - "Remove" text label
+
+#### Step 10.4: Set Up Removal Confirmation
+**Configure the student removal process:**
+
+1. **Confirmation Dialog:**
+   - When Remove button is clicked, show confirmation message
+   - Message should include student name
+   - Include warning that action cannot be undone
+   - Provide Cancel and Confirm options
+
+2. **Post-Removal Actions:**
+   - Remove student from the displayed list
+   - Update the AP student counter
+   - Show success message with student name
+   - If no students remain, close the modal automatically
+
+#### Step 10.5: Configure Student Count Updates
+**Set up automatic counter updates:**
+
+1. **AP Student Counter:**
+   - Connect the counter display to show current number of AP students
+   - Update automatically when students are removed
+   - Display should reflect real-time changes
+
+2. **Statistics Integration:**
+   - Ensure removal updates the main statistics cards
+   - Total students count should decrease accordingly
+   - Active/Paused counts should update based on removed student status
+
+#### Step 10.6: Modal Close Functionality
+**Configure lightbox closing behavior:**
+
+1. **Close Button Setup:**
+   - Add close button (X) in modal header
+   - Configure to hide the lightbox when clicked
+   - Ensure modal can be closed without making changes
+
+2. **Auto-Close Conditions:**
+   - Modal should close automatically when all students are removed
+   - Show final confirmation message before closing
+
+### Phase 11: EHCP File Upload Implementation (60 minutes)
+
+#### Step 11.1: File Upload Security Configuration
+1. **Configure File Upload Settings in Wix**
+   - Go to Database Manager → File Upload Settings
    - Set allowed file types: PDF, DOC, DOCX
    - Set maximum file size: 10MB
-   - Enable virus scanning (if available)
-   - Configure access permissions
+   - Enable file validation in upload element properties
+   - Configure user access permissions for file uploads
 
-#### Step 10.2: Frontend File Upload Integration
-1. **Add File Upload Elements**
-   - `ehcpFileUpload` - Upload button in AP student form
-   - `fileUploadStatus` - Status indicator
-   - `fileUploadProgress` - Progress bar
-   - `uploadedFileName` - Display uploaded file name
+#### Step 11.2: File Upload Elements Setup
+1. **Add File Upload Elements to AP Student Form**
+   - Add Upload Button: `ehcpFileUpload`
+     - Position: Below education plan dropdown
+     - Label: "Upload EHCP File"
+     - Accepted file types: PDF, DOC, DOCX
+   - Add Status Text: `fileUploadStatus`
+     - Position: Below upload button
+     - Initial text: "No file selected"
+   - Add Progress Bar: `fileUploadProgress`
+     - Position: Below status text
+     - Initially hidden
+   - Add File Name Display: `uploadedFileName`
+     - Position: Below progress bar
+     - Initially hidden
 
-2. **Implement Upload Monitoring**
-   - Add file upload event handler
-   - Implement file validation function
-   - Create upload progress tracking
-   - Add error handling for failed uploads
+#### Step 11.3: Database Collection Updates
+1. **Update Students Collection Fields**
+   - Go to Database Manager → Students Collection
+   - Add new fields:
+     - `ehcpFileUrl` (URL field)
+     - `ehcpFileName` (Text field)
+     - `ehcpFileSize` (Number field)
+     - `ehcpUploadDate` (Date field)
+     - `ehcpFileStatus` (Text field)
+   - Set field permissions to "Admin only"
 
-#### Step 10.3: Database Schema Updates
-1. **Update Students Collection**
-   - Add `ehcpFileUrl` field (text)
-   - Add `ehcpFileName` field (text)
-   - Add `ehcpFileSize` field (number)
-   - Add `ehcpUploadDate` field (text)
-   - Add `ehcpFileStatus` field (text)
-
-2. **Create FileActivityLogs Collection**
-   - Set up audit trail for file operations
-   - Configure automatic logging
-
-#### Step 10.4: Additional Information Fields
+#### Step 11.4: Additional Information Fields
 1. **Update Students Collection with Additional Fields**
    - Add `homeLessonsWithoutSupervision` field (text) - Whether student can have home lessons without supervision (Yes/No)
    - Add `supportLongerThanFourWeeks` field (text) - Whether student needs support longer than four weeks (Yes/No)
@@ -422,16 +537,16 @@ Create complete form in AP Student Lightbox:
    - Configure search indexing for relevant fields
    - Set up field permissions
 
-### Phase 11: Responsive Design (45 minutes)
+### Phase 12: Responsive Design (45 minutes)
 
-#### Step 11.1: Mobile Layout
+#### Step 12.1: Mobile Layout
 1. **Switch to mobile view**
 2. **Hide sidebar**
 3. **Adjust grid to single column**
 4. **Adjust font sizes and spacing**
 5. **Optimize file upload for mobile**
 
-#### Step 11.2: Tablet Layout
+#### Step 12.2: Tablet Layout
 1. **Switch to tablet view**
 2. **Adjust sidebar width to 200px**
 3. **Adjust grid to 2 columns**
@@ -440,9 +555,42 @@ Create complete form in AP Student Lightbox:
 
 ## Deployment and Maintenance
 
-### Step 12: EHCP File Management Testing (30 minutes)
+### Step 13: Remove AP Student Testing (20 minutes)
 
-#### Step 12.1: File Upload Testing
+#### Step 13.1: Remove AP Student Modal Testing
+1. **Test Modal Display**
+   - Click "Remove AP Student" button
+   - Verify lightbox opens correctly
+   - Check student list displays with proper formatting
+   - Verify status badges show correct colors (Active: green, Paused: orange)
+
+2. **Test Student List Functionality**
+   - Verify all 10 sample students are displayed
+   - Check student information is correctly formatted (Name, Grade | Course)
+   - Verify Remove buttons are functional
+   - Test modal close functionality
+
+#### Step 13.2: Student Removal Process Testing
+1. **Test Removal Confirmation**
+   - Click Remove button for any student
+   - Verify confirmation dialog appears with correct student name
+   - Test "Cancel" option (student should remain)
+   - Test "OK" option (student should be removed)
+
+2. **Test Post-Removal Updates**
+   - Verify student is removed from the list
+   - Check AP student count is updated correctly
+   - Verify success message is displayed
+   - Test removing all students (modal should close automatically)
+
+3. **Test Edge Cases**
+   - Test removing the last student
+   - Verify "All AP students have been removed" message
+   - Test reopening modal after all students removed
+
+### Step 14: EHCP File Management Testing (30 minutes)
+
+#### Step 14.1: File Upload Testing
 1. **Test Valid File Types**
    - Upload PDF files
    - Upload DOC/DOCX files
@@ -456,9 +604,9 @@ Create complete form in AP Student Lightbox:
 3. **Test File Security**
    - Verify file access permissions
    - Test unauthorized access attempts
-   - Check audit logging functionality
+   - Check file activity tracking
 
-#### Step 12.2: Database Integration Testing
+#### Step 14.2: Database Integration Testing
 1. **Verify Data Persistence**
    - Check file URL saving to database
    - Verify file metadata storage
@@ -469,7 +617,7 @@ Create complete form in AP Student Lightbox:
    - Test file access and download
    - Test file deletion (if implemented)
 
-### Step 13: Pre-Deployment Checklist
+### Step 14: Pre-Deployment Checklist
 
 #### Content Review
 - [ ] All text content is accurate and professional
@@ -479,11 +627,11 @@ Create complete form in AP Student Lightbox:
 - [ ] Database connections are secure
 
 #### Technical Review
-- [ ] All code is properly commented
-- [ ] Error handling is implemented
-- [ ] Console errors are resolved
-- [ ] Performance is optimized
-- [ ] Security best practices are followed
+- [ ] All elements are properly named and organized
+- [ ] Form validation is implemented
+- [ ] All interactions work correctly
+- [ ] Page performance is optimized
+- [ ] User permissions are configured
 
 #### Testing Review
 - [ ] Cross-browser testing completed
@@ -492,7 +640,7 @@ Create complete form in AP Student Lightbox:
 - [ ] Database operations tested
 - [ ] Third-party integrations tested
 
-### Step 14: Deployment Process
+### Step 15: Deployment Process
 
 1. **Final Testing:**
    - Test in Wix preview mode
@@ -512,7 +660,7 @@ Create complete form in AP Student Lightbox:
    - Test form submissions
    - Monitor error logs
 
-### Step 15: Ongoing Maintenance
+### Step 16: Ongoing Maintenance
 
 #### EHCP File Management Tasks
 **Daily Tasks:**
@@ -528,7 +676,7 @@ Create complete form in AP Student Lightbox:
 **Monthly Tasks:**
 - Generate file activity reports
 - Review and update file retention policies
-- Audit file access permissions
+- Review file access permissions
 - Optimize file storage
 
 #### General Maintenance Tasks
@@ -552,7 +700,7 @@ Create complete form in AP Student Lightbox:
 - Feature updates based on user feedback
 
 #### Quarterly Tasks
-- Comprehensive security audit
+- Complete system review
 - Complete backup of website and database
 - Review and update documentation
 - Plan new features and improvements
@@ -564,12 +712,13 @@ This comprehensive guide provides everything needed to create a fully functional
 - **Complete UI/UX Design:** Professional, responsive interface
 - **Database Integration:** Robust data management system
 - **Form Processing:** Comprehensive validation and submission
+- **Remove AP Student Functionality:** Dynamic student list with removal confirmation and real-time updates
 - **Third-party Integration:** Lark notification system
 - **Responsive Design:** Mobile, tablet, and desktop optimization
-- **Error Handling:** Comprehensive error management
+- **Form Validation:** Comprehensive input validation
 - **Performance Optimization:** Fast, efficient operations
 
-**Estimated Total Implementation Time:** 6-8 hours
+**Estimated Total Implementation Time:** 6.5-8.5 hours
 **Maintenance Time:** 2-4 hours per month
 
 **Next Steps:**

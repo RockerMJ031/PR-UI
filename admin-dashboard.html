@@ -817,6 +817,116 @@
                             opt.selected = checkbox.checked;
                         }
                     });
+
+        // Screenshot functionality
+        function takeScreenshot() {
+            const button = event.target.closest('button');
+            const originalText = button.innerHTML;
+            
+            // Show loading state
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Taking Screenshot...';
+            button.disabled = true;
+            
+            // Simulate screenshot process
+            setTimeout(() => {
+                // Create screenshot preview modal
+                const modal = document.createElement('div');
+                modal.className = 'modal';
+                modal.style.display = 'block';
+                modal.innerHTML = `
+                    <div class="modal-content" style="max-width: 800px;">
+                        <div class="modal-header">
+                            <h2><i class="fas fa-camera"></i> Screenshot Preview</h2>
+                            <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
+                        </div>
+                        <div class="modal-body">
+                            <div style="text-align: center; padding: 20px;">
+                                <div style="background: linear-gradient(135deg, #f0f8ff, #e6f3ff); border: 2px dashed #4a90e2; border-radius: 12px; padding: 40px; margin-bottom: 20px;">
+                                    <i class="fas fa-image" style="font-size: 3rem; color: #4a90e2; margin-bottom: 15px;"></i>
+                                    <h3 style="color: #4a90e2; margin-bottom: 10px;">Screenshot Generated</h3>
+                                    <p style="color: #666; margin-bottom: 20px;">Current page screenshot has been successfully generated, including all AP student information</p>
+                                    <div style="background: white; border-radius: 8px; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                                        <strong>Screenshot Info:</strong><br>
+                                        Filename: admin-dashboard-screenshot.png<br>
+                                        Size: 1920x1080<br>
+                                        File Size: 2.3MB<br>
+                                        Time: ${new Date().toLocaleString()}
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 15px; justify-content: center;">
+                                    <button class="btn btn-primary" onclick="alert('Screenshot saved to Downloads folder')">
+                                        <i class="fas fa-download"></i> Download Screenshot
+                                    </button>
+                                    <button class="btn btn-secondary" onclick="alert('Screenshot copied to clipboard')">
+                                        <i class="fas fa-copy"></i> Copy to Clipboard
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                
+                // Restore button state
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }, 2000);
+        }
+
+        // Functions moved to global scope in second script tag
+
+        // AP学生列表展开/收起功能
+        function toggleAPStudents() {
+            const studentsList = document.getElementById('apStudentsList');
+            const toggleBtn = document.querySelector('.toggle-ap-btn');
+            const isVisible = studentsList.style.display !== 'none';
+            
+            if (isVisible) {
+                studentsList.style.display = 'none';
+                toggleBtn.innerHTML = '<i class="fas fa-chevron-down"></i> 展开查看学生列表';
+                toggleBtn.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
+            } else {
+                studentsList.style.display = 'block';
+                toggleBtn.innerHTML = '<i class="fas fa-chevron-up"></i> 收起学生列表';
+                toggleBtn.style.background = 'linear-gradient(135deg, #6c757d, #5a6268)';
+            }
+        }
+
+        // 学生状态切换
+        function toggleStudentStatus(studentId) {
+            const statusBadge = document.querySelector(`[data-student-id="${studentId}"] .status-badge`);
+            const currentStatus = statusBadge.textContent.trim();
+            
+            if (currentStatus === '活跃') {
+                statusBadge.textContent = '暂停';
+                statusBadge.className = 'status-badge status-paused';
+            } else {
+                statusBadge.textContent = '活跃';
+                statusBadge.className = 'status-badge status-active';
+            }
+        }
+
+        // 移除AP学生
+        function removeAPStudent(studentId, studentName) {
+            if (confirm(`确定要移除学生 ${studentName} 吗？`)) {
+                const studentRow = document.querySelector(`[data-student-id="${studentId}"]`);
+                studentRow.remove();
+                
+                // 更新学生数量
+                const countElement = document.getElementById('apStudentCount');
+                const currentCount = parseInt(countElement.textContent);
+                countElement.textContent = currentCount - 1;
+                
+                // 如果没有学生了，隐藏列表
+                const remainingStudents = document.querySelectorAll('.ap-student-item').length;
+                if (remainingStudents === 0) {
+                    document.getElementById('apStudentsList').style.display = 'none';
+                    document.querySelector('.toggle-ap-btn').style.display = 'none';
+                }
+                
+                alert(`学生 ${studentName} 已被移除`);
+            }
+        }
                     
                     // 触发change事件
                     const event = new Event('change', { bubbles: true });
@@ -1059,18 +1169,22 @@
                     <div class="ap-student-counter">
                         <div class="counter-display">
                             <span class="counter-label">Current AP Students:</span>
-                            <span class="counter-value" id="apStudentCount">0</span>
+                            <span class="counter-value" id="apStudentCount">10</span>
                         </div>
                     </div>
+                    
+
+                    
                     <div class="action-buttons">
                         <button class="btn btn-success" onclick="openAPStudentModal()">
                             <i class="fas fa-plus"></i>
                             Add AP Student
                         </button>
-                        <button class="btn btn-warning" onclick="removeAPStudent()">
+                        <button class="btn btn-warning" onclick="openRemoveStudentModal()">
                             <i class="fas fa-minus"></i>
                             Remove Student
                         </button>
+
                     </div>
                 </div>
                 
@@ -1559,6 +1673,91 @@
     </div>
 
     <script>
+        // Open Remove Student Modal with AP Student List
+        function openRemoveStudentModal() {
+            const apStudents = [
+                { id: 1, name: 'Oliver Thompson', grade: 'Year 9', course: 'Core Subjects', status: 'Active' },
+                { id: 2, name: 'Emily Johnson', grade: 'Year 8', course: 'Core + Arts', status: 'Active' },
+                { id: 3, name: 'Harry Williams', grade: 'Year 10', course: 'All Subjects + Therapy', status: 'Paused' },
+                { id: 4, name: 'Sophie Brown', grade: 'Year 7', course: 'Core Subjects', status: 'Active' },
+                { id: 5, name: 'Jack Davies', grade: 'Year 9', course: 'Core + Arts', status: 'Active' },
+                { id: 6, name: 'Charlotte Wilson', grade: 'Year 11', course: 'All Subjects', status: 'Active' },
+                { id: 7, name: 'George Evans', grade: 'Year 8', course: 'Core + PSHE', status: 'Paused' },
+                { id: 8, name: 'Amelia Taylor', grade: 'Year 10', course: 'Core + Career', status: 'Active' },
+                { id: 9, name: 'Thomas Anderson', grade: 'Year 9', course: 'All Subjects + Therapy', status: 'Active' },
+                { id: 10, name: 'Isabella Clark', grade: 'Year 7', course: 'Core Subjects', status: 'Active' }
+            ];
+
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'block';
+            
+            let studentListHTML = '';
+            apStudents.forEach(student => {
+                const statusClass = student.status === 'Active' ? 'status-active' : 'status-paused';
+                studentListHTML += `
+                    <div class="ap-student-item" data-student-id="${student.id}">
+                        <div class="student-info">
+                            <div class="student-name">${student.name}</div>
+                            <div class="student-details">${student.grade} | ${student.course}</div>
+                        </div>
+                        <div class="student-actions">
+                            <span class="status-badge ${statusClass}">${student.status}</span>
+                            <button class="remove-student-btn" onclick="confirmRemoveStudent(${student.id}, '${student.name}')">
+                                <i class="fas fa-times"></i> Remove
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            modal.innerHTML = `
+                <div class="modal-content" style="max-width: 900px;">
+                    <div class="modal-header">
+                        <h2><i class="fas fa-users"></i> Remove AP Student</h2>
+                        <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        <div style="margin-bottom: 20px;">
+                            <h3 style="color: var(--primary-color); margin-bottom: 15px;">Select a student to remove:</h3>
+                            <p style="color: #666; margin-bottom: 20px;">Click on any student below to remove them from the AP program. This action cannot be undone.</p>
+                        </div>
+                        <div class="ap-students-list">
+                            ${studentListHTML}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        // Confirm student removal
+        function confirmRemoveStudent(studentId, studentName) {
+            if (confirm(`Are you sure you want to remove ${studentName} from the AP program?\n\nThis action cannot be undone.`)) {
+                // Remove student from the modal list
+                const studentRow = document.querySelector(`[data-student-id="${studentId}"]`);
+                if (studentRow) {
+                    studentRow.remove();
+                }
+                
+                // Update student count
+                const countElement = document.getElementById('apStudentCount');
+                const currentCount = parseInt(countElement.textContent);
+                countElement.textContent = currentCount - 1;
+                
+                // Show success message
+                alert(`${studentName} has been successfully removed from the AP program.`);
+                
+                // If no students left, close modal
+                const remainingStudents = document.querySelectorAll('.ap-student-item').length;
+                if (remainingStudents === 0) {
+                    document.querySelector('.modal').remove();
+                    alert('All AP students have been removed.');
+                }
+            }
+        }
+
         // Sample course data (in real implementation, this would come from database)
         const courseData = [
             {
@@ -2975,6 +3174,143 @@
             transform: translateY(-2px);
         }
 
+        /* AP学生列表样式 */
+        .ap-students-list {
+            background: linear-gradient(135deg, #f8f9ff, #fff);
+            border: 2px solid #e3f2fd;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .toggle-ap-btn {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toggle-ap-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .ap-student-item {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .ap-student-item:hover {
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transform: translateY(-1px);
+        }
+
+        .student-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .student-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .student-details {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .student-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .status-active {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-paused {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .remove-student-btn {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .remove-student-btn:hover {
+            background: linear-gradient(135deg, #c82333, #a71e2a);
+            transform: scale(1.05);
+        }
+
+        /* 截图按钮样式 */
+        .screenshot-btn {
+            background: linear-gradient(135deg, #6f42c1, #8b5cf6);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .screenshot-btn:hover {
+            background: linear-gradient(135deg, #8b5cf6, #a855f7);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(111, 66, 193, 0.3);
+        }
+
+        .screenshot-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         /* Responsive Design for Modal */
         @media (max-width: 768px) {
             .modal-content {
@@ -3015,6 +3351,16 @@
             
             .confirmation-actions {
                 flex-direction: column;
+            }
+
+            .ap-student-item {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+
+            .student-actions {
+                justify-content: center;
             }
         }
     </style>
