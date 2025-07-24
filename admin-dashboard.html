@@ -1533,9 +1533,6 @@
             <!-- Statistics Cards -->
             <div class="stats-header">
                 <h2 class="section-title">Statistics</h2>
-                <button id="refreshStatsBtn" class="btn btn-sm btn-primary" onclick="refreshStatistics()">
-                    <i class="fas fa-sync-alt"></i> Refresh Stats
-                </button>
             </div>
             <div class="stats-grid">
                 <div class="stat-card total-students">
@@ -1549,12 +1546,12 @@
                     <div class="stat-description">Currently attending</div>
                 </div>
                 <div class="stat-card safeguarding">
-                    <div class="stat-title" id="securityAlertsText">本月提交工单</div>
+                    <div class="stat-title" id="securityAlertsText">Safeguarding Alerts</div>
                     <div class="stat-value" id="securityAlertsValue">3</div>
                     <div class="stat-description">Require attention</div>
                 </div>
                 <div class="stat-card invoices">
-                    <div class="stat-title" id="pendingInvoicesText">本月已解决工单</div>
+                    <div class="stat-title" id="pendingInvoicesText">Open Tickets</div>
                     <div class="stat-value" id="pendingInvoicesValue">12</div>
                     <div class="stat-description">Awaiting payment</div>
                 </div>
@@ -4183,33 +4180,7 @@
     </style>
     
     <script>
-        // 刷新统计数据
-        function refreshStatistics() {
-            const refreshBtn = document.getElementById('refreshStatsBtn');
-            const originalText = refreshBtn.innerHTML;
-            
-            // 禁用按钮并显示加载中状态
-            refreshBtn.disabled = true;
-            refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 加载中...';
-            
-            // 模拟API调用延迟
-            setTimeout(() => {
-                // 更新工单统计数据
-                const submittedTickets = Math.floor(Math.random() * 10) + 1; // 随机生成1-10之间的数字
-                const resolvedTickets = Math.floor(Math.random() * submittedTickets); // 随机生成0到submittedTickets之间的数字
-                
-                // 更新DOM元素
-                document.getElementById('securityAlertsValue').textContent = submittedTickets;
-                document.getElementById('pendingInvoicesValue').textContent = resolvedTickets;
-                
-                // 恢复按钮状态
-                refreshBtn.disabled = false;
-                refreshBtn.innerHTML = originalText;
-                
-                // 显示成功消息
-                alert('统计数据已成功刷新！');
-            }, 1500);
-        }
+
         
         // Add event listeners for course extension modal
         document.addEventListener('DOMContentLoaded', function() {
@@ -4240,8 +4211,7 @@
                 });
             }
             
-            // 初始化时加载一次统计数据
-            refreshStatistics();
+
         });
     </script>
 </body>
