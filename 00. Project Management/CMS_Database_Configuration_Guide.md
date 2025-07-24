@@ -73,6 +73,39 @@ This document details the database collection configuration required for the tut
   registrationStatus: "text", // pending, approved, rejected, Activated
   ehcpDocument: "text", // EHCP Document Attachment URL
   
+  // EHCP Status - Multi-select field (REQUIRED TO ADD TO CMS-1)
+  ehcpStatus: ["text"], // EHCP Status options:
+  // - SpLD - Specific Learning Difficulties
+  // - SLCN - Speech, Language and Communication Needs
+  // - SEMH - Social, Emotional and Mental Health
+  // - ASD - Autistic Spectrum Disorder
+  // - VI - Visual Impairment
+  // - HI - Hearing Impairment
+  // - MSI - Multisensory Impairment
+  // - PD - Physical Disability
+  // - NSA - SEN support but no specialist assessment
+  // - OTH - Other Difficulty/Disorder
+  // - DS - Down Syndrome
+  
+  ehcpDetails: "text", // EHCP Details (REQUIRED TO ADD TO CMS-1)
+  caseworkerName: "text", // EHCP Officer/Caseworker Name (REQUIRED TO ADD TO CMS-1)
+  caseworkerEmail: "text", // EHCP Officer/Caseworker Email (REQUIRED TO ADD TO CMS-1)
+  
+  // Additional Student Information Fields (REQUIRED TO ADD TO CMS-1)
+  emergencyContact: "text", // Emergency Contact Information
+  emergencyName: "text", // Emergency Contact Person Name
+  previousEducation: "text", // Previous Education Background
+  homeAddress: "text", // Home Address
+  homeLessonsWithoutSupervision: "text", // Whether student will access lessons at home without supervision (yes/no)
+  supportLongerThanFourWeeks: "text", // Whether Purple Ruler support is expected longer than four weeks (yes/no)
+  
+  // Educational Plan Selection (REQUIRED TO ADD TO CMS-1)
+  selectedPlan: "text", // Educational Plan options:
+  // - Core Subjects
+  // - Core Subjects + PSHE Careers + PE and Art
+  // - All Subjects + Therapy
+  // - Purple Ruler Blueprint
+  
   // Additional Lark-specific fields
   startDate: "text", // Start Date
   examBoard: "text", // Examination Board
@@ -474,6 +507,37 @@ This document details the database collection configuration required for the tut
   extracurriculars: ["text"], // Extracurricular activities
   counselorNotes: "text", // Counselor notes
   ehcpDocument: "text", // EHCP document URL
+  
+  // EHCP Status - Multi-select field (REQUIRED TO ADD TO CMS-7)
+  ehcpStatus: ["text"], // EHCP Status options:
+  // - SpLD - Specific Learning Difficulties
+  // - SLCN - Speech, Language and Communication Needs
+  // - SEMH - Social, Emotional and Mental Health
+  // - ASD - Autistic Spectrum Disorder
+  // - VI - Visual Impairment
+  // - HI - Hearing Impairment
+  // - MSI - Multisensory Impairment
+  // - PD - Physical Disability
+  // - NSA - SEN support but no specialist assessment
+  // - OTH - Other Difficulty/Disorder
+  // - DS - Down Syndrome
+  
+  ehcpDetails: "text", // EHCP Details (REQUIRED TO ADD TO CMS-7)
+  caseworkerName: "text", // EHCP Officer/Caseworker Name (REQUIRED TO ADD TO CMS-7)
+  caseworkerEmail: "text", // EHCP Officer/Caseworker Email (REQUIRED TO ADD TO CMS-7)
+  
+  // Additional Student Information Fields (REQUIRED TO ADD TO CMS-7)
+  emergencyContact: "text", // Emergency Contact Information
+  emergencyName: "text", // Emergency Contact Person Name
+  previousEducation: "text", // Previous Education Background
+  homeAddress: "text", // Home Address
+  
+  // Educational Plan Selection (REQUIRED TO ADD TO CMS-7)
+  selectedPlan: "text", // Educational Plan options:
+  // - Core Subjects
+  // - Core Subjects + PSHE Careers + PE and Art
+  // - All Subjects + Therapy
+  // - Purple Ruler Blueprint
   
   // Additional Information fields
   homeLessonsWithoutSupervision: "text", // Whether student can have home lessons without supervision (Yes/No)
