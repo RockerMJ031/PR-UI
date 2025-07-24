@@ -742,6 +742,177 @@
             font-size: 0.8rem;
             color: var(--text-light);
         }
+
+        /* Course Extension Modal Styles */
+        .extension-modal {
+            max-width: 800px;
+            width: 90%;
+        }
+
+        .extension-course-info {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .extension-course-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .extension-course-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .extension-course-subject {
+            background-color: #007bff;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .extension-students-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .extension-student-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background-color: white;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+        }
+
+        .extension-student-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .extension-lessons-count {
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .extension-form {
+            margin-bottom: 25px;
+        }
+
+        .extension-form .form-group {
+            margin-bottom: 20px;
+        }
+
+        .extension-form label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .extension-date-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .extension-date-input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            outline: none;
+        }
+
+        .focus-area-textarea,
+        .extension-description-textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        .extension-description-textarea {
+            min-height: 120px;
+        }
+
+        .focus-area-textarea:focus,
+        .extension-description-textarea:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            outline: none;
+        }
+
+        .form-note {
+            display: flex;
+            align-items: center;
+            margin-top: 6px;
+            color: #6c757d;
+            font-size: 13px;
+        }
+
+        .form-note i {
+            margin-right: 6px;
+            color: #17a2b8;
+        }
+
+        .extension-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .extension-actions .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .extension-actions .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .extension-actions .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .extension-actions .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .extension-actions .btn-success:hover {
+            background-color: #218838;
+        }
     </style>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -1622,7 +1793,7 @@
                         <i class="fas fa-exclamation-triangle"></i>
                         <span>Two Week Notice Required</span>
                     </div>
-                    <p>Course cancellation requires a minimum of two weeks advance notice. The cancellation will take effect from the calculated date below.</p>
+                    <p>Course cancellation requires a minimum of two weeks advance notice. If you select a start date within two weeks, the system will automatically adjust it to ensure the two-week notice period is met.</p>
                 </div>
                 
                 <div class="course-selection">
@@ -1630,6 +1801,15 @@
                     <select id="cancellationCourseDropdown" class="course-dropdown">
                         <option value="">Choose a course...</option>
                     </select>
+                </div>
+                
+                <div class="cancellation-start-time">
+                    <label for="cancellationStartDate"><strong>Cancellation Start Date:</strong></label>
+                    <input type="date" id="cancellationStartDate" class="cancellation-date-input">
+                    <div class="cancellation-note">
+                        <i class="fas fa-info-circle"></i>
+                        <span>If the selected date is within two weeks from today, the system will automatically adjust it to two weeks from now.</span>
+                    </div>
                 </div>
                 
                 <div class="cancellation-details" id="cancellationDetails" style="display: none;">
@@ -1648,6 +1828,50 @@
                     <button class="btn btn-danger" id="confirmCancellationBtn">
                         <i class="fas fa-times"></i>
                         Confirm Cancellation
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Course Extension Details Modal -->
+    <div id="courseExtensionModal" class="modal">
+        <div class="modal-content extension-modal">
+            <div class="modal-header">
+                <h2>Course Extension Request</h2>
+                <span class="close" id="closeExtensionModalBtn">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="extension-course-info" id="extensionCourseInfo">
+                    <!-- Course information will be populated here -->
+                </div>
+                
+                <div class="extension-form">
+                    <div class="form-group">
+                        <label for="extensionEndDate"><strong>Extend Course Until:</strong></label>
+                        <input type="date" id="extensionEndDate" class="extension-date-input" required>
+                        <div class="form-note">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Please select the new end date for the course extension.</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="updatedFocusArea"><strong>Updated Focus Area:</strong></label>
+                        <textarea id="updatedFocusArea" class="focus-area-textarea" placeholder="Please describe the updated focus areas or learning objectives for the extended period..." required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="extensionDescription"><strong>Detailed Description of Course Extension:</strong></label>
+                        <textarea id="extensionDescription" class="extension-description-textarea" placeholder="Please provide a detailed description of your course extension, including reasons for extension, specific goals, and any additional requirements..." required></textarea>
+                    </div>
+                </div>
+                
+                <div class="extension-actions">
+                    <button class="btn btn-secondary" id="closeExtensionModalBtn2">Cancel</button>
+                    <button class="btn btn-success" id="submitExtensionBtn">
+                        <i class="fas fa-paper-plane"></i>
+                        Submit Extension Request
                     </button>
                 </div>
             </div>
@@ -1895,69 +2119,77 @@
         }
 
         // Sample course data (in real implementation, this would come from database)
+        // Course data grouped by class with multiple students (up to 6 per class)
         const courseData = [
             {
                 classId: 'AS-APY-Y9-EL-BIOLOGY',
-                studentName: 'Emma Johnson',
                 subject: 'Biology',
                 courseId: 'BIO-001',
-                qtyLessons: 54
+                students: [
+                    { name: 'Emma Johnson', qtyLessons: 54 },
+                    { name: 'James Smith', qtyLessons: 52 },
+                    { name: 'Sophie Chen', qtyLessons: 48 }
+                ]
             },
             {
                 classId: 'AS-APY-Y9-EL-ENGLISH',
-                studentName: 'James Smith',
                 subject: 'English',
                 courseId: 'ENG-002',
-                qtyLessons: 67
+                students: [
+                    { name: 'Michael Brown', qtyLessons: 67 },
+                    { name: 'Isabella Davis', qtyLessons: 65 },
+                    { name: 'Oliver Wilson', qtyLessons: 63 },
+                    { name: 'Ava Martinez', qtyLessons: 61 },
+                    { name: 'Lucas Anderson', qtyLessons: 59 },
+                    { name: 'Mia Thompson', qtyLessons: 57 }
+                ]
             },
             {
                 classId: 'AS-APY-Y9-EL-FRENCH',
-                studentName: 'Sophie Chen',
                 subject: 'French',
                 courseId: 'FRE-003',
-                qtyLessons: 43
+                students: [
+                    { name: 'Charlotte Wilson', qtyLessons: 43 },
+                    { name: 'Henry Garcia', qtyLessons: 41 }
+                ]
             },
             {
                 classId: 'AS-APY-Y9-EL-PHYSICS',
-                studentName: 'Michael Brown',
                 subject: 'Physics',
                 courseId: 'PHY-004',
-                qtyLessons: 59
-            },
-            {
-                classId: 'AS-STY-Y7-DG-ENGLISH',
-                studentName: 'Isabella Davis',
-                subject: 'English',
-                courseId: 'ENG-005',
-                qtyLessons: 35
-            },
-            {
-                classId: 'AS-STY-Y7-DG-HISTORY',
-                studentName: 'Oliver Wilson',
-                subject: 'History',
-                courseId: 'HIS-006',
-                qtyLessons: 17
+                students: [
+                    { name: 'Amelia Rodriguez', qtyLessons: 59 },
+                    { name: 'Benjamin Lee', qtyLessons: 56 },
+                    { name: 'Grace Kim', qtyLessons: 54 },
+                    { name: 'Daniel Park', qtyLessons: 52 }
+                ]
             },
             {
                 classId: 'AS-STY-Y7-DG-MATHS',
-                studentName: 'Ava Martinez',
                 subject: 'Mathematics',
                 courseId: 'MAT-007',
-                qtyLessons: 39
+                students: [
+                    { name: 'Lily Zhang', qtyLessons: 39 },
+                    { name: 'Noah Johnson', qtyLessons: 37 },
+                    { name: 'Zoe Williams', qtyLessons: 35 }
+                ]
             },
             {
                 classId: 'AS-STY-Y7-DG-SCIENCE',
-                studentName: 'Lucas Anderson',
                 subject: 'Science',
                 courseId: 'SCI-008',
-                qtyLessons: 13
+                students: [
+                    { name: 'Ethan Brown', qtyLessons: 13 },
+                    { name: 'Maya Patel', qtyLessons: 11 }
+                ]
             },
             {
                 classId: 'AS-STY-Y7-DG-GEOGRAPHY',
-                studentName: 'Mia Thompson',
                 subject: 'Geography',
                 courseId: 'GEO-009',
-                qtyLessons: 7
+                students: [
+                    { name: 'Alex Thompson', qtyLessons: 7 }
+                ]
             }
         ];
 
@@ -1996,17 +2228,27 @@
         function createCourseItem(course) {
             const item = document.createElement('div');
             item.className = 'course-item';
+            
+            // Create student list HTML with better layout for up to 6 students
+            const studentsHtml = course.students.map(student => 
+                `<div class="student-item">
+                    <span class="student-name">${student.name}</span>
+                    <span class="lessons-remaining">${student.qtyLessons} lessons</span>
+                </div>`
+            ).join('');
+            
+            const studentCount = course.students.length;
+            const studentCountText = studentCount === 1 ? '1 student' : `${studentCount} students`;
+            
             item.innerHTML = `
                 <div class="course-info">
                     <div class="course-header">
-                        <span class="student-name">${course.studentName}</span>
-                        <span class="qty-lessons">${course.qtyLessons} lessons remaining</span>
+                        <span class="class-id">${course.classId}</span>
+                        <span class="subject">${course.subject}</span>
+                        <span class="student-count">(${studentCountText})</span>
                     </div>
-                    <div class="course-details">
-                        <div class="detail-row">
-                            <span class="label">Subject:</span>
-                            <span class="value">${course.subject}</span>
-                        </div>
+                    <div class="students-list ${studentCount > 3 ? 'multi-column' : ''}">
+                        ${studentsHtml}
                     </div>
                 </div>
                 <div class="course-actions">
@@ -2036,8 +2278,9 @@
 
         function handleCourseAction(classId, action) {
             if (action === 'extend') {
-                // In real implementation, this would redirect to Wix form or API call
-                window.open('https://purpleruler.larksuite.com/share/base/form/shrusquF0kTZixa4bKNTqTUSPme', '_blank');
+                // Open course extension details modal
+                openCourseExtensionModal(classId);
+                closeCourseModal();
             } else if (action === 'cancel') {
                 // Open course cancellation modal instead of simple confirm
                 openCourseCancellationModal();
@@ -2045,10 +2288,93 @@
             }
         }
 
+        // Course Extension Modal Functions
+        function openCourseExtensionModal(classId) {
+            const modal = document.getElementById('courseExtensionModal');
+            const course = courseData.find(c => c.classId === classId);
+            
+            if (course) {
+                populateExtensionCourseInfo(course);
+                setDefaultExtensionDate();
+                modal.style.display = 'block';
+            }
+        }
+
+        function closeExtensionModal() {
+            const modal = document.getElementById('courseExtensionModal');
+            modal.style.display = 'none';
+            // Reset form
+            document.getElementById('extensionEndDate').value = '';
+            document.getElementById('updatedFocusArea').value = '';
+            document.getElementById('extensionDescription').value = '';
+        }
+
+        function populateExtensionCourseInfo(course) {
+            const courseInfoContainer = document.getElementById('extensionCourseInfo');
+            
+            const studentsHtml = course.students.map(student => 
+                `<div class="extension-student-item">
+                    <span class="extension-student-name">${student.name}</span>
+                    <span class="extension-lessons-count">${student.qtyLessons} lessons remaining</span>
+                </div>`
+            ).join('');
+            
+            const studentCount = course.students.length;
+            const studentCountText = studentCount === 1 ? '1 student' : `${studentCount} students`;
+            
+            courseInfoContainer.innerHTML = `
+                <div class="extension-course-header">
+                    <div class="extension-course-title">${course.classId}</div>
+                    <div class="extension-course-subject">${course.subject}</div>
+                </div>
+                <div style="margin-bottom: 10px; color: #6c757d; font-size: 14px;">
+                    <i class="fas fa-users"></i> ${studentCountText}
+                </div>
+                <div class="extension-students-list">
+                    ${studentsHtml}
+                </div>
+            `;
+        }
+
+        function setDefaultExtensionDate() {
+            const today = new Date();
+            const threeMonthsFromNow = new Date(today.getTime() + (90 * 24 * 60 * 60 * 1000));
+            const dateInput = document.getElementById('extensionEndDate');
+            dateInput.value = threeMonthsFromNow.toISOString().split('T')[0];
+        }
+
+        function submitExtensionRequest() {
+            const extensionEndDate = document.getElementById('extensionEndDate').value;
+            const updatedFocusArea = document.getElementById('updatedFocusArea').value;
+            const extensionDescription = document.getElementById('extensionDescription').value;
+            
+            if (!extensionEndDate || !updatedFocusArea || !extensionDescription) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            // In real implementation, this would send data to backend
+            const extensionData = {
+                extensionEndDate,
+                updatedFocusArea,
+                extensionDescription,
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log('Extension request submitted:', extensionData);
+            
+            // Show success message
+            alert('Course extension request has been submitted successfully!');
+            
+            // Close modal
+            closeExtensionModal();
+        }
+
         // Course Cancellation Modal Functions
         function openCourseCancellationModal() {
             const modal = document.getElementById('courseCancellationLightbox');
             loadCancellableCourses();
+            setDefaultCancellationDate();
             modal.style.display = 'block';
         }
         
@@ -2058,7 +2384,27 @@
             // Reset form
             document.getElementById('cancellationCourseDropdown').value = '';
             document.getElementById('cancellationReasonTextarea').value = '';
+            document.getElementById('cancellationStartDate').value = '';
             document.getElementById('cancellationDetails').style.display = 'none';
+        }
+        
+        function setDefaultCancellationDate() {
+            const today = new Date();
+            const twoWeeksFromNow = new Date(today.getTime() + (14 * 24 * 60 * 60 * 1000));
+            const dateInput = document.getElementById('cancellationStartDate');
+            dateInput.value = twoWeeksFromNow.toISOString().split('T')[0];
+        }
+        
+        function validateAndAdjustCancellationDate() {
+            const dateInput = document.getElementById('cancellationStartDate');
+            const selectedDate = new Date(dateInput.value);
+            const today = new Date();
+            const twoWeeksFromNow = new Date(today.getTime() + (14 * 24 * 60 * 60 * 1000));
+            
+            if (selectedDate < twoWeeksFromNow) {
+                dateInput.value = twoWeeksFromNow.toISOString().split('T')[0];
+                alert('The selected date has been automatically adjusted to meet the two-week notice requirement.');
+            }
         }
         
         function loadCancellableCourses() {
@@ -2066,9 +2412,11 @@
             dropdown.innerHTML = '<option value="">Choose a course...</option>';
             
             courseData.forEach(course => {
+                const studentCount = course.students.length;
+                const studentCountText = studentCount === 1 ? '1 student' : `${studentCount} students`;
                 const option = document.createElement('option');
                 option.value = course.classId;
-                option.textContent = `${course.classId} - ${course.studentName} (${course.subject})`;
+                option.textContent = `${course.classId} - ${course.subject} (${studentCountText})`;
                 dropdown.appendChild(option);
             });
         }
@@ -2092,9 +2440,15 @@
         function confirmCourseCancellation() {
             const selectedCourse = document.getElementById('cancellationCourseDropdown').value;
             const reason = document.getElementById('cancellationReasonTextarea').value.trim();
+            const startDate = document.getElementById('cancellationStartDate').value;
             
             if (!selectedCourse) {
                 alert('Please select a course to cancel.');
+                return;
+            }
+            
+            if (!startDate) {
+                alert('Please select a cancellation start date.');
                 return;
             }
             
@@ -2103,7 +2457,7 @@
                 return;
             }
             
-            const cancellationDate = calculateCancellationDate();
+            const cancellationDate = new Date(startDate);
             const formattedDate = formatDate(cancellationDate);
             
             if (confirm(`Confirm cancellation of course ${selectedCourse}?\n\nCancellation will take effect on: ${formattedDate}\n\nReason: ${reason}`)) {
@@ -2133,11 +2487,24 @@
                 if (selectedCourseId) {
                     const course = courseData.find(c => c.classId === selectedCourseId);
                     if (course) {
+                        // Create students list HTML
+                        const studentsListHtml = course.students.map(student => 
+                            `<div class="student-info-item">
+                                <span class="student-name">${student.name}</span>
+                                <span class="student-lessons">${student.qtyLessons} lessons</span>
+                            </div>`
+                        ).join('');
+                        
+                        const studentCount = course.students.length;
+                        const studentCountText = studentCount === 1 ? '1 student' : `${studentCount} students`;
+                        
                         courseInfoDiv.innerHTML = `
                             <p><strong>Class ID:</strong> ${course.classId}</p>
-                            <p><strong>Student:</strong> ${course.studentName}</p>
                             <p><strong>Subject:</strong> ${course.subject}</p>
-                            <p><strong>Remaining Lessons:</strong> ${course.qtyLessons}</p>
+                            <p><strong>Students:</strong> ${studentCountText}</p>
+                            <div class="students-info-list">
+                                ${studentsListHtml}
+                            </div>
                         `;
                         
                         const cancellationDate = calculateCancellationDate();
@@ -2157,6 +2524,9 @@
             
             // Confirm cancellation button
             document.getElementById('confirmCancellationBtn').addEventListener('click', confirmCourseCancellation);
+            
+            // Cancellation start date change handler
+            document.getElementById('cancellationStartDate').addEventListener('change', validateAndAdjustCancellationDate);
         });
 
         // Close modal when clicking outside of it
@@ -2864,12 +3234,86 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
         }
 
-        .student-name {
+        .class-id {
             font-weight: 700;
             font-size: 1.1rem;
             color: var(--primary-color);
+        }
+
+        .subject {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+
+        .student-count {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .students-list {
+            display: grid;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .students-list.multi-column {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .student-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0.75rem;
+            background: #f8f9ff;
+            border-radius: 8px;
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .student-item .student-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .student-item .lessons-remaining {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .students-info-list {
+            margin-top: 0.75rem;
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .student-info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0.75rem;
+            background: #f8f9ff;
+            border-radius: 8px;
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .student-info-item .student-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .student-info-item .student-lessons {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 500;
         }
 
         .qty-lessons {
@@ -3262,6 +3706,42 @@
         .course-dropdown:focus {
             outline: none;
             border-color: var(--primary-color);
+        }
+        
+        .cancellation-start-time {
+            margin-bottom: 25px;
+        }
+        
+        .cancellation-date-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            transition: border-color 0.3s ease;
+            margin-bottom: 10px;
+        }
+        
+        .cancellation-date-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .cancellation-note {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--info-color);
+            font-size: 0.9rem;
+            background: linear-gradient(135deg, #e3f2fd, #f8f9fa);
+            padding: 10px 15px;
+            border-radius: 6px;
+            border-left: 4px solid var(--info-color);
+        }
+        
+        .cancellation-note i {
+            font-size: 1rem;
         }
         
         .reason-section {
@@ -3682,5 +4162,37 @@
             }
         }
     </style>
+    
+    <script>
+        // Add event listeners for course extension modal
+        document.addEventListener('DOMContentLoaded', function() {
+            // Close extension modal buttons
+            const closeExtensionBtn1 = document.getElementById('closeExtensionModalBtn');
+            const closeExtensionBtn2 = document.getElementById('closeExtensionModalBtn2');
+            const submitExtensionBtn = document.getElementById('submitExtensionBtn');
+            
+            if (closeExtensionBtn1) {
+                closeExtensionBtn1.addEventListener('click', closeExtensionModal);
+            }
+            
+            if (closeExtensionBtn2) {
+                closeExtensionBtn2.addEventListener('click', closeExtensionModal);
+            }
+            
+            if (submitExtensionBtn) {
+                submitExtensionBtn.addEventListener('click', submitExtensionRequest);
+            }
+            
+            // Close modal when clicking outside
+            const extensionModal = document.getElementById('courseExtensionModal');
+            if (extensionModal) {
+                extensionModal.addEventListener('click', function(e) {
+                    if (e.target === extensionModal) {
+                        closeExtensionModal();
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

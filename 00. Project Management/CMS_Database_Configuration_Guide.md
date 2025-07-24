@@ -664,8 +664,68 @@ This document details the database collection configuration required for the tut
     comment: "text",
     timestamp: "text"
   }],
+  completionSummary: "text", // Summary of ticket completion - **Note: Not yet added to Wix CMS**
+  proposeToCloseSendAt: "text", // Proposed closure notification time - **Note: Not yet added to Wix CMS**
   larkSyncStatus: "text", // Synchronization status with Lark
   larkSyncTime: "text", // Last synchronization time with Lark
+  _createdDate: "text",
+  _updatedDate: "text"
+}
+```
+
+### CMS-11: Course Management Collection
+**Used on Pages**: Admin Dashboard - Course Management Module  
+**Code Call**: `wixData.query('CourseManagement')`
+**Lark Integration**: Data synchronized with Lark Anycross PRT Operation 02.Course Management via HTTP request
+**UI Components**: Course creation, modification, cancellation, and student assignment from Admin Dashboard
+
+> **Note**: This collection will be established in Wix CMS with Collection ID `CourseManagement` for comprehensive course management operations.
+
+**Data Flow / 数据流**:
+1. Course management operations initiated from Admin Dashboard / 从管理员仪表板发起课程管理操作
+2. Course data saved to CMS-11 Course Management Collection / 课程数据保存到CMS-11课程管理集合
+3. HTTP request sent to Lark Anycross API for synchronization / 向Lark Anycross API发送HTTP请求进行同步
+4. Data synchronized to PRT Operation 02.Course Management table / 数据同步到PRT Operation 02.Course Management表
+5. Bidirectional sync ensures consistency between Wix CMS and Lark / 双向同步确保Wix CMS和Lark之间的一致性
+6. Real-time updates reflect course status changes across platforms / 实时更新反映跨平台的课程状态变化
+7. Course extension and cancellation operations tracked with detailed reasons / 课程延期和取消操作通过详细原因进行跟踪
+8. Progress notes and reschedule information maintained for operational transparency / 维护进度备注和重新安排信息以确保操作透明度
+
+**Fields for Lark Anycross PRT Operation 02.Course Management**:
+- Course ID (courseId) - 课程唯一标识符
+- Course Title (courseTitle) - 课程名称/标题
+- Subject Category (subject) - 学科类别（数学、科学、英语等）
+- Course Status (courseStatus) - 课程状态（active, cancelled, completed, postponed, pending）
+- Cancel From (cancelFrom) - 课程开始日期
+- Extend Until (extendUntil) - 课程结束日期
+- Progress Notes (progressNotes) - 进度跟踪备注
+- Cancellation Reason (cancellationReason) - 取消原因（如适用）
+- Postponement Reason (postponementReason) - 延期原因（如适用）
+- Reschedule Date (rescheduleDate) - 重新安排的日期（如重新安排）
+- Created By (createdBy) - 创建课程的管理员用户
+- Last Modified By (lastModifiedBy) - 最后修改的管理员用户
+- Lark Sync Status (larkSyncStatus) - 与Lark Anycross的同步状态
+- Lark Sync Time (larkSyncTime) - 最后同步时间
+- Anycross Record ID (anycrossRecordId) - Lark Anycross中对应的记录ID
+
+```javascript
+{
+  _id: "text",
+  courseId: "text", // Unique course identifier
+  courseTitle: "text", // Course name/title
+  subject: "text", // Subject category (Mathematics, Science, English, etc.)
+  courseStatus: "text", // active, cancelled, completed, postponed, pending
+  cancelFrom: "text", // Course start date
+  extendUntil: "text", // Course end date
+  progressNotes: "text", // Progress tracking notes
+  cancellationReason: "text", // Reason for cancellation (if applicable)
+  postponementReason: "text", // Reason for postponement (if applicable)
+  rescheduleDate: "text", // New date if rescheduled
+  createdBy: "text", // Admin user who created the course
+  lastModifiedBy: "text", // Admin user who last modified
+  larkSyncStatus: "text", // Synchronization status with Lark Anycross
+  larkSyncTime: "text", // Last synchronization time
+  anycrossRecordId: "text", // Corresponding record ID in Lark Anycross
   _createdDate: "text",
   _updatedDate: "text"
 }
@@ -714,6 +774,14 @@ The following diagram illustrates the data flow between Wix CMS collections and 
 |  Information        |    |  C4                  |    |  Collection          |
 |                     |    |                      |    |                      |
 +---------------------+    +----------------------+    +----------------------+
+         ^                                                      ^
+         |                                                      |
++---------------------+    +----------------------+    +----------------------+
+|                     |    |                      |    |                      |
+|  Admin Dashboard    |<-->|  CMS-11: Course      |<-->|  Lark Anycross:      |
+|  Course Management  |    |  Management          |    |  PRT Operation       |
+|  Module             |    |  Collection          |    |  02.Course Mgmt      |
++---------------------+    +----------------------+    +----------------------+
                                                                 ^
                                                                 |
                                                       +----------------------+
@@ -739,6 +807,8 @@ The system's data flow follows these key patterns:
 2. **Course Management Flow**:
    - Course data from Lark's PRT Logistic C4 syncs to CMS-3
    - Student course assignments from Lark's ST1 sync to CMS-2
+   - Admin Dashboard Course Management operations sync to CMS-11
+   - CMS-11 data synchronizes with Lark Anycross PRT Operation 02.Course Management
 
 3. **Reporting Flow**:
    - Student reports from Lark's R2 sync to CMS-4
@@ -748,7 +818,13 @@ The system's data flow follows these key patterns:
    - Admin data in CMS-6 receives student counts from C01.Client Info
    - Admin report links sync from Lark to CMS-6
 
-5. **Support Ticket Flow**:
+5. **Course Management Enhancement Flow**:
+   - Admin Dashboard initiates course management operations
+   - Course data saved to CMS-11 Course Management Collection
+   - HTTP requests sent to Lark Anycross for real-time synchronization
+   - Bidirectional sync with PRT Operation 02.Course Management
+
+6. **Support Ticket Flow**:
    - Tickets in CMS-10 sync with Lark's T01.Ticket System
    - Bidirectional updates maintain consistency
 
@@ -765,6 +841,8 @@ The system's data flow follows these key patterns:
 2. **课程管理流程**：
    - 来自Lark的PRT Logistic C4的课程数据同步到CMS-3
    - 来自Lark的ST1的学生课程分配同步到CMS-2
+   - 管理员仪表板课程管理操作同步到CMS-11
+   - CMS-11数据与Lark Anycross PRT Operation 02.Course Management同步
 
 3. **报告流程**：
    - 来自Lark的R2的学生报告同步到CMS-4
@@ -774,6 +852,12 @@ The system's data flow follows these key patterns:
    - CMS-6中的管理员数据从C01.Client Info接收学生数量
    - 管理员报告链接从Lark同步到CMS-6
 
-5. **支持工单流程**：
+5. **课程管理增强流程**：
+   - 管理员仪表板发起课程管理操作
+   - 课程数据保存到CMS-11课程管理集合
+   - 向Lark Anycross发送HTTP请求进行实时同步
+   - 与PRT Operation 02.Course Management双向同步
+
+6. **支持工单流程**：
    - CMS-10中的工单与Lark的T01.Ticket System同步
    - 双向更新保持一致性

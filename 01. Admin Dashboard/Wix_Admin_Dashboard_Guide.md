@@ -10,13 +10,16 @@
 ## Project Overview
 
 This guide will help you create a comprehensive admin dashboard in Wix with the following features:
-- **Course Management**: Course extension and cancellation
+- **Enhanced Course Management**: Multi-student course display, extension and cancellation with group class support (up to 6 students per course)
+- **Advanced Course Extension System**: Dedicated extension request modal with detailed form fields including extension date, updated focus areas, and comprehensive description
+- **Improved Course Cancellation**: Enhanced cancellation process with two-week notice warnings, detailed course selection, and cancellation reason documentation
 - **Tutoring Student Management**: Course enrollment, add and remove tutoring students
 - **Alternative Provision (AP) Student Management**: Specialized AP student enrollment with curriculum selection and EHCP file upload
 - **Ticket Management**: Support ticket submission and tracking
 - **Statistics Display**: Real-time student counts and metrics
 - **Pricing Plans**: Four-tier curriculum selection for AP students
 - **Lark Integration**: External form integration for course enrollment and tickets
+- **Advanced Search & Filtering**: Multi-criteria search for courses by Class ID, Subject, or Student Name
 
 **Important Note:** In Wix, popups will be implemented using **Wix Lightbox components** instead of traditional HTML modals. This provides better integration with Wix's responsive design system and built-in functionality.
 
@@ -292,8 +295,10 @@ Create the following datasets to support dashboard functionality:
 1. **Students** - Store tutoring student information
    - Fields: firstName, lastName, dateOfBirth, email, startDate, courseGroup, gradeLevel, sendStatus, examBoard, homeAddress
 
-2. **Courses** - Store course information
-   - Fields: classId, studentName, subject, courseId, qtyLessons, status
+2. **Courses** - Store course information (grouped by class with multiple students)
+   - Fields: classId, subject, students (array of student objects with name and qtyLessons), status
+   - Student object structure: { name: string, qtyLessons: number }
+   - Note: Each course can contain up to 6 students for group classes
 
 3. **APStudents** - Store AP student information
    - Fields: firstName, lastName, dateOfBirth, email, startDate, sendStatus, sendFile, sendDetails, caseworkerName, caseworkerEmail, guardianName, guardianEmail, guardianPhone, emergencyContact, emergencyName, previousEducation, homeAddress, educationPlan, homeLessonsSupervision, supportDuration
@@ -316,28 +321,67 @@ Create the following datasets to support dashboard functionality:
 - HTML `studentModal` → Wix `studentManagementLightbox`
 - HTML `apStudentModal` → Wix `apStudentRegistrationLightbox`
 
-#### Step 8.1: Course Management Modal
-**Replaces:** `courseModal` from original HTML file
+**Course Data Structure Update:**
+The course management system has been updated to support multiple students per course (up to 6 students). The new data structure groups students by class ID and subject, allowing for more efficient management of group classes.
+
+#### Step 8.1: Course Extension Modal
+**New Implementation:** Enhanced Course Extension Request System
 1. **Add:** Elements → Popups & Lightboxes → Lightbox
-2. **Lightbox ID:** `courseManagementLightbox`
-3. **Title:** "Course Management" (dynamically changes to "Course Extension" or "Course Cancellation" based on operation)
-4. **Content:**
-   - Search box: for filtering courses and students
-   - Course list: displays student names, subjects and remaining course count
-   - Action buttons: displays appropriate buttons based on selected operation (Extend/Cancel)
-   - Confirm button
-   - Cancel button
+2. **Lightbox ID:** `courseExtensionLightbox`
+3. **Title:** "Course Extension Request"
+4. **Content Structure:**
+   - **Modal Header:**
+     - Title: "Course Extension Request"
+     - Close button (×) in top-right corner
+   - **Modal Body:**
+     - **Course Information Section:** `extensionCourseInfo`
+       - Dynamically populated with selected course details
+       - Shows course ID, subject, and student information
+     - **Extension Form Section:**
+       - **Extend Until Date:** Date input field with label "Extend Course Until:"
+         - Input ID: `extensionEndDate`
+         - Required field with date validation
+         - Info note: "Please select the new end date for the course extension."
+       - **Updated Focus Area:** Textarea field
+         - Input ID: `updatedFocusArea`
+         - Placeholder: "Please describe the updated focus areas or learning objectives for the extended period..."
+         - Required field
+       - **Detailed Description:** Large textarea field
+         - Input ID: `extensionDescription`
+         - Placeholder: "Please provide a detailed description of your course extension, including reasons for extension, specific goals, and any additional requirements..."
+         - Required field
+   - **Action Buttons:**
+     - Cancel button: `closeExtensionModalBtn2` (secondary style)
+     - Submit button: `submitExtensionBtn` (success style with paper plane icon)
 
 #### Step 8.2: Course Cancellation Modal
-**New Addition:** Course cancellation confirmation
+**Enhanced Implementation:** Course cancellation with detailed information
 1. **Add:** Elements → Popups & Lightboxes → Lightbox
 2. **Lightbox ID:** `courseCancellationLightbox`
 3. **Title:** "Course Cancellation"
-4. **Content:**
-   - Two-week notice warning
-   - Course selection dropdown menu
-   - Cancellation reason text box
-   - Confirm cancellation button
+4. **Content Structure:**
+   - **Modal Header:**
+     - Title: "Course Cancellation"
+     - Close button (×) in top-right corner
+   - **Modal Body:**
+     - **Warning Section:**
+       - Two-week notice requirement warning
+       - Important notice styling with alert icon
+     - **Course Selection:**
+       - Dropdown menu showing "Class ID - Subject (X students)" format
+       - Real-time course details display upon selection
+     - **Selected Course Details:**
+       - Course ID, subject, and student count
+       - Complete list of all students with remaining lesson counts
+       - Multi-column layout for courses with multiple students
+     - **Cancellation Form:**
+       - **Cancellation Date:** Date input with label "Cancel From:"
+       - **Cancellation Reason:** Textarea field
+         - Placeholder: "Please provide the reason for course cancellation..."
+         - Required field for documentation
+   - **Action Buttons:**
+     - Cancel button (secondary style)
+     - Confirm Cancellation button (danger style)
 
 #### Step 8.3: Student Management Modal
 **Replaces:** `studentModal` from original HTML file
@@ -450,6 +494,153 @@ Create complete form in AP Student Lightbox:
 **Buttons:**
 - `registerAPStudentBtn` - Register
 - `cancelAPRegistrationBtn` - Cancel
+
+### Phase 9.5: Course Management Enhancement (45 minutes)
+
+#### Step 9.5.1: Multi-Student Course Display Implementation
+**Enhanced Course List Functionality:**
+
+1. **Course Item Structure:**
+   - Course Header: Displays Class ID, Subject, and Student Count
+   - Student List: Shows all students with names and remaining lessons
+   - Responsive Layout: Automatically switches to multi-column for 4+ students
+
+2. **CSS Styling for Multi-Student Display:**
+   ```css
+   .course-header {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     margin-bottom: 10px;
+   }
+   
+   .students-list {
+     display: grid;
+     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+     gap: 10px;
+   }
+   
+   .student-item {
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     padding: 8px;
+     background: #f8f9fa;
+     border-radius: 4px;
+   }
+   ```
+
+3. **Course Cancellation Enhancement:**
+   - Dropdown shows "Class ID - Subject (X students)" format
+   - Selection displays all student details with remaining lessons
+   - Confirmation shows impact on all students in the course
+
+4. **Search Functionality:**
+   - Filter by Class ID, Subject, or Student Name
+   - Real-time filtering as user types
+   - Highlights matching terms in results
+
+#### Step 9.5.2: CSS Styling for Course Extension Modal
+**Enhanced Modal Styling:**
+
+1. **Extension Modal Specific Styles:**
+   ```css
+   .extension-modal {
+     max-width: 600px;
+     width: 90%;
+   }
+   
+   .extension-course-info {
+     background: #f8f9fa;
+     padding: 15px;
+     border-radius: 8px;
+     margin-bottom: 20px;
+     border-left: 4px solid #007bff;
+   }
+   
+   .extension-form .form-group {
+     margin-bottom: 20px;
+   }
+   
+   .extension-date-input {
+     width: 100%;
+     padding: 10px;
+     border: 1px solid #ddd;
+     border-radius: 4px;
+     font-size: 14px;
+   }
+   
+   .focus-area-textarea {
+     width: 100%;
+     min-height: 80px;
+     padding: 10px;
+     border: 1px solid #ddd;
+     border-radius: 4px;
+     resize: vertical;
+   }
+   
+   .extension-description-textarea {
+     width: 100%;
+     min-height: 120px;
+     padding: 10px;
+     border: 1px solid #ddd;
+     border-radius: 4px;
+     resize: vertical;
+   }
+   
+   .form-note {
+     display: flex;
+     align-items: center;
+     margin-top: 5px;
+     font-size: 12px;
+     color: #6c757d;
+   }
+   
+   .form-note i {
+     margin-right: 5px;
+     color: #17a2b8;
+   }
+   
+   .extension-actions {
+     display: flex;
+     justify-content: flex-end;
+     gap: 10px;
+     margin-top: 20px;
+   }
+   ```
+
+2. **Cancellation Modal Specific Styles:**
+   ```css
+   .cancellation-date {
+     width: 100%;
+     padding: 10px;
+     border: 1px solid #ddd;
+     border-radius: 4px;
+     font-size: 14px;
+   }
+   
+   .cancellation-warning {
+     background: #fff3cd;
+     border: 1px solid #ffeaa7;
+     color: #856404;
+     padding: 15px;
+     border-radius: 4px;
+     margin-bottom: 20px;
+   }
+   ```
+
+#### Step 9.5.3: JavaScript Implementation Notes
+**Key Functions for Wix Velo:**
+
+1. **openCourseExtensionModal()** - Opens extension modal and populates course info
+2. **closeExtensionModal()** - Closes extension modal and resets form
+3. **submitExtensionRequest()** - Handles extension form submission
+4. **openCourseCancellationModal()** - Opens cancellation modal
+5. **handleCourseAction()** - Manages course action routing
+6. **createCourseItem()** - Updated to handle multiple students
+7. **loadCancellableCourses()** - Enhanced dropdown with student counts
+8. **Course selection handler** - Shows detailed student information
+9. **filterCourses()** - Multi-criteria search functionality
 
 ### Phase 10: Remove AP Student Setup (30 minutes)
 
@@ -618,9 +809,78 @@ Create complete form in AP Student Lightbox:
 
 ## Deployment and Maintenance
 
-### Step 13: Remove AP Student Testing (20 minutes)
+### Step 13: Course Management Enhancement Testing (35 minutes)
 
-#### Step 13.1: Remove AP Student Modal Testing
+#### Step 13.1: Course Extension Modal Testing
+1. **Test Extension Modal Display**
+   - Click "Course Extension" button
+   - Verify `courseExtensionLightbox` opens correctly
+   - Check modal header displays "Course Extension Request" title
+   - Verify close button (×) is functional
+
+2. **Test Extension Form Fields**
+   - **Course Information Section:**
+     - Verify `extensionCourseInfo` populates with selected course details
+     - Check course ID, subject, and student information display
+   - **Extension Date Field:**
+     - Test `extensionEndDate` input field
+     - Verify date validation (required field)
+     - Check info note displays correctly
+   - **Focus Area Field:**
+     - Test `updatedFocusArea` textarea
+     - Verify placeholder text and required validation
+   - **Description Field:**
+     - Test `extensionDescription` textarea
+     - Verify placeholder text and required validation
+
+3. **Test Extension Form Submission**
+   - Fill all required fields
+   - Click "Submit Extension Request" button (`submitExtensionBtn`)
+   - Verify form validation works for empty fields
+   - Test successful submission process
+   - Check modal closes after successful submission
+
+4. **Test Extension Modal Actions**
+   - Test "Cancel" button (`closeExtensionModalBtn2`)
+   - Verify modal closes without saving changes
+   - Test clicking outside modal to close
+   - Verify form resets when modal reopens
+
+#### Step 13.2: Course Cancellation Enhancement Testing
+1. **Test Cancellation Modal Display**
+   - Open course cancellation modal
+   - Verify warning section displays two-week notice
+   - Check alert icon and styling
+   - Verify dropdown shows "Class ID - Subject (X students)" format
+
+2. **Test Course Selection and Details**
+   - Select a course from dropdown
+   - Verify detailed student information displays
+   - Check that all students' remaining lessons are shown
+   - Test multi-column layout for courses with multiple students
+
+3. **Test Cancellation Form**
+   - Test "Cancel From" date input (`cancellation-date`)
+   - Verify cancellation reason textarea
+   - Test form validation for required fields
+   - Test cancellation confirmation with multiple students
+
+#### Step 13.3: Event Handler Configuration Testing
+1. **Test Button Event Handlers**
+   - Verify `courseExtensionBtn` opens extension modal
+   - Test `closeExtensionModalBtn` and `closeExtensionModalBtn2` close modal
+   - Check `submitExtensionBtn` triggers form submission
+   - Test modal backdrop click closes modal
+
+2. **Test JavaScript Function Integration**
+   - Verify `openCourseExtensionModal()` function
+   - Test `closeExtensionModal()` function
+   - Check `submitExtensionRequest()` function
+   - Test `handleCourseAction()` routing function
+
+### Step 14: Remove AP Student Testing (20 minutes)
+
+#### Step 14.1: Remove AP Student Modal Testing
 1. **Test Modal Display**
    - Click "Remove AP Student" button
    - Verify lightbox opens correctly
@@ -633,7 +893,7 @@ Create complete form in AP Student Lightbox:
    - Verify Remove buttons are functional
    - Test modal close functionality
 
-#### Step 13.2: Student Removal Process Testing
+#### Step 14.2: Student Removal Process Testing
 1. **Test Removal Confirmation**
    - Click Remove button for any student
    - Verify confirmation dialog appears with correct student name
@@ -651,9 +911,9 @@ Create complete form in AP Student Lightbox:
    - Verify "All AP students have been removed" message
    - Test reopening modal after all students removed
 
-### Step 14: EHCP File Management Testing (30 minutes)
+### Step 15: EHCP File Management Testing (30 minutes)
 
-#### Step 14.1: File Upload Testing
+#### Step 15.1: File Upload Testing
 1. **Test Valid File Types**
    - Upload PDF files
    - Upload DOC/DOCX files
@@ -669,7 +929,7 @@ Create complete form in AP Student Lightbox:
    - Test unauthorized access attempts
    - Check file activity tracking
 
-#### Step 14.2: Database Integration Testing
+#### Step 15.2: Database Integration Testing
 1. **Verify Data Persistence**
    - Check file URL saving to database
    - Verify file metadata storage
@@ -680,7 +940,7 @@ Create complete form in AP Student Lightbox:
    - Test file access and download
    - Test file deletion (if implemented)
 
-### Step 14: Pre-Deployment Checklist
+### Step 16: Pre-Deployment Checklist
 
 #### Content Review
 - [ ] All text content is accurate and professional
@@ -703,7 +963,7 @@ Create complete form in AP Student Lightbox:
 - [ ] Database operations tested
 - [ ] Third-party integrations tested
 
-### Step 15: Deployment Process
+### Step 17: Deployment Process
 
 1. **Final Testing:**
    - Test in Wix preview mode
@@ -723,7 +983,7 @@ Create complete form in AP Student Lightbox:
    - Test form submissions
    - Monitor error logs
 
-### Step 16: Ongoing Maintenance
+### Step 18: Ongoing Maintenance
 
 #### EHCP File Management Tasks
 **Daily Tasks:**
@@ -773,15 +1033,28 @@ Create complete form in AP Student Lightbox:
 This comprehensive guide provides everything needed to create a fully functional admin dashboard in Wix. The implementation includes:
 
 - **Complete UI/UX Design:** Professional, responsive interface
-- **Database Integration:** Robust data management system
-- **Form Processing:** Comprehensive validation and submission
+- **Enhanced Course Management:** Multi-student course display with group class support (up to 6 students per course)
+- **Advanced Course Extension System:** Dedicated extension request modal with comprehensive form fields:
+  - Extension end date selection with validation
+  - Updated focus area description
+  - Detailed extension description and requirements
+  - Professional form styling with info notes and icons
+- **Improved Course Cancellation Process:** Enhanced cancellation workflow featuring:
+  - Two-week notice requirement warnings
+  - Detailed course selection with student count display
+  - Comprehensive cancellation reason documentation
+  - Multi-student impact visualization
+- **Database Integration:** Robust data management system with updated course data structure
+- **Form Processing:** Comprehensive validation and submission with enhanced error handling
+- **Advanced Course Operations:** Enhanced course cancellation and extension with detailed student information
 - **Remove AP Student Functionality:** Dynamic student list with removal confirmation and real-time updates
 - **Third-party Integration:** Lark notification system
-- **Responsive Design:** Mobile, tablet, and desktop optimization
-- **Form Validation:** Comprehensive input validation
-- **Performance Optimization:** Fast, efficient operations
+- **Responsive Design:** Mobile, tablet, and desktop optimization with multi-column layouts
+- **Form Validation:** Comprehensive input validation with real-time feedback
+- **Performance Optimization:** Fast, efficient operations with improved search functionality
+- **Enhanced Event Handling:** Comprehensive JavaScript event management for modal interactions
 
-**Estimated Total Implementation Time:** 6.5-8.5 hours
+**Estimated Total Implementation Time:** 8-10 hours (including enhanced course management features)
 **Maintenance Time:** 2-4 hours per month
 
 **Next Steps:**
