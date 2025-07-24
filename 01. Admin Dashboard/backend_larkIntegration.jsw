@@ -478,11 +478,54 @@ export const testConnection = webMethod(
 );
 
 // ==========================================
+// 工单同步到 Lark
+// ==========================================
+
+/**
+ * 同步工单信息到 Lark
+ * @param {Object} ticketData - 工单数据
+ * @returns {Promise<Object>} 同步结果
+ */
+export async function syncTicketToLark(ticketData) {
+    try {
+        if (!ticketData || !ticketData.id) {
+            throw new LarkIntegrationError('工单数据无效', ERROR_TYPES.VALIDATION_ERROR);
+        }
+        
+        const notification = {
+            type: 'system_alert',
+            alertType: '工单更新',
+            alertLevel: ticketData.priority || 'info',
+            message: `工单 #${ticketData.id} ${ticketData.status || '已更新'}: ${ticketData.title || '无标题'}`
+        };
+        
+        // 添加工单详情
+        if (ticketData.description) {
+            notification.message += `\n\n详情: ${ticketData.description.substring(0, 500)}`;
+            if (ticketData.description.length > 500) {
+                notification.message += '...(已截断)';
+            }
+        }
+        
+        return await sendLarkNotification(notification);
+        
+    } catch (error) {
+        console.error('同步工单到 Lark 错误:', error);
+        return {
+            success: false,
+            error: error.message,
+            errorType: error.type || 'UNKNOWN_ERROR'
+        };
+    }
+}
+
+// ==========================================
 // 导出所有函数
 // ==========================================
 
 export {
     sendLarkNotification,
     sendBatchLarkNotifications,
-    testLarkConnection
+    testLarkConnection,
+    syncTicketToLark
 };

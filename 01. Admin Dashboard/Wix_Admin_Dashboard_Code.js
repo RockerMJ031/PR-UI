@@ -56,7 +56,52 @@ function initializePage() {
     // 设置默认状态
     $w('#studentModalStates').changeState('addStudent');
     
+    // 初始化当前用户信息
+    initCurrentUser();
+    
     console.log('页面初始化成功');
+}
+
+// 初始化当前用户信息
+async function initCurrentUser() {
+    try {
+        const currentUser = await wixUsers.currentUser.getHiddenCollectionToken();
+        const adminCollection = wixData.collection('Admins');
+        const adminQuery = await adminCollection.find({
+            filter: wixData.filter().eq('_id', currentUser.id)
+        });
+        
+        if (adminQuery.items.length > 0) {
+            // 将管理员信息存储在全局变量中，以便后续使用
+            global.currentAdmin = adminQuery.items[0];
+            console.log('当前管理员信息已初始化');
+        } else {
+            console.error('未找到当前管理员信息');
+        }
+    } catch (error) {
+        console.error('初始化当前用户信息错误:', error);
+    }
+}
+
+// 获取当前用户信息
+function getCurrentUser() {
+    // 如果全局变量中存在当前管理员信息，则返回
+    if (global.currentAdmin) {
+        return {
+            id: global.currentAdmin._id,
+            name: global.currentAdmin.name,
+            email: global.currentAdmin.email,
+            role: global.currentAdmin.role
+        };
+    }
+    
+    // 否则返回默认信息
+    return {
+        id: 'unknown',
+        name: 'Unknown User',
+        email: 'unknown@example.com',
+        role: 'viewer'
+    };
 }
 
 // 设置事件处理器
@@ -76,7 +121,7 @@ function setupEventHandlers() {
     $w('#addAPStudentBtn').onClick(() => openAPStudentModal());
     $w('#removeAPStudentBtn').onClick(() => openRemoveAPModal());
     $w('#submitTicketBtn').onClick(() => handleTicketSubmission());
-    $w('#checkStatusBtn').onClick(() => handleStatusCheck());
+    $w('#checkTicketStatusBtn').onClick(() => handleStatusCheck());
     
     // Lark Base 同步按钮
     $w('#syncWithLarkBtn').onClick(() => openLarkSyncModal());
@@ -110,6 +155,11 @@ function setupEventHandlers() {
     // 文件上传
     $w('#ehcpFileUpload').onChange(() => handleFileUpload());
     
+    // 刷新统计数据按钮
+    if ($w('#refreshStatsBtn')) {
+        $w('#refreshStatsBtn').onClick(() => refreshStatistics());
+    }
+    
     console.log('事件处理器设置完成');
 }
 
@@ -120,8 +170,183 @@ function loadInitialData() {
     loadStudents();
     loadAPStudents();
     loadPricingPlans();
+    initTicketSystem();
     
     console.log('初始数据加载开始');
+}
+
+// 初始化工单系统
+function initTicketSystem() {
+    // 初始化工单状态检查模态框
+    if ($w('#ticketStatusLightbox')) {
+        // 设置工单ID输入框事件
+        $w('#ticketIdInput').onInput(() => {
+            const ticketId = $w('#ticketIdInput').value;
+            $w('#checkTicketBtn').enable(ticketId && ticketId.trim().length > 0);
+        });
+        
+        // 设置检查按钮点击事件
+        $w('#checkTicketBtn').onClick(() => {
+            const ticketId = $w('#ticketIdInput').value;
+            if (ticketId && ticketId.trim().length > 0) {
+                checkTicketStatus(ticketId)
+                    .then(ticketDetails => {
+                        // 关闭状态检查模态框，显示详情模态框
+                        $w('#ticketStatusLightbox').hide();
+                        showTicketDetails(ticketDetails);
+                    })
+                    .catch(error => {
+                        $w('#ticketStatusError').text = error.message || '查询工单失败';
+                        $w('#ticketStatusError').show();
+                    });
+            }
+        });
+        
+        // 设置关闭按钮点击事件
+        $w('#closeTicketStatusBtn').onClick(() => {
+            $w('#ticketStatusLightbox').hide();
+        });
+    }
+    
+    // 初始化工单详情模态框
+    if ($w('#ticketDetailsLightbox')) {
+        // 设置关闭按钮点击事件
+        $w('#closeTicketDetailsBtn').onClick(() => {
+            $w('#ticketDetailsLightbox').hide();
+        });
+        
+        // 设置更新状态按钮点击事件
+        $w('#updateTicketStatusBtn').onClick(() => {
+            const ticketId = $w('#ticketDetailsId').text;
+            const newStatus = $w('#ticketStatusDropdown').value;
+            const comments = $w('#ticketCommentsInput').value;
+            const resolution = newStatus === 'resolved' ? $w('#ticketResolutionInput').value : '';
+            
+            updateTicketStatus(ticketId, newStatus, comments, resolution)
+                .then(updatedTicket => {
+                    // 刷新工单详情
+                    showTicketDetails(updatedTicket);
+                    $w('#ticketUpdateSuccess').show();
+                    setTimeout(() => $w('#ticketUpdateSuccess').hide(), 3000);
+                })
+                .catch(error => {
+                    $w('#ticketUpdateError').text = error.message || '更新工单失败';
+                    $w('#ticketUpdateError').show();
+                });
+        });
+    }
+}
+
+// 显示工单详情
+function showTicketDetails(ticketDetails) {
+    if (!$w('#ticketDetailsLightbox')) return;
+    
+    // 设置工单基本信息
+    $w('#ticketDetailsId').text = ticketDetails.ticketId || '';
+    $w('#ticketDetailsTitle').text = ticketDetails.title || '';
+    $w('#ticketDetailsSubmittedDate').text = formatDate(ticketDetails.submittedDate);
+    $w('#ticketDetailsCategory').text = ticketDetails.category || '';
+    $w('#ticketDetailsPriority').text = ticketDetails.priority || '';
+    $w('#ticketDetailsStatus').text = formatTicketStatus(ticketDetails.status);
+    $w('#ticketDetailsDescription').text = ticketDetails.description || '';
+    
+    // 设置工单评论
+    if (ticketDetails.comments && ticketDetails.comments.length > 0) {
+        const commentsHtml = ticketDetails.comments.map(comment => {
+            return `<div class="ticket-comment">
+                <div class="comment-header">
+                    <span class="comment-author">${comment.author || '系统'}</span>
+                    <span class="comment-date">${formatDate(comment.date)}</span>
+                </div>
+                <div class="comment-text">${comment.text}</div>
+            </div>`;
+        }).join('');
+        
+        $w('#ticketCommentsContainer').html = commentsHtml;
+        $w('#ticketCommentsContainer').show();
+    } else {
+        $w('#ticketCommentsContainer').hide();
+    }
+    
+    // 设置解决方案（如果有）
+    if (ticketDetails.resolution) {
+        $w('#ticketResolutionContainer').show();
+        $w('#ticketResolution').text = ticketDetails.resolution;
+        $w('#ticketResolvedDate').text = formatDate(ticketDetails.resolvedDate);
+    } else {
+        $w('#ticketResolutionContainer').hide();
+    }
+    
+    // 设置完成总结（如果有）
+    if (ticketDetails.completionSummary) {
+        $w('#ticketCompletionContainer').show();
+        $w('#ticketCompletionSummary').text = ticketDetails.completionSummary;
+    } else {
+        $w('#ticketCompletionContainer').hide();
+    }
+    
+    // 设置Lark同步状态
+    $w('#ticketLarkSyncStatus').text = formatLarkSyncStatus(ticketDetails.larkSyncStatus);
+    $w('#ticketLarkSyncTime').text = ticketDetails.larkSyncTime ? formatDate(ticketDetails.larkSyncTime) : '未同步';
+    
+    // 根据工单状态启用/禁用更新按钮
+    if (ticketDetails.status === 'closed') {
+        $w('#updateTicketStatusBtn').disable();
+        $w('#ticketStatusDropdown').disable();
+        $w('#ticketCommentsInput').disable();
+        $w('#ticketResolutionInput').disable();
+    } else {
+        $w('#updateTicketStatusBtn').enable();
+        $w('#ticketStatusDropdown').enable();
+        $w('#ticketCommentsInput').enable();
+        
+        // 只有在状态为已解决时才启用解决方案输入
+        if ($w('#ticketStatusDropdown').value === 'resolved') {
+            $w('#ticketResolutionInput').enable();
+        } else {
+            $w('#ticketResolutionInput').disable();
+        }
+    }
+    
+    // 显示模态框
+    $w('#ticketDetailsLightbox').show();
+}
+
+// 格式化工单状态
+function formatTicketStatus(status) {
+    const statusMap = {
+        'open': '待处理',
+        'in_progress': '处理中',
+        'resolved': '已解决',
+        'closed': '已关闭'
+    };
+    
+    return statusMap[status] || status;
+}
+
+// 格式化Lark同步状态
+function formatLarkSyncStatus(status) {
+    const statusMap = {
+        'pending': '待同步',
+        'synced': '已同步',
+        'failed': '同步失败'
+    };
+    
+    return statusMap[status] || status;
+}
+
+// 格式化日期
+function formatDate(dateString) {
+    if (!dateString) return '';
+    
+    const date = new Date(dateString);
+    return date.toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
 }
 
 // 加载统计数据
@@ -143,24 +368,87 @@ function loadStatistics() {
         });
 }
 
+// 刷新统计数据
+function refreshStatistics() {
+    console.log('刷新统计数据');
+    
+    // 显示加载中提示
+    if ($w('#refreshStatsBtn')) {
+        $w('#refreshStatsBtn').disable();
+        $w('#refreshStatsBtn').label = '加载中...';
+    }
+    
+    // 重新加载统计数据
+    loadStatistics();
+    
+    // 恢复按钮状态
+    setTimeout(() => {
+        if ($w('#refreshStatsBtn')) {
+            $w('#refreshStatsBtn').enable();
+            $w('#refreshStatsBtn').label = '刷新统计';
+        }
+    }, 1000);
+}
+
 // 更新统计显示
 function updateStatisticsDisplay(stats) {
     $w('#totalStudentsValue').text = stats.totalStudents.toString();
     $w('#activeStudentsValue').text = stats.activeStudents.toString();
-    $w('#securityAlertsValue').text = stats.securityAlerts.toString();
-    $w('#pendingInvoicesValue').text = stats.pendingInvoices.toString();
+    
+    // 获取当前年月
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth() + 1;
+    const currentYear = currentDate.getFullYear();
+    const monthKey = `${currentYear}-${currentMonth}`;
+    
+    // 获取工单统计数据
+    let submittedTickets = 0;
+    let resolvedTickets = 0;
+    
+    if (stats.ticketStats && stats.ticketStats[monthKey]) {
+        submittedTickets = stats.ticketStats[monthKey].submitted || 0;
+        resolvedTickets = stats.ticketStats[monthKey].resolved || 0;
+    }
+    
+    // 更新统计卡片显示 - 使用安全警报卡片显示提交工单数，使用待处理发票卡片显示已解决工单数
+    $w('#securityAlertsValue').text = submittedTickets.toString();
+    $w('#pendingInvoicesValue').text = resolvedTickets.toString();
+    
+    // 更新文本标签
+    if ($w('#securityAlertsText')) {
+        $w('#securityAlertsText').text = '本月提交工单';
+    }
+    if ($w('#pendingInvoicesText')) {
+        $w('#pendingInvoicesText').text = '本月已解决工单';
+    }
     
     console.log('统计数据已更新:', stats);
 }
 
 // 创建默认统计数据（如果不存在）
 function createDefaultStatistics() {
+    // 获取当前年月
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth() + 1;
+    const currentYear = currentDate.getFullYear();
+    const monthKey = `${currentYear}-${currentMonth}`;
+    
+    // 创建默认统计数据
     const defaultStats = {
         totalStudents: 0,
         activeStudents: 0,
-        securityAlerts: 0,
-        pendingInvoices: 0,
-        lastUpdated: new Date()
+        securityAlerts: 0,  // 保留字段，现在用于显示提交工单数
+        pendingInvoices: 0, // 保留字段，现在用于显示已解决工单数
+        lastUpdated: new Date(),
+        // 工单统计数据 - 按月份记录工单提交、解决、关闭和查询数量
+        ticketStats: {
+            [monthKey]: {
+                submitted: 0, // 提交的工单数
+                resolved: 0, // 已解决的工单数
+                closed: 0,   // 已关闭的工单数
+                checked: 0   // 查询的工单数
+            }
+        }
     };
     
     wixData.insert("PR-Statistics", defaultStats)
@@ -1256,6 +1544,16 @@ function hideAllModals() {
     if ($w('#apStudentRegistrationLightbox')) {
         $w('#apStudentRegistrationLightbox').hide(); // Wix Lightbox 而非 HTML 模态框
     }
+    // 工单相关模态框
+    if ($w('#ticketStatusLightbox')) {
+        $w('#ticketStatusLightbox').hide();
+    }
+    if ($w('#ticketDetailsLightbox')) {
+        $w('#ticketDetailsLightbox').hide();
+    }
+    if ($w('#ticketSubmissionLightbox')) {
+        $w('#ticketSubmissionLightbox').hide();
+    }
 }
 
 // 权限管理类
@@ -1733,12 +2031,12 @@ class StatisticsManager {
                 $w('#totalCoursesText').text = stats.totalCourses?.toString() || '0';
             }
             
-            // 更新系统统计
+            // 更新系统统计 - 现在显示工单统计
             if ($w('#securityAlertsText')) {
-                $w('#securityAlertsText').text = stats.securityAlerts?.toString() || '0';
+                $w('#securityAlertsText').text = '本月提交工单';
             }
             if ($w('#pendingInvoicesText')) {
-                $w('#pendingInvoicesText').text = stats.pendingInvoices?.toString() || '0';
+                $w('#pendingInvoicesText').text = '本月已解决工单';
             }
             
             // 更新最后更新时间
@@ -1795,14 +2093,252 @@ function filterCourses() {
 function handleTicketSubmission() {
     // 实现工单提交逻辑
     console.log('工单提交已点击');
-    // 可以打开另一个模态框或重定向到工单表单
+    
+    // 获取当前用户信息
+    const currentUser = getCurrentUser();
+    const clientId = currentUser.id;
+    const clientName = currentUser.name;
+    const email = currentUser.email;
+    
+    // 构建Lark工单提交表单URL，包含预填充的用户信息
+    const larkTicketFormUrl = `https://anycross.larksuite.com/base/form/share?token=xxxx&client_id=${clientId}&clientName=${encodeURIComponent(clientName)}&email=${encodeURIComponent(email)}`;
+    
+    // 在新窗口打开Lark表单
+    wixWindow.openLightbox('ticketSubmissionLightbox', {
+        url: larkTicketFormUrl,
+        clientId: clientId,
+        clientName: clientName,
+        email: email
+    });
+    
+    // 记录工单提交事件到统计数据
+    updateTicketStatistics('submitted');
 }
 
 // 处理状态检查
 function handleStatusCheck() {
     // 实现状态检查逻辑
     console.log('状态检查已点击');
-    // 可以打开另一个模态框或重定向到状态页面
+    
+    // 打开工单状态检查模态框
+    wixWindow.openLightbox('ticketStatusLightbox')
+        .then(ticketId => {
+            if (ticketId) {
+                // 如果用户输入了工单ID，查询该工单的状态
+                return checkTicketStatus(ticketId);
+            }
+        })
+        .catch(error => {
+            console.error('工单状态检查错误:', error);
+            wixWindow.openLightbox('errorLightbox', {
+                title: '工单状态检查错误',
+                message: '无法检查工单状态，请稍后再试。'
+            });
+        });
+}
+
+// 检查工单状态
+async function checkTicketStatus(ticketId) {
+    try {
+        // 从CMS-10 Tickets集合查询工单信息
+        const ticketsCollection = wixData.collection('Tickets');
+        const ticketResult = await ticketsCollection.get(ticketId);
+        
+        if (!ticketResult) {
+            throw new Error('未找到工单');
+        }
+        
+        // 获取工单详情
+        const ticketDetails = {
+            ticketId: ticketResult.ticketId,
+            submittedDate: ticketResult.submittedDate,
+            title: ticketResult.title,
+            category: ticketResult.category,
+            priority: ticketResult.priority,
+            status: ticketResult.status,
+            description: ticketResult.description,
+            comments: ticketResult.comments || [],
+            resolution: ticketResult.resolution,
+            resolvedDate: ticketResult.resolvedDate,
+            completionSummary: ticketResult.completionSummary,
+            proposeToCloseSendAt: ticketResult.proposeToCloseSendAt,
+            larkSyncStatus: ticketResult.larkSyncStatus,
+            larkSyncTime: ticketResult.larkSyncTime
+        };
+        
+        // 显示工单详情模态框
+        wixWindow.openLightbox('ticketDetailsLightbox', ticketDetails);
+        
+        // 记录工单查询事件到统计数据
+        updateTicketStatistics('checked');
+        
+        return ticketDetails;
+    } catch (error) {
+        console.error('查询工单状态错误:', error);
+        wixWindow.openLightbox('errorLightbox', {
+            title: '工单查询错误',
+            message: error.message || '无法查询工单状态，请确认工单ID是否正确。'
+        });
+        throw error;
+    }
+}
+
+// 更新工单统计数据
+async function updateTicketStatistics(action) {
+    try {
+        // 获取当前统计数据
+        const statisticsCollection = wixData.collection('PR-Statistics');
+        const statisticsQuery = await statisticsCollection.find();
+        let statistics = statisticsQuery.items[0];
+        
+        if (!statistics) {
+            // 如果没有统计数据，创建默认统计数据
+            statistics = await createDefaultStatistics();
+        }
+        
+        // 根据操作类型更新相应的统计数据
+        const currentDate = new Date();
+        const currentMonth = currentDate.getMonth() + 1;
+        const currentYear = currentDate.getFullYear();
+        
+        // 确保月度工单统计数据存在
+        if (!statistics.ticketStats) {
+            statistics.ticketStats = {};
+        }
+        
+        const monthKey = `${currentYear}-${currentMonth}`;
+        if (!statistics.ticketStats[monthKey]) {
+            statistics.ticketStats[monthKey] = {
+                submitted: 0,
+                resolved: 0,
+                closed: 0,
+                checked: 0
+            };
+        }
+        
+        // 更新相应的计数器
+        statistics.ticketStats[monthKey][action]++;
+        
+        // 保存更新后的统计数据
+        await statisticsCollection.update(statistics);
+        
+        // 刷新显示的统计数据
+        loadStatistics();
+        
+        console.log(`工单统计数据已更新: ${action}`);
+        return statistics;
+    } catch (error) {
+        console.error('更新工单统计数据错误:', error);
+        // 错误处理，但不中断用户操作
+        return null;
+    }
+}
+
+// 更新工单状态
+async function updateTicketStatus(ticketId, newStatus, comments, resolution) {
+    try {
+        // 从CMS-10 Tickets集合查询工单信息
+        const ticketsCollection = wixData.collection('Tickets');
+        const ticketResult = await ticketsCollection.get(ticketId);
+        
+        if (!ticketResult) {
+            throw new Error('未找到工单');
+        }
+        
+        // 更新工单状态
+        const updatedTicket = { ...ticketResult };
+        updatedTicket.status = newStatus;
+        
+        // 添加评论（如果有）
+        if (comments) {
+            if (!updatedTicket.comments) {
+                updatedTicket.comments = [];
+            }
+            
+            updatedTicket.comments.push({
+                text: comments,
+                date: new Date(),
+                author: getCurrentUser().name
+            });
+        }
+        
+        // 如果状态为已解决，添加解决方案和解决日期
+        if (newStatus === 'resolved' && resolution) {
+            updatedTicket.resolution = resolution;
+            updatedTicket.resolvedDate = new Date();
+        }
+        
+        // 如果状态为已关闭，添加完成总结
+        if (newStatus === 'closed') {
+            updatedTicket.completionSummary = comments || '工单已关闭';
+        }
+        
+        // 更新Lark同步状态
+        updatedTicket.larkSyncStatus = 'pending';
+        
+        // 保存更新后的工单
+        const savedTicket = await ticketsCollection.update(updatedTicket);
+        
+        // 同步到Lark
+        syncTicketToLark(savedTicket);
+        
+        // 更新统计数据
+        if (newStatus === 'resolved') {
+            updateTicketStatistics('resolved');
+        } else if (newStatus === 'closed') {
+            updateTicketStatistics('closed');
+        }
+        
+        return savedTicket;
+    } catch (error) {
+        console.error('更新工单状态错误:', error);
+        throw error;
+    }
+}
+
+// 同步工单到Lark
+async function syncTicketToLark(ticket) {
+    try {
+        // 构建Lark API请求数据
+        const larkData = {
+            ticketId: ticket.ticketId,
+            status: ticket.status,
+            title: ticket.title,
+            category: ticket.category,
+            priority: ticket.priority,
+            description: ticket.description,
+            comments: ticket.comments,
+            resolution: ticket.resolution,
+            resolvedDate: ticket.resolvedDate,
+            completionSummary: ticket.completionSummary
+        };
+        
+        // 调用后端模块发送到Lark
+        const result = await backend_larkIntegration.syncTicketToLark(larkData);
+        
+        // 更新同步状态
+        const ticketsCollection = wixData.collection('Tickets');
+        await ticketsCollection.update({
+            ...ticket,
+            larkSyncStatus: 'synced',
+            larkSyncTime: new Date()
+        });
+        
+        console.log('工单已同步到Lark:', result);
+        return result;
+    } catch (error) {
+        console.error('同步工单到Lark错误:', error);
+        
+        // 更新同步状态为失败
+        const ticketsCollection = wixData.collection('Tickets');
+        await ticketsCollection.update({
+            ...ticket,
+            larkSyncStatus: 'failed',
+            larkSyncTime: new Date()
+        });
+        
+        throw error;
+    }
 }
 
 // ==========================================

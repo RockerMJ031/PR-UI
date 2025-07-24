@@ -73,8 +73,8 @@ This document details the database collection configuration required for the tut
   registrationStatus: "text", // pending, approved, rejected, Activated
   ehcpDocument: "text", // EHCP Document Attachment URL
   
-  // EHCP Status - Multi-select field (REQUIRED TO ADD TO CMS-1)
-  ehcpStatus: ["text"], // EHCP Status options:
+  // EHCP Status - Multi-select field (RAdded into Wix)
+  ehcpStatus: ["text"], // EHCP Status options: - Added into Wix
   // - SpLD - Specific Learning Difficulties
   // - SLCN - Speech, Language and Communication Needs
   // - SEMH - Social, Emotional and Mental Health
@@ -87,9 +87,9 @@ This document details the database collection configuration required for the tut
   // - OTH - Other Difficulty/Disorder
   // - DS - Down Syndrome
   
-  ehcpDetails: "text", // EHCP Details (REQUIRED TO ADD TO CMS-1)
-  caseworkerName: "text", // EHCP Officer/Caseworker Name (REQUIRED TO ADD TO CMS-1)
-  caseworkerEmail: "text", // EHCP Officer/Caseworker Email (REQUIRED TO ADD TO CMS-1)
+  ehcpDetails: "text", // EHCP Details (Added into Wix)
+  caseworkerName: "text", // EHCP Officer/Caseworker Name (Added into Wix)
+  caseworkerEmail: "text", // EHCP Officer/Caseworker Email (Added into Wix)
   
   // Additional Student Information Fields (REQUIRED TO ADD TO CMS-1)
   emergencyContact: "text", // Emergency Contact Information
@@ -99,7 +99,7 @@ This document details the database collection configuration required for the tut
   homeLessonsWithoutSupervision: "text", // Whether student will access lessons at home without supervision (yes/no)
   supportLongerThanFourWeeks: "text", // Whether Purple Ruler support is expected longer than four weeks (yes/no)
   
-  // Educational Plan Selection (REQUIRED TO ADD TO CMS-1)
+  // Educational Plan Selection (Added into Wix)
   selectedPlan: "text", // Educational Plan options:
   // - Core Subjects
   // - Core Subjects + PSHE Careers + PE and Art
@@ -111,7 +111,6 @@ This document details the database collection configuration required for the tut
   examBoard: "text", // Examination Board
   caseworkerContact: "text", // Caseworker Contact Information
   school: "text", // School
-  address: "text", // Address
   
   /* Data Flow Description:
    * 数据流程说明：
@@ -652,7 +651,7 @@ This document details the database collection configuration required for the tut
   submittedBy: "text", // Submitter ID
   assignedTo: "text", // Assigned to (Admin ID)
   client_id: "text", // Client ID for Lark synchronization
-  name: "text", // Client name
+  clientName: "text", // Client name
   email: "text", // Client email
   submittedDate: "text", // Submission time
   resolvedDate: "text", // Resolution time
@@ -725,7 +724,7 @@ This document details the database collection configuration required for the tut
   lastModifiedBy: "text", // Admin user who last modified
   larkSyncStatus: "text", // Synchronization status with Lark Anycross
   larkSyncTime: "text", // Last synchronization time
-  anycrossRecordId: "text", // Corresponding record ID in Lark Anycross
+  larkRecordId: "text", // Corresponding record ID in Lark
   _createdDate: "text",
   _updatedDate: "text"
 }

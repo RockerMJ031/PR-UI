@@ -166,18 +166,9 @@ This guide will help you create a comprehensive admin dashboard in Wix with the 
    - Hover: `#f8f9fa`
    - Active: `#007bff` (white text)
 
-### Phase 4: Student Type Toggle (20 minutes)
 
-#### Step 4.1: Add Student Type Toggle
-1. **At top of main column add:** Student type toggle buttons
-2. **Tutoring Students Button:** `tutoringStudentsBtn`
-   - Text: "Tutoring Students"
-   - Background: #17a2b8 (info color)
-3. **Alternative Provision Students Button:** `apStudentsBtn`
-   - Text: "Alternative Provision Students"
-   - Background: #663399 (primary color)
 
-#### Step 4.2: Add Statistics Cards
+### Phase 4: Add Statistics Cards
 Create dynamic statistics cards that update based on student type:
 
 1. **Total Students Card:**
@@ -200,16 +191,16 @@ Create dynamic statistics cards that update based on student type:
    - Value Text: `needAttentionValue` (Font: 48px, bold)
    - Label Text: `needAttentionLabel` ("Need Attention")
 
-### Phase 5: Action Cards (45 minutes)
+### Phase 4.1: Action Cards (45 minutes)
 
-#### Step 5.1: Create Action Grid
+#### Step 4.1.1: Create Action Grid
 1. **Below statistics grid add:** Add Elements → Layout → Grid
 2. **Grid Name:** `actionCardsGrid`
 3. **Columns:** 3
 4. **Spacing:** 20px
 5. **Height:** Auto
 
-#### Step 5.2: Add Action Cards
+#### Step 4.1.2: Add Action Cards
 
 1. **Course Management Card:**
    - Container: `courseManagementCard`
@@ -262,24 +253,24 @@ Create dynamic statistics cards that update based on student type:
      - `submitTicketBtn` ("Submit Ticket")
      - `checkStatusBtn` ("Check Status")
 
-### Phase 6: Pricing Plans (30 minutes)
+### Phase 4.2: Pricing Plans (30 minutes)
 
-#### Step 6.1: Create Pricing Grid
+#### Step 4.2.1: Create Pricing Grid
 1. **Below action cards add:** Add Elements → Layout → Grid
 2. **Grid Name:** `pricingGrid`
 3. **Columns:** 3
 4. **Spacing:** 20px
 
-#### Step 6.2: Add Pricing Cards
+#### Step 4.2.2: Add Pricing Cards
 Create three pricing plan cards, each containing:
 - Plan name
 - Price
 - Feature list
 - "Select Plan" button
 
-### Phase 7: Dataset Connections (30 minutes)
+### Phase 5: Dataset Connections (30 minutes)
 
-#### Step 7.1: Add Datasets
+#### Step 5.1: Add Datasets
 1. **Click:** Add Elements → Database → Dataset
 2. **Add the following datasets:**
    - `studentsDataset` → Students collection
@@ -289,7 +280,7 @@ Create three pricing plan cards, each containing:
    - `ticketsDataset` → Tickets collection
    - `apStudentsDataset` → Students collection (filter isAP = true)
 
-#### Step 7.2: Dataset Field Configuration
+#### Step 5.2: Dataset Field Configuration
 Create the following datasets to support dashboard functionality:
 
 1. **Students** - Store tutoring student information
@@ -309,12 +300,12 @@ Create the following datasets to support dashboard functionality:
 5. **Statistics** - Store statistical data
    - Fields: totalStudents, activeStudents, safeguardingAlerts, pendingInvoices, apStudentCount, openTickets
 
-#### Step 7.3: Connect Elements to Datasets
+#### Step 5.3: Connect Elements to Datasets
 1. **Connect statistics values to statisticsDataset**
 2. **Connect pricing cards to pricingDataset**
 3. **Set dataset permissions to "Admin Only"**
 
-### Phase 8: Modal/Lightbox Creation (60 minutes)
+### Phase 6: Modal/Lightbox Creation (60 minutes)
 
 **Important:** Modals from the original HTML file should be replaced with Lightbox components in Wix. Here are the correspondences:
 - HTML `courseModal` → Wix `courseManagementLightbox`
@@ -324,7 +315,7 @@ Create the following datasets to support dashboard functionality:
 **Course Data Structure Update:**
 The course management system has been updated to support multiple students per course (up to 6 students). The new data structure groups students by class ID and subject, allowing for more efficient management of group classes.
 
-#### Step 8.1: Course Extension Modal
+#### Step 6.1: Course Extension Modal
 **New Implementation:** Enhanced Course Extension Request System
 1. **Add:** Elements → Popups & Lightboxes → Lightbox
 2. **Lightbox ID:** `courseExtensionLightbox`
@@ -354,7 +345,7 @@ The course management system has been updated to support multiple students per c
      - Cancel button: `closeExtensionModalBtn2` (secondary style)
      - Submit button: `submitExtensionBtn` (success style with paper plane icon)
 
-#### Step 8.2: Course Cancellation Modal
+#### Step 6.2: Course Cancellation Modal
 **Enhanced Implementation:** Course cancellation with detailed information
 1. **Add:** Elements → Popups & Lightboxes → Lightbox
 2. **Lightbox ID:** `courseCancellationLightbox`
@@ -383,7 +374,7 @@ The course management system has been updated to support multiple students per c
      - Cancel button (secondary style)
      - Confirm Cancellation button (danger style)
 
-#### Step 8.3: Student Management Modal
+#### Step 6.3: Student Management Modal
 **Replaces:** `studentModal` from original HTML file
 1. **Add:** Elements → Popups & Lightboxes → Lightbox
 2. **Lightbox ID:** `studentManagementLightbox`
@@ -393,7 +384,7 @@ The course management system has been updated to support multiple students per c
    - Remove student options: remove all courses / remove specific courses
    - Tab navigation
 
-#### Step 8.4: AP Student Registration Modal
+#### Step 6.4: AP Student Registration Modal
 **Replaces:** `apStudentModal` from original HTML file
 1. **Add:** Elements → Popups & Lightboxes → Lightbox
 2. **Lightbox ID:** `apStudentRegistrationLightbox`
@@ -404,7 +395,7 @@ The course management system has been updated to support multiple students per c
    - Education plan selection (Core Subjects, Core Plus, All Subjects + Therapy, Blueprint)
    - Additional questions (home supervision, support duration)
 
-#### Step 8.5: Remove AP Student Modal
+#### Step 6.5: Remove AP Student Modal
 **New Feature:** Remove AP Student functionality
 1. **Add:** Elements → Popups & Lightboxes → Lightbox
 2. **Lightbox ID:** `removeAPStudentLightbox`
@@ -431,9 +422,9 @@ The course management system has been updated to support multiple students per c
   - Status Badge: `statusBadge` (Active: green, Paused: orange)
   - Remove Button: `removeStudentButton` (Red background, white text)
 
-### Phase 9: Form Creation (90 minutes)
+### Phase 7: Form Creation (90 minutes)
 
-#### Step 9.1: Add Student Form
+#### Step 7.1: Add Student Form
 Create form in Student Management Lightbox:
 
 **Basic Information:**
@@ -454,7 +445,7 @@ Create form in Student Management Lightbox:
 - `submitAddStudentBtn` - Submit
 - `cancelAddStudentBtn` - Cancel
 
-#### Step 9.2: AP Student Registration Form
+#### Step 7.2: AP Student Registration Form
 Create complete form in AP Student Lightbox:
 
 **Student Information (OEAS Framework):**
@@ -495,9 +486,9 @@ Create complete form in AP Student Lightbox:
 - `registerAPStudentBtn` - Register
 - `cancelAPRegistrationBtn` - Cancel
 
-### Phase 9.5: Course Management Enhancement (45 minutes)
+### Phase 7.5: Course Management Enhancement (45 minutes)
 
-#### Step 9.5.1: Multi-Student Course Display Implementation
+#### Step 7.5.1: Multi-Student Course Display Implementation
 **Enhanced Course List Functionality:**
 
 1. **Course Item Structure:**
@@ -540,7 +531,7 @@ Create complete form in AP Student Lightbox:
    - Real-time filtering as user types
    - Highlights matching terms in results
 
-#### Step 9.5.2: CSS Styling for Course Extension Modal
+#### Step 7.5.2: CSS Styling for Course Extension Modal
 **Enhanced Modal Styling:**
 
 1. **Extension Modal Specific Styles:**
@@ -629,7 +620,7 @@ Create complete form in AP Student Lightbox:
    }
    ```
 
-#### Step 9.5.3: JavaScript Implementation Notes
+#### Step 7.5.3: JavaScript Implementation Notes
 **Key Functions for Wix Velo:**
 
 1. **openCourseExtensionModal()** - Opens extension modal and populates course info
@@ -642,9 +633,9 @@ Create complete form in AP Student Lightbox:
 8. **Course selection handler** - Shows detailed student information
 9. **filterCourses()** - Multi-criteria search functionality
 
-### Phase 10: Remove AP Student Setup (30 minutes)
+### Phase 8: Remove AP Student Setup (30 minutes)
 
-#### Step 10.1: Prepare Student Data Structure
+#### Step 8.1: Prepare Student Data Structure
 **Set up data connection for AP students:**
 
 **Note:** The system will use common UK student names to reflect the target demographic.
@@ -665,7 +656,7 @@ Create complete form in AP Student Lightbox:
      - Thomas Anderson (Year 9, All Subjects + Therapy, Active)
      - Isabella Clark (Year 7, Core Subjects, Active)
 
-#### Step 10.2: Configure Remove AP Student Button
+#### Step 8.2: Configure Remove AP Student Button
 **Set up the Remove AP Student button functionality:**
 
 1. **Select the Remove AP Student Button:**
@@ -679,7 +670,7 @@ Create complete form in AP Student Lightbox:
    - The lightbox should populate with current AP students from database
    - Each student should display with their information and status
 
-#### Step 10.3: Design Student List Display
+#### Step 8.3: Design Student List Display
 **Configure how students appear in the removal modal:**
 
 1. **Student List Container:**
@@ -704,7 +695,7 @@ Create complete form in AP Student Lightbox:
    - Small size, rounded corners
    - "Remove" text label
 
-#### Step 10.4: Set Up Removal Confirmation
+#### Step 8.4: Set Up Removal Confirmation
 **Configure the student removal process:**
 
 1. **Confirmation Dialog:**
@@ -719,7 +710,7 @@ Create complete form in AP Student Lightbox:
    - Show success message with student name
    - If no students remain, close the modal automatically
 
-#### Step 10.5: Configure Student Count Updates
+#### Step 8.5: Configure Student Count Updates
 **Set up automatic counter updates:**
 
 1. **AP Student Counter:**
@@ -732,7 +723,7 @@ Create complete form in AP Student Lightbox:
    - Total students count should decrease accordingly
    - Active/Paused counts should update based on removed student status
 
-#### Step 10.6: Modal Close Functionality
+#### Step 8.6: Modal Close Functionality
 **Configure lightbox closing behavior:**
 
 1. **Close Button Setup:**
@@ -744,9 +735,9 @@ Create complete form in AP Student Lightbox:
    - Modal should close automatically when all students are removed
    - Show final confirmation message before closing
 
-### Phase 11: EHCP File Upload Implementation (60 minutes)
+### Phase 9: EHCP File Upload Implementation (60 minutes)
 
-#### Step 11.1: File Upload Security Configuration
+#### Step 9.1: File Upload Security Configuration
 1. **Configure File Upload Settings in Wix**
    - Go to Database Manager → File Upload Settings
    - Set allowed file types: PDF, DOC, DOCX
@@ -754,7 +745,7 @@ Create complete form in AP Student Lightbox:
    - Enable file validation in upload element properties
    - Configure user access permissions for file uploads
 
-#### Step 11.2: File Upload Elements Setup
+#### Step 9.2: File Upload Elements Setup
 1. **Add File Upload Elements to AP Student Form**
    - Add Upload Button: `ehcpFileUpload`
      - Position: Below education plan dropdown
@@ -770,7 +761,7 @@ Create complete form in AP Student Lightbox:
      - Position: Below progress bar
      - Initially hidden
 
-#### Step 11.3: Database Collection Updates
+#### Step 9.3: Database Collection Updates
 1. **Update Students Collection Fields**
    - Go to Database Manager → Students Collection
    - Add new fields:
@@ -781,7 +772,7 @@ Create complete form in AP Student Lightbox:
      - `ehcpFileStatus` (Text field)
    - Set field permissions to "Admin only"
 
-#### Step 11.4: Additional Information Fields
+#### Step 9.4: Additional Information Fields
 1. **Update Students Collection with Additional Fields**
    - Add `homeLessonsWithoutSupervision` field (text) - Whether student can have home lessons without supervision (Yes/No)
    - Add `supportLongerThanFourWeeks` field (text) - Whether student needs support longer than four weeks (Yes/No)
@@ -791,16 +782,16 @@ Create complete form in AP Student Lightbox:
    - Configure search indexing for relevant fields
    - Set up field permissions
 
-### Phase 12: Responsive Design (45 minutes)
+### Phase 10: Responsive Design (45 minutes)
 
-#### Step 12.1: Mobile Layout
+#### Step 10.1: Mobile Layout
 1. **Switch to mobile view**
 2. **Hide sidebar**
 3. **Adjust grid to single column**
 4. **Adjust font sizes and spacing**
 5. **Optimize file upload for mobile**
 
-#### Step 12.2: Tablet Layout
+#### Step 10.2: Tablet Layout
 1. **Switch to tablet view**
 2. **Adjust sidebar width to 200px**
 3. **Adjust grid to 2 columns**
@@ -809,9 +800,9 @@ Create complete form in AP Student Lightbox:
 
 ## Deployment and Maintenance
 
-### Step 13: Course Management Enhancement Testing (35 minutes)
+### Step 11: Course Management Enhancement Testing (35 minutes)
 
-#### Step 13.1: Course Extension Modal Testing
+#### Step 11.1: Course Extension Modal Testing
 1. **Test Extension Modal Display**
    - Click "Course Extension" button
    - Verify `courseExtensionLightbox` opens correctly
@@ -846,7 +837,7 @@ Create complete form in AP Student Lightbox:
    - Test clicking outside modal to close
    - Verify form resets when modal reopens
 
-#### Step 13.2: Course Cancellation Enhancement Testing
+#### Step 11.2: Course Cancellation Enhancement Testing
 1. **Test Cancellation Modal Display**
    - Open course cancellation modal
    - Verify warning section displays two-week notice
@@ -865,7 +856,7 @@ Create complete form in AP Student Lightbox:
    - Test form validation for required fields
    - Test cancellation confirmation with multiple students
 
-#### Step 13.3: Event Handler Configuration Testing
+#### Step 11.3: Event Handler Configuration Testing
 1. **Test Button Event Handlers**
    - Verify `courseExtensionBtn` opens extension modal
    - Test `closeExtensionModalBtn` and `closeExtensionModalBtn2` close modal
@@ -878,9 +869,9 @@ Create complete form in AP Student Lightbox:
    - Check `submitExtensionRequest()` function
    - Test `handleCourseAction()` routing function
 
-### Step 14: Remove AP Student Testing (20 minutes)
+### Step 12: Remove AP Student Testing (20 minutes)
 
-#### Step 14.1: Remove AP Student Modal Testing
+#### Step 12.1: Remove AP Student Modal Testing
 1. **Test Modal Display**
    - Click "Remove AP Student" button
    - Verify lightbox opens correctly
@@ -893,7 +884,7 @@ Create complete form in AP Student Lightbox:
    - Verify Remove buttons are functional
    - Test modal close functionality
 
-#### Step 14.2: Student Removal Process Testing
+#### Step 12.2: Student Removal Process Testing
 1. **Test Removal Confirmation**
    - Click Remove button for any student
    - Verify confirmation dialog appears with correct student name
@@ -911,9 +902,9 @@ Create complete form in AP Student Lightbox:
    - Verify "All AP students have been removed" message
    - Test reopening modal after all students removed
 
-### Step 15: EHCP File Management Testing (30 minutes)
+### Step 13: EHCP File Management Testing (30 minutes)
 
-#### Step 15.1: File Upload Testing
+#### Step 13.1: File Upload Testing
 1. **Test Valid File Types**
    - Upload PDF files
    - Upload DOC/DOCX files
@@ -929,7 +920,7 @@ Create complete form in AP Student Lightbox:
    - Test unauthorized access attempts
    - Check file activity tracking
 
-#### Step 15.2: Database Integration Testing
+#### Step 13.2: Database Integration Testing
 1. **Verify Data Persistence**
    - Check file URL saving to database
    - Verify file metadata storage
@@ -940,7 +931,7 @@ Create complete form in AP Student Lightbox:
    - Test file access and download
    - Test file deletion (if implemented)
 
-### Step 16: Pre-Deployment Checklist
+### Step 14: Pre-Deployment Checklist
 
 #### Content Review
 - [ ] All text content is accurate and professional
@@ -963,7 +954,7 @@ Create complete form in AP Student Lightbox:
 - [ ] Database operations tested
 - [ ] Third-party integrations tested
 
-### Step 17: Deployment Process
+### Step 15: Deployment Process
 
 1. **Final Testing:**
    - Test in Wix preview mode
@@ -983,7 +974,7 @@ Create complete form in AP Student Lightbox:
    - Test form submissions
    - Monitor error logs
 
-### Step 18: Ongoing Maintenance
+### Step 16: Ongoing Maintenance
 
 #### EHCP File Management Tasks
 **Daily Tasks:**
