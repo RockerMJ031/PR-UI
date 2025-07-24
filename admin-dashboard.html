@@ -1040,6 +1040,136 @@
         // 调用原始函数
         originalRegisterAPStudent();
     };
+    
+    // Ticket Status Function
+    function showAllTicketStatus() {
+        // Sample ticket data (in real implementation, this would come from database)
+        const ticketData = [
+            {
+                id: 'TK-001',
+                title: 'Course Extension Request',
+                status: 'Open',
+                priority: 'High',
+                submittedBy: 'John Smith',
+                dateSubmitted: '2024-01-15',
+                description: 'Request to extend Biology course for student Emma Johnson'
+            },
+            {
+                id: 'TK-002',
+                title: 'Technical Support',
+                status: 'In Progress',
+                priority: 'Medium',
+                submittedBy: 'Sarah Wilson',
+                dateSubmitted: '2024-01-14',
+                description: 'Login issues with student portal'
+            },
+            {
+                id: 'TK-003',
+                title: 'Payment Query',
+                status: 'Open',
+                priority: 'Low',
+                submittedBy: 'Michael Brown',
+                dateSubmitted: '2024-01-13',
+                description: 'Question about invoice charges'
+            },
+            {
+                id: 'TK-004',
+                title: 'Schedule Change',
+                status: 'Resolved',
+                priority: 'Medium',
+                submittedBy: 'Lisa Davis',
+                dateSubmitted: '2024-01-12',
+                description: 'Request to change lesson times'
+            },
+            {
+                id: 'TK-005',
+                title: 'Course Cancellation',
+                status: 'Open',
+                priority: 'High',
+                submittedBy: 'David Johnson',
+                dateSubmitted: '2024-01-11',
+                description: 'Need to cancel Mathematics course'
+            }
+        ];
+        
+        // Create modal
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.style.display = 'block';
+        
+        // Generate ticket list HTML
+        let ticketListHTML = '';
+        ticketData.forEach(ticket => {
+            const statusClass = ticket.status.toLowerCase().replace(' ', '-');
+            const priorityClass = ticket.priority.toLowerCase();
+            
+            ticketListHTML += `
+                <div class="ticket-item" data-ticket-id="${ticket.id}">
+                    <div class="ticket-header">
+                        <div class="ticket-id">${ticket.id}</div>
+                        <div class="ticket-status">
+                            <span class="status-badge status-${statusClass}">${ticket.status}</span>
+                            <span class="priority-badge priority-${priorityClass}">${ticket.priority}</span>
+                        </div>
+                    </div>
+                    <div class="ticket-content">
+                        <h4 class="ticket-title">${ticket.title}</h4>
+                        <p class="ticket-description">${ticket.description}</p>
+                        <div class="ticket-meta">
+                            <span class="submitted-by">Submitted by: ${ticket.submittedBy}</span>
+                            <span class="date-submitted">Date: ${ticket.dateSubmitted}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 1000px;">
+                <div class="modal-header">
+                    <h2><i class="fas fa-ticket-alt"></i> All Ticket Status</h2>
+                    <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="ticket-status-container">
+                        <div class="ticket-summary">
+                            <h3>Ticket Summary</h3>
+                            <div class="summary-stats">
+                                <div class="stat-item">
+                                    <span class="stat-label">Total Tickets:</span>
+                                    <span class="stat-value">${ticketData.length}</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Open:</span>
+                                    <span class="stat-value">${ticketData.filter(t => t.status === 'Open').length}</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">In Progress:</span>
+                                    <span class="stat-value">${ticketData.filter(t => t.status === 'In Progress').length}</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Resolved:</span>
+                                    <span class="stat-value">${ticketData.filter(t => t.status === 'Resolved').length}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ticket-list">
+                            ${ticketListHTML}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Update ticket count in the main dashboard
+        const openTickets = ticketData.filter(t => t.status === 'Open').length;
+        const ticketCountElement = document.getElementById('ticketCount');
+        if (ticketCountElement) {
+            ticketCountElement.textContent = openTickets;
+        }
+    }
     </script>
 </head>
 <body>
@@ -1118,13 +1248,9 @@
                         Course Management
                     </h2>
                     <p class="section-description">
-                        Manage course extensions, cancellations and new courses
+                        Manage course extensions and cancellations
                     </p>
                     <div class="action-buttons">
-                        <a href="https://purpleruler.larksuite.com/share/base/form/shrus1sQDc4LW4xpAQvpThPAO1c" target="_blank" class="btn btn-success">
-                            <i class="fas fa-plus-circle"></i>
-                            Course Enrolment
-                        </a>
                         <button class="btn btn-primary" onclick="openCourseModal('extend')">
                             <i class="fas fa-plus"></i>
                             Course Extension
@@ -1143,9 +1269,13 @@
                         Tutoring Student
                     </h2>
                     <p class="section-description">
-                        Manage tutoring student enrollment and sessions
+                        Manage tutoring student and course enrollment
                     </p>
                     <div class="action-buttons">
+                        <a href="https://purpleruler.larksuite.com/share/base/form/shrus1sQDc4LW4xpAQvpThPAO1c" target="_blank" class="btn btn-success">
+                            <i class="fas fa-plus-circle"></i>
+                            Course Enrolment
+                        </a>
                         <button class="btn btn-success" onclick="openStudentModal('add')">
                             <i class="fas fa-user-plus"></i>
                             Add Tutoring Student
@@ -1197,15 +1327,21 @@
                     <p class="section-description">
                         Submit support tickets and check status
                     </p>
+                    <div class="ap-student-counter">
+                        <div class="counter-display">
+                            <span class="counter-label">Open Tickets:</span>
+                            <span class="counter-value" id="ticketCount">5</span>
+                        </div>
+                    </div>
                     <div class="action-buttons">
                         <a href="https://purpleruler.larksuite.com/share/base/form/shrusaHWmdONTi0eb0PSBxpo6Lh" target="_blank" class="btn btn-primary">
                             <i class="fas fa-plus"></i>
                             Submit Ticket
                         </a>
-                        <a href="https://purpleruler.larksuite.com/share/base/query/shrusMF1CqK7ZD5PBP6uI7CUpwi" target="_blank" class="btn btn-info">
+                        <button class="btn btn-info" onclick="showAllTicketStatus()">
                             <i class="fas fa-search"></i>
                             Check Status
-                        </a>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1394,9 +1530,9 @@
                                 <option value="AS-STY-Y7-DG-MATHS">AS-STY-Y7-DG-MATHS</option>
                             </select>
                             <input type="text" placeholder="Current Grade/Level" class="form-input">
-                            <div class="form-input-label">SEND Status</div>
+                            <div class="form-input-label">EHCP Status</div>
                             <div class="multi-select-container">
-                                <select class="form-select" name="sendCode[]" multiple>
+                                <select class="form-select" name="ehcpCode[]" multiple>
                                     <option value="SpLD">SpLD - Specific Learning Difficulties</option>
                                     <option value="SLCN">SLCN - Speech, Language and Communication Needs</option>
                                     <option value="SEMH">SEMH - Social, Emotional and Mental Health</option>
@@ -1551,9 +1687,9 @@
                         <input type="date" id="classStartDate" name="classStartDate" required title="Date when student starts to learn">
                     </div>
                     <div class="form-group">
-                        <label for="sendStatus">SEND Status *</label>
+                        <label for="ehcpStatus">EHCP Status *</label>
                         <div class="multi-select-container">
-                            <select id="sendStatus" name="sendStatus[]" multiple required>
+                            <select id="ehcpStatus" name="ehcpStatus[]" multiple required>
                                 <option value="SpLD">SpLD - Specific Learning Difficulties</option>
                                 <option value="SLCN">SLCN - Speech, Language and Communication Needs</option>
                                 <option value="SEMH">SEMH - Social, Emotional and Mental Health</option>
@@ -1570,12 +1706,12 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="ehcpFile">SEND Document Upload</label>
+                        <label for="ehcpFile">EHCP Document Upload</label>
                         <div class="file-upload-container">
                             <input type="file" id="ehcpFile" name="ehcpFile" accept=".pdf,.doc,.docx,.txt" class="file-input">
                             <label for="ehcpFile" class="file-upload-label">
                                 <i class="fas fa-cloud-upload-alt"></i>
-                                <span class="file-upload-text">Choose SEND document or drag and drop</span>
+                                <span class="file-upload-text">Choose EHCP document or drag and drop</span>
                             </label>
                             <div class="file-upload-info">
                                 <small>Supported formats: PDF, DOC, DOCX, TXT (Max 10MB)</small>
@@ -1583,12 +1719,12 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="ehcpDetails">SEND Details</label>
-                        <textarea id="ehcpDetails" name="ehcpDetails" placeholder="Please provide SEND details if applicable, including specific needs and provisions"></textarea>
+                        <label for="ehcpDetails">EHCP Details</label>
+                        <textarea id="ehcpDetails" name="ehcpDetails" placeholder="Please provide EHCP details if applicable, including specific needs and provisions"></textarea>
                     </div>
                     <div class="form-group">
                         <label for="caseworkerName">Caseworker Name</label>
-                        <input type="text" id="caseworkerName" name="caseworkerName" placeholder="Local Authority SEND Officer/Caseworker">
+                        <input type="text" id="caseworkerName" name="caseworkerName" placeholder="Local Authority EHCP Officer/Caseworker">
                     </div>
                     <div class="form-group">
                         <label for="caseworkerEmail">Caseworker Email</label>
@@ -1863,21 +1999,13 @@
             item.innerHTML = `
                 <div class="course-info">
                     <div class="course-header">
-                        <span class="class-id">${course.classId}</span>
+                        <span class="student-name">${course.studentName}</span>
                         <span class="qty-lessons">${course.qtyLessons} lessons remaining</span>
                     </div>
                     <div class="course-details">
                         <div class="detail-row">
-                            <span class="label">Student:</span>
-                            <span class="value">${course.studentName}</span>
-                        </div>
-                        <div class="detail-row">
                             <span class="label">Subject:</span>
                             <span class="value">${course.subject}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="label">Course ID:</span>
-                            <span class="value">${course.courseId}</span>
                         </div>
                     </div>
                 </div>
@@ -2738,7 +2866,7 @@
             margin-bottom: 1rem;
         }
 
-        .class-id {
+        .student-name {
             font-weight: 700;
             font-size: 1.1rem;
             color: var(--primary-color);
@@ -3311,6 +3439,180 @@
             transform: none;
         }
 
+        /* Ticket Status Styles */
+        .ticket-status-container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .ticket-summary {
+            background: linear-gradient(135deg, #f8f9ff, #e3f2fd);
+            border: 2px solid var(--primary-color);
+            border-radius: 12px;
+            padding: 20px;
+        }
+        
+        .ticket-summary h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .stat-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .stat-label {
+            display: block;
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            display: block;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .ticket-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .ticket-item {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .ticket-item:hover {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .ticket-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .ticket-id {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+        }
+        
+        .ticket-status {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-open {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .status-in-progress {
+            background: linear-gradient(135deg, #cce5ff, #b3d9ff);
+            color: #004085;
+            border: 1px solid #b3d9ff;
+        }
+        
+        .status-resolved {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .priority-badge {
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .priority-high {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .priority-medium {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .priority-low {
+            background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .ticket-content {
+            margin-bottom: 15px;
+        }
+        
+        .ticket-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .ticket-description {
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
+        .ticket-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #888;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+        
+        .submitted-by {
+            font-weight: 600;
+        }
+        
+        .date-submitted {
+            font-style: italic;
+        }
+
         /* Responsive Design for Modal */
         @media (max-width: 768px) {
             .modal-content {
@@ -3361,6 +3663,22 @@
 
             .student-actions {
                 justify-content: center;
+            }
+            
+            .summary-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .ticket-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            
+            .ticket-meta {
+                flex-direction: column;
+                gap: 5px;
+                align-items: flex-start;
             }
         }
     </style>

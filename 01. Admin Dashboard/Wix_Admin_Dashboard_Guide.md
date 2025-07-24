@@ -10,10 +10,9 @@
 ## Project Overview
 
 This guide will help you create a comprehensive admin dashboard in Wix with the following features:
-- **Course Management**: Course enrollment, extension, and cancellation
-- **Tutoring Student Management**: Add and remove tutoring students
+- **Course Management**: Course extension and cancellation
+- **Tutoring Student Management**: Course enrollment, add and remove tutoring students
 - **Alternative Provision (AP) Student Management**: Specialized AP student enrollment with curriculum selection and EHCP file upload
-- **EHCP File Management**: Secure file upload, validation, and lifecycle management
 - **Ticket Management**: Support ticket submission and tracking
 - **Statistics Display**: Real-time student counts and metrics
 - **Pricing Plans**: Four-tier curriculum selection for AP students
@@ -214,7 +213,6 @@ Create dynamic statistics cards that update based on student type:
    - Title: "Course Management"
    - Description: "Manage course extensions, cancellations and new courses"
    - Buttons:
-     - `courseEnrollmentBtn` ("Course Enrolment") - Links to Lark form
      - `courseExtensionBtn` ("Course Extension")
      - `cancelCourseBtn` ("Cancel Course")
 
@@ -223,6 +221,7 @@ Create dynamic statistics cards that update based on student type:
    - Title: "Tutoring Student"
    - Description: "Manage tutoring student enrollment and sessions"
    - Buttons:
+     - `courseEnrollmentBtn` ("Course Enrolment") - Links to Lark form
      - `addTutoringStudentBtn` ("Add Tutoring Student")
      - `removeTutoringStudentBtn` ("Remove Student")
 
@@ -230,7 +229,7 @@ Create dynamic statistics cards that update based on student type:
    - Container: `apStudentCard`
    - Title: "Alternative Provision"
    - Description: "Manage AP students and specialized educational provision"
-   - AP Student Counter: `apStudentCount`
+   - AP Student Counter: `apStudentCount` (displays "10")
    - Buttons:
      - `addAPStudentBtn` ("Add AP Student")
      - `removeAPStudentBtn` ("Remove Student")
@@ -239,11 +238,10 @@ Create dynamic statistics cards that update based on student type:
    - Container: `ticketManagementCard`
    - Title: "Ticket Management"
    - Description: "Submit support tickets and check status"
+   - Open Tickets Counter: displays "3"
    - Buttons:
      - `submitTicketBtn` ("Submit Ticket") - Links to Lark form
      - `checkTicketStatusBtn` ("Check Status")
-     - `addStudentBtn` ("Add Student")
-     - `removeStudentBtn` ("Remove Student")
 
 3. **AP Student Card:**
    - Container: `apStudentCard`
@@ -288,7 +286,25 @@ Create three pricing plan cards, each containing:
    - `ticketsDataset` → Tickets collection
    - `apStudentsDataset` → Students collection (filter isAP = true)
 
-#### Step 7.2: Connect Elements to Datasets
+#### Step 7.2: Dataset Field Configuration
+Create the following datasets to support dashboard functionality:
+
+1. **Students** - Store tutoring student information
+   - Fields: firstName, lastName, dateOfBirth, email, startDate, courseGroup, gradeLevel, sendStatus, examBoard, homeAddress
+
+2. **Courses** - Store course information
+   - Fields: classId, studentName, subject, courseId, qtyLessons, status
+
+3. **APStudents** - Store AP student information
+   - Fields: firstName, lastName, dateOfBirth, email, startDate, sendStatus, sendFile, sendDetails, caseworkerName, caseworkerEmail, guardianName, guardianEmail, guardianPhone, emergencyContact, emergencyName, previousEducation, homeAddress, educationPlan, homeLessonsSupervision, supportDuration
+
+4. **Tickets** - Store ticket information
+   - Fields: ticketId, title, description, status, priority, createdDate, assignedTo
+
+5. **Statistics** - Store statistical data
+   - Fields: totalStudents, activeStudents, safeguardingAlerts, pendingInvoices, apStudentCount, openTickets
+
+#### Step 7.3: Connect Elements to Datasets
 1. **Connect statistics values to statisticsDataset**
 2. **Connect pricing cards to pricingDataset**
 3. **Set dataset permissions to "Admin Only"**
@@ -304,31 +320,47 @@ Create three pricing plan cards, each containing:
 **Replaces:** `courseModal` from original HTML file
 1. **Add:** Elements → Popups & Lightboxes → Lightbox
 2. **Lightbox ID:** `courseManagementLightbox`
-3. **Title:** "Course Management"
+3. **Title:** "Course Management" (dynamically changes to "Course Extension" or "Course Cancellation" based on operation)
 4. **Content:**
-   - Course selection dropdown
-   - Action selection (register/extend/cancel)
+   - Search box: for filtering courses and students
+   - Course list: displays student names, subjects and remaining course count
+   - Action buttons: displays appropriate buttons based on selected operation (Extend/Cancel)
    - Confirm button
    - Cancel button
 
-#### Step 8.2: Student Management Modal
+#### Step 8.2: Course Cancellation Modal
+**New Addition:** Course cancellation confirmation
+1. **Add:** Elements → Popups & Lightboxes → Lightbox
+2. **Lightbox ID:** `courseCancellationLightbox`
+3. **Title:** "Course Cancellation"
+4. **Content:**
+   - Two-week notice warning
+   - Course selection dropdown menu
+   - Cancellation reason text box
+   - Confirm cancellation button
+
+#### Step 8.3: Student Management Modal
 **Replaces:** `studentModal` from original HTML file
 1. **Add:** Elements → Popups & Lightboxes → Lightbox
 2. **Lightbox ID:** `studentManagementLightbox`
 3. **Title:** "Student Management"
 4. **Content:** Multi-state container including:
-   - Add student form
-   - Remove student form
+   - Add student form containing basic information, academic information and SEND status
+   - Remove student options: remove all courses / remove specific courses
    - Tab navigation
 
-#### Step 8.3: AP Student Registration Modal
+#### Step 8.4: AP Student Registration Modal
 **Replaces:** `apStudentModal` from original HTML file
 1. **Add:** Elements → Popups & Lightboxes → Lightbox
 2. **Lightbox ID:** `apStudentRegistrationLightbox`
-3. **Title:** "AP Student Registration"
-4. **Content:** Complete AP student registration form
+3. **Title:** "Alternative Provision Student Registration"
+4. **Content:**
+   - Student information form (OEAS framework)
+   - SEND file upload (supports PDF, DOC, DOCX, TXT formats)
+   - Education plan selection (Core Subjects, Core Plus, All Subjects + Therapy, Blueprint)
+   - Additional questions (home supervision, support duration)
 
-#### Step 8.4: Remove AP Student Modal
+#### Step 8.5: Remove AP Student Modal
 **New Feature:** Remove AP Student functionality
 1. **Add:** Elements → Popups & Lightboxes → Lightbox
 2. **Lightbox ID:** `removeAPStudentLightbox`
@@ -338,6 +370,9 @@ Create three pricing plan cards, each containing:
    - Instructions text: "Select a student to remove:"
    - Warning text: "Click on any student below to remove them from the AP program. This action cannot be undone."
    - Dynamic student list container: `apStudentsListContainer`
+   - AP student list (displays name, grade, course and status)
+   - Status badges (Active/Paused)
+   - Removal confirmation functionality
    - Each student item should include:
      - Student name and details
      - Status badge (Active/Paused)
@@ -357,12 +392,19 @@ Create three pricing plan cards, each containing:
 #### Step 9.1: Add Student Form
 Create form in Student Management Lightbox:
 
-**Required Fields:**
-- `studentNameInput` - Student Name (text input)
-- `studentEmailInput` - Email (email input)
-- `studentPhoneInput` - Phone (phone input)
-- `studentStatusDropdown` - Status (dropdown)
-- `studentCourseDropdown` - Course (dropdown)
+**Basic Information:**
+- `studentFirstNameInput` - 👤 First Name (text input, required)
+- `studentLastNameInput` - 👤 Last Name (text input, required)
+- `studentDOBInput` - 🎂 Date of Birth (date input, required)
+- `studentEmailInput` - 📧 Email Address (email input, required)
+- `startLearningDateInput` - 📚 Start Learning Date (date input, required)
+
+**Academic Information:**
+- `existingCourseGroupDropdown` - Existing Course Group (dropdown with options: AS-APY-Y9-EL-BIOLOGY, AS-APY-Y9-EL-ENGLISH, AS-APY-Y9-EL-FRENCH, AS-STY-Y7-DG-MATHS)
+- `currentGradeLevelInput` - Current Grade/Level (text input)
+- `sendStatusMultiSelect` - SEND Status (multi-select dropdown with 11 options: SpLD, SLCN, SEMH, ASD, VI, HI, MSI, PD, NSA, OTH, DS)
+- `examBoardDropdown` - Exam Board (dropdown: AQA, Edexcel, OCR, WJEC, CIE)
+- `homeAddressTextarea` - 🏠 Home Address (textarea)
 
 **Buttons:**
 - `submitAddStudentBtn` - Submit
@@ -371,23 +413,37 @@ Create form in Student Management Lightbox:
 #### Step 9.2: AP Student Registration Form
 Create complete form in AP Student Lightbox:
 
-**Student Information:**
-- `apStudentNameInput` - Name
-- `apStudentAgeInput` - Age
-- `sendStatusDropdown` - SEND Status
+**Student Information (OEAS Framework):**
+- `apStudentFirstNameInput` - 👤 First Name (text input, required)
+- `apStudentLastNameInput` - 👤 Last Name (text input, required)
+- `apStudentDOBInput` - 🎂 Date of Birth (date input, required)
+- `apStudentEmailInput` - 📧 Email Address (email input, required)
+- `apStartLearningDateInput` - 📚 Start Learning Date (date input, required)
+- `apSendStatusMultiSelect` - SEND Status (multi-select, required, 11 options)
+- `sendFileUpload` - SEND File Upload (file upload: PDF, DOC, DOCX, TXT, max 10MB)
+- `sendDetailsTextarea` - SEND Details (textarea)
+- `caseworkerNameInput` - Caseworker Name (text input)
+- `caseworkerEmailInput` - Caseworker Email (email input)
 
 **Guardian Information:**
-- `guardianNameInput` - Guardian Name
-- `guardianPhoneInput` - Guardian Phone
-- `guardianEmailInput` - Guardian Email
+- `apGuardianNameInput` - 👨‍👩‍👧‍👦 Guardian Name (text input, required)
+- `apGuardianEmailInput` - 📧 Guardian Email (email input, required)
+- `apGuardianPhoneInput` - 📞 Guardian Phone (phone input)
+- `emergencyContactInput` - 🚨 Emergency Contact (text input)
+- `emergencyNameInput` - 🆘 Emergency Contact Name (text input)
 
 **Other Information:**
-- `medicalInfoTextarea` - Medical Information
-- `educationBackgroundTextarea` - Education Background
-- `educationPlanDropdown` - Education Plan
-- `ehcpFileUpload` - EHCP File Upload
+- `previousEducationTextarea` - Previous Education Setting (textarea)
+- `apHomeAddressTextarea` - 🏠 Home Address (textarea)
 
-**Additional Information Section:**
+**Educational Plan Selection (Required):**
+- `educationPlanDropdown` - Education Plan (dropdown, required):
+  - Core Subjects
+  - Core Subjects + PSHE Careers + PE and Art
+  - All Subjects + Therapy
+  - Purple Ruler Blueprint
+
+**Additional Questions:**
 - `homeLessonsWithoutSupervisionDropdown` - Will your student(s) be accessing the lessons at home without adult supervision most of the time? (Yes/No)
 - `supportLongerThanFourWeeksDropdown` - Is Purple Ruler expected to support the learner longer than four weeks? (Yes/No)
 
@@ -407,9 +463,16 @@ Create complete form in AP Student Lightbox:
    - Create or connect to "Students" collection
    - Ensure fields include: id, name, grade, course, status
    - Add sample data with UK student names:
-     - Oliver Thompson, Emily Johnson, Harry Williams, Sophie Brown
-     - Jack Davies, Charlotte Wilson, George Evans, Amelia Taylor
-     - Thomas Anderson, Isabella Clark
+     - Oliver Thompson (Year 9, Core Subjects, Active)
+     - Emily Johnson (Year 8, Core + Arts, Active)
+     - Harry Williams (Year 10, All Subjects + Therapy, Paused)
+     - Sophie Brown (Year 7, Core Subjects, Active)
+     - Jack Davies (Year 9, Core + Arts, Active)
+     - Charlotte Wilson (Year 11, All Subjects, Active)
+     - George Evans (Year 8, Core + PSHE, Paused)
+     - Amelia Taylor (Year 10, Core + Career, Active)
+     - Thomas Anderson (Year 9, All Subjects + Therapy, Active)
+     - Isabella Clark (Year 7, Core Subjects, Active)
 
 #### Step 10.2: Configure Remove AP Student Button
 **Set up the Remove AP Student button functionality:**
