@@ -256,6 +256,7 @@ The page will work perfectly on:
     font-family: Arial, sans-serif;
     max-width: 100%;
     margin: 0 auto;
+    padding: 10px;
 }
 
 .calendar-header {
@@ -263,42 +264,213 @@ The page will work perfectly on:
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-    padding: 10px;
+    padding: 15px;
     background: #f8f9fa;
-    border-radius: 5px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.calendar-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #2c3e50;
+    font-weight: 600;
 }
 
 .calendar-header button {
     background: #3498db;
     color: white;
     border: none;
-    padding: 8px 12px;
-    border-radius: 3px;
+    padding: 12px 16px;
+    border-radius: 6px;
     cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    min-width: 44px;
+    min-height: 44px;
+}
+
+.calendar-header button:hover {
+    background: #2980b9;
+    transform: translateY(-1px);
+}
+
+.calendar-header button:active {
+    transform: translateY(0);
 }
 
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 1px;
-    background: #ddd;
-    border: 1px solid #ddd;
+    gap: 2px;
+    background: #ecf0f1;
+    border: 1px solid #bdc3c7;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 .day-header {
     background: #34495e;
     color: white;
-    padding: 10px;
+    padding: 12px 8px;
     text-align: center;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.calendar-day {
+    background: white;
+    padding: 10px;
+    min-height: 60px;
+    border: 1px solid #ecf0f1;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.calendar-day:hover {
+    background: #f8f9fa;
+}
+
+.calendar-day.today {
+    background: #e3f2fd;
     font-weight: bold;
 }
 
-@media (max-width: 768px) {
-    .calendar-grid {
-        font-size: 12px;
+.calendar-day.selected {
+    background: #3498db;
+    color: white;
+}
+
+/* Desktop styles (1024px and above) */
+@media (min-width: 1024px) {
+    .calendar-wrapper {
+        padding: 20px;
     }
+    
+    .calendar-header {
+        padding: 20px;
+        margin-bottom: 25px;
+    }
+    
+    .calendar-header h3 {
+        font-size: 1.5rem;
+    }
+    
+    .calendar-header button {
+        padding: 14px 20px;
+        font-size: 18px;
+    }
+    
     .day-header {
-        padding: 5px;
+        padding: 15px 10px;
+        font-size: 1rem;
+    }
+    
+    .calendar-day {
+        min-height: 80px;
+        padding: 15px;
+    }
+}
+
+/* Tablet styles (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .calendar-wrapper {
+        padding: 15px;
+    }
+    
+    .calendar-header {
+        padding: 18px;
+        margin-bottom: 20px;
+    }
+    
+    .calendar-header h3 {
+        font-size: 1.3rem;
+    }
+    
+    .calendar-header button {
+        padding: 12px 18px;
+        font-size: 16px;
+        min-width: 48px;
+        min-height: 48px;
+    }
+    
+    .day-header {
+        padding: 12px 8px;
+        font-size: 0.95rem;
+    }
+    
+    .calendar-day {
+        min-height: 70px;
+        padding: 12px;
+    }
+}
+
+/* Mobile styles (under 768px) */
+@media (max-width: 767px) {
+    .calendar-wrapper {
+        padding: 10px;
+    }
+    
+    .calendar-header {
+        padding: 12px;
+        margin-bottom: 15px;
+        flex-direction: row;
+        gap: 10px;
+    }
+    
+    .calendar-header h3 {
+        font-size: 1.1rem;
+        text-align: center;
+        flex: 1;
+    }
+    
+    .calendar-header button {
+        padding: 10px 12px;
+        font-size: 14px;
+        min-width: 44px;
+        min-height: 44px;
+        border-radius: 8px;
+    }
+    
+    .calendar-grid {
+        gap: 1px;
+    }
+    
+    .day-header {
+        padding: 8px 4px;
+        font-size: 0.8rem;
+    }
+    
+    .calendar-day {
+        min-height: 50px;
+        padding: 8px 4px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Extra small mobile (under 480px) */
+@media (max-width: 479px) {
+    .calendar-header h3 {
+        font-size: 1rem;
+    }
+    
+    .calendar-header button {
+        padding: 8px 10px;
+        font-size: 12px;
+        min-width: 40px;
+        min-height: 40px;
+    }
+    
+    .day-header {
+        padding: 6px 2px;
+        font-size: 0.7rem;
+    }
+    
+    .calendar-day {
+        min-height: 40px;
+        padding: 6px 2px;
+        font-size: 0.8rem;
     }
 }
 </style>

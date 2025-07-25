@@ -1674,6 +1674,7 @@ function refreshData() {
 // ==========================================
 
 function setupResponsiveDesign() {
+    // Set up viewport listeners for different device types
     wixWindow.viewportEnter('mobile', () => {
         adjustForMobile();
     });
@@ -1685,46 +1686,241 @@ function setupResponsiveDesign() {
     wixWindow.viewportEnter('desktop', () => {
         adjustForDesktop();
     });
+    
+    // Initial setup based on current viewport
+    const currentViewport = wixWindow.viewportType;
+    switch(currentViewport) {
+        case 'mobile':
+            adjustForMobile();
+            break;
+        case 'tablet':
+            adjustForTablet();
+            break;
+        case 'desktop':
+            adjustForDesktop();
+            break;
+    }
 }
 
 function adjustForMobile() {
-    // Switch to list view on mobile
+    console.log('Adjusting layout for mobile devices');
+    
+    // Switch to list view on mobile for better usability
     switchView('list');
     
-    // Adjust layout for mobile
-    $w('#statisticsGrid').layout = 'singleColumn';
-    $w('#actionButtonsContainer').layout = 'vertical';
-    $w('#filterContainer').layout = 'vertical';
+    // Adjust main layout containers
+    if ($w('#statisticsGrid')) {
+        $w('#statisticsGrid').layout = 'singleColumn';
+    }
     
-    // Hide some columns in table view
-    if ($w('#sessionsTable').columns) {
+    if ($w('#actionButtonsContainer')) {
+        $w('#actionButtonsContainer').layout = 'vertical';
+    }
+    
+    if ($w('#filterContainer')) {
+        $w('#filterContainer').layout = 'vertical';
+    }
+    
+    // Adjust filter section for mobile
+    if ($w('#viewToggleContainer')) {
+        $w('#viewToggleContainer').layout = 'grid';
+        // Stack view toggle buttons in 2x2 grid
+    }
+    
+    // Hide calendar container on mobile to save space
+    if ($w('#calendarContainer')) {
+        $w('#calendarContainer').hide();
+    }
+    
+    // Adjust sessions table for mobile
+    if ($w('#sessionsTable') && $w('#sessionsTable').columns) {
         $w('#sessionsTable').columns.forEach((column, index) => {
-            if (index > 4) { // Hide columns after the 5th one
+            // Only show essential columns on mobile
+            if (index > 3) {
                 column.visible = false;
             }
         });
     }
+    
+    // Adjust sessions header for mobile
+    if ($w('#sessionsHeader')) {
+        $w('#sessionsHeader').layout = 'vertical';
+    }
+    
+    // Increase touch target sizes for mobile
+    adjustTouchTargets('mobile');
+    
+    // Adjust font sizes for mobile readability
+    adjustFontSizes('mobile');
 }
 
 function adjustForTablet() {
+    console.log('Adjusting layout for tablet devices');
+    
+    // Keep both calendar and list views available on tablet
+    if ($w('#calendarContainer')) {
+        $w('#calendarContainer').show();
+    }
+    
     // Adjust layout for tablet
-    $w('#statisticsGrid').layout = 'twoColumns';
-    $w('#actionButtonsContainer').layout = 'horizontal';
-    $w('#filterContainer').layout = 'horizontal';
+    if ($w('#statisticsGrid')) {
+        $w('#statisticsGrid').layout = 'twoColumns';
+    }
+    
+    if ($w('#actionButtonsContainer')) {
+        $w('#actionButtonsContainer').layout = 'horizontal';
+    }
+    
+    if ($w('#filterContainer')) {
+        $w('#filterContainer').layout = 'horizontal';
+    }
+    
+    if ($w('#viewToggleContainer')) {
+        $w('#viewToggleContainer').layout = 'horizontal';
+    }
+    
+    // Show more columns on tablet
+    if ($w('#sessionsTable') && $w('#sessionsTable').columns) {
+        $w('#sessionsTable').columns.forEach((column, index) => {
+            if (index <= 4) {
+                column.visible = true;
+            } else {
+                column.visible = false;
+            }
+        });
+    }
+    
+    // Adjust sessions header for tablet
+    if ($w('#sessionsHeader')) {
+        $w('#sessionsHeader').layout = 'horizontal';
+    }
+    
+    // Adjust touch target sizes for tablet
+    adjustTouchTargets('tablet');
+    
+    // Adjust font sizes for tablet
+    adjustFontSizes('tablet');
 }
 
 function adjustForDesktop() {
-    // Adjust layout for desktop
-    $w('#statisticsGrid').layout = 'fourColumns';
-    $w('#actionButtonsContainer').layout = 'horizontal';
-    $w('#filterContainer').layout = 'horizontal';
+    console.log('Adjusting layout for desktop devices');
     
-    // Show all table columns
-    if ($w('#sessionsTable').columns) {
+    // Show all features on desktop
+    if ($w('#calendarContainer')) {
+        $w('#calendarContainer').show();
+    }
+    
+    // Adjust layout for desktop
+    if ($w('#statisticsGrid')) {
+        $w('#statisticsGrid').layout = 'fourColumns';
+    }
+    
+    if ($w('#actionButtonsContainer')) {
+        $w('#actionButtonsContainer').layout = 'horizontal';
+    }
+    
+    if ($w('#filterContainer')) {
+        $w('#filterContainer').layout = 'horizontal';
+    }
+    
+    if ($w('#viewToggleContainer')) {
+        $w('#viewToggleContainer').layout = 'horizontal';
+    }
+    
+    // Show all table columns on desktop
+    if ($w('#sessionsTable') && $w('#sessionsTable').columns) {
         $w('#sessionsTable').columns.forEach(column => {
             column.visible = true;
         });
     }
+    
+    // Adjust sessions header for desktop
+    if ($w('#sessionsHeader')) {
+        $w('#sessionsHeader').layout = 'horizontal';
+    }
+    
+    // Reset touch target sizes for desktop
+    adjustTouchTargets('desktop');
+    
+    // Adjust font sizes for desktop
+    adjustFontSizes('desktop');
+}
+
+function adjustTouchTargets(deviceType) {
+    const buttons = [
+        '#allSessionsBtn', '#scheduledBtn', '#completedBtn', '#cancelledBtn',
+        '#addSessionBtn', '#refreshBtn', '#exportSessionsBtn', '#bulkActionsBtn',
+        '#prevPageBtn', '#nextPageBtn', '#prevMonthBtn', '#nextMonthBtn'
+    ];
+    
+    buttons.forEach(buttonId => {
+        if ($w(buttonId)) {
+            switch(deviceType) {
+                case 'mobile':
+                    // Minimum 44px touch targets for mobile
+                    $w(buttonId).style.minHeight = '44px';
+                    $w(buttonId).style.minWidth = '44px';
+                    $w(buttonId).style.padding = '12px 16px';
+                    break;
+                case 'tablet':
+                    // Slightly larger touch targets for tablet
+                    $w(buttonId).style.minHeight = '48px';
+                    $w(buttonId).style.minWidth = '48px';
+                    $w(buttonId).style.padding = '14px 18px';
+                    break;
+                case 'desktop':
+                    // Standard button sizes for desktop
+                    $w(buttonId).style.minHeight = '40px';
+                    $w(buttonId).style.minWidth = '40px';
+                    $w(buttonId).style.padding = '10px 16px';
+                    break;
+            }
+        }
+    });
+}
+
+function adjustFontSizes(deviceType) {
+    const textElements = {
+        '#pageTitle': { mobile: '24px', tablet: '28px', desktop: '32px' },
+        '#pageSubtitle': { mobile: '14px', tablet: '15px', desktop: '16px' },
+        '.session-item-text': { mobile: '14px', tablet: '15px', desktop: '16px' },
+        '.filter-label': { mobile: '13px', tablet: '14px', desktop: '14px' }
+    };
+    
+    Object.keys(textElements).forEach(selector => {
+        if ($w(selector)) {
+            const fontSize = textElements[selector][deviceType];
+            if (fontSize) {
+                $w(selector).style.fontSize = fontSize;
+            }
+        }
+    });
+}
+
+function adjustSpacing(deviceType) {
+    const containers = [
+        '#pageHeader', '#filterSection', '#sessionsContainer',
+        '#paginationContainer', '#calendarContainer'
+    ];
+    
+    containers.forEach(containerId => {
+        if ($w(containerId)) {
+            switch(deviceType) {
+                case 'mobile':
+                    $w(containerId).style.padding = '15px';
+                    $w(containerId).style.margin = '10px 0';
+                    break;
+                case 'tablet':
+                    $w(containerId).style.padding = '18px';
+                    $w(containerId).style.margin = '15px 0';
+                    break;
+                case 'desktop':
+                    $w(containerId).style.padding = '20px';
+                    $w(containerId).style.margin = '20px 0';
+                    break;
+            }
+        }
+    });
 }
 
 // ==========================================
