@@ -414,6 +414,11 @@ function updateStatisticsDisplay(stats) {
     $w('#securityAlertsValue').text = submittedTickets.toString();
     $w('#pendingInvoicesValue').text = resolvedTickets.toString();
     
+    // 更新Open Tickets Counter - 显示当前未解决的工单数量
+    if (stats.openTickets !== undefined && $w('#openTicketsValue')) {
+        $w('#openTicketsValue').text = stats.openTickets.toString();
+    }
+    
     // 更新文本标签
     if ($w('#securityAlertsText')) {
         $w('#securityAlertsText').text = '本月提交工单';
@@ -439,6 +444,8 @@ function createDefaultStatistics() {
         activeStudents: 0,
         securityAlerts: 0,  // 保留字段，现在用于显示提交工单数
         pendingInvoices: 0, // 保留字段，现在用于显示已解决工单数
+        apStudentCount: 0,  // AP学生数量
+        openTickets: 0,     // 当前未解决的工单数量
         lastUpdated: new Date(),
         // 工单统计数据 - 按月份记录工单提交、解决、关闭和查询数量
         ticketStats: {
@@ -522,6 +529,8 @@ function populateStudentDropdowns(students) {
 // 更新 AP 学生计数
 function updateAPStudentCount(students) {
     const apStudents = students.filter(student => student.isAP === true);
+    // 更新UI元素显示AP学生数量
+    $w('#apStudentCount').text = apStudents.length.toString();
     console.log('AP 学生数量:', apStudents.length);
 }
 

@@ -232,7 +232,7 @@ Create dynamic statistics cards that update based on student type:
    - Container: `ticketManagementCard`
    - Title: "Ticket Management"
    - Description: "Submit support tickets and check status"
-   - Open Tickets Counter: displays "3"
+   - Open Tickets Counter: `openTicketsValue` (displays "3")
    - Buttons:
      - `submitTicketBtn` ("Submit Ticket") - Links to Lark form
      - `checkTicketStatusBtn` ("Check Status")
