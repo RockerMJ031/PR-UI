@@ -152,6 +152,17 @@ function setupEventHandlers() {
     // 搜索功能
     $w('#courseSearchInput').onInput(() => filterCourses());
     
+    // Repeater 搜索功能
+    if ($w('#studentSearchInput')) {
+        $w('#studentSearchInput').onInput(() => filterStudentRepeater());
+    }
+    if ($w('#courseSearchInput2')) {
+        $w('#courseSearchInput2').onInput(() => filterCourseRepeater());
+    }
+    if ($w('#apStudentSearchInput')) {
+        $w('#apStudentSearchInput').onInput(() => filterAPStudentRepeater());
+    }
+    
     // 文件上传
     $w('#ehcpFileUpload').onChange(() => handleFileUpload());
     
@@ -612,9 +623,166 @@ function switchStudentModalTab(tab) {
         $w('#studentModalStates').changeState('removeStudent');
         $w('#removeStudentTabBtn').style.backgroundColor = '#007bff';
         $w('#addStudentTabBtn').style.backgroundColor = 'transparent';
+        
+        // 当切换到移除学生标签页时，加载学生和课程列表到 Repeater
+        loadStudentsToRepeater();
+        loadCoursesToRepeater();
     }
     
     console.log('学生模态框标签页切换到:', tab);
+}
+
+// 加载学生到 Repeater（用于移除所有课程功能）
+function loadStudentsToRepeater() {
+    // 设置学生 Repeater 的数据源
+    $w('#studentListRepeater').onItemReady(($item, itemData, index) => {
+        // 设置学生信息
+        $item('#studentNameText').text = `${itemData.firstName} ${itemData.lastName}`;
+        $item('#studentEmailText').text = itemData.email;
+        $item('#courseCountText').text = `${itemData.courses ? itemData.courses.length : 0} 门课程`;
+        
+        // 设置移除所有课程按钮事件
+        $item('#removeAllCoursesButton').onClick(() => {
+            confirmRemoveAllCourses(itemData._id, `${itemData.firstName} ${itemData.lastName}`);
+        });
+    });
+    
+    // 查询学生数据
+    wixData.query('Students')
+        .eq('status', 'active')
+        .find()
+        .then((results) => {
+            $w('#studentListRepeater').data = results.items;
+            console.log('学生列表已加载到 Repeater:', results.items.length);
+        })
+        .catch((error) => {
+            console.error('加载学生列表错误:', error);
+            showErrorMessage('加载学生列表失败');
+        });
+}
+
+// 加载课程到 Repeater（用于移除特定课程功能）
+function loadCoursesToRepeater() {
+    // 设置课程 Repeater 的数据源
+    $w('#courseListRepeater').onItemReady(($item, itemData, index) => {
+        // 设置课程信息
+        $item('#courseIdText').text = itemData.courseId || itemData._id;
+        $item('#courseSubjectText').text = itemData.subject;
+        $item('#studentNamesText').text = itemData.studentNames || '未分配学生';
+        
+        // 设置取消课程按钮事件
+        $item('#cancelCourseButton').onClick(() => {
+            confirmCancelCourse(itemData._id, itemData.subject);
+        });
+    });
+    
+    // 查询课程数据
+    wixData.query('Courses')
+        .eq('status', 'active')
+        .find()
+        .then((results) => {
+            $w('#courseListRepeater').data = results.items;
+            console.log('课程列表已加载到 Repeater:', results.items.length);
+        })
+        .catch((error) => {
+            console.error('加载课程列表错误:', error);
+            showErrorMessage('加载课程列表失败');
+        });
+}
+
+// 确认移除学生的所有课程
+function confirmRemoveAllCourses(studentId, studentName) {
+    const confirmMessage = `确定要移除学生 "${studentName}" 的所有课程吗？此操作无法撤销。`;
+    
+    wixWindow.openLightbox('confirmationDialog', {
+        title: '确认移除所有课程',
+        message: confirmMessage,
+        studentId: studentId,
+        studentName: studentName
+    })
+    .then((result) => {
+        if (result && result.confirmed) {
+            removeAllCoursesForStudent(studentId, studentName);
+        }
+    })
+    .catch((error) => {
+        console.error('确认对话框错误:', error);
+    });
+}
+
+// 确认取消特定课程
+function confirmCancelCourse(courseId, courseSubject) {
+    const confirmMessage = `确定要取消课程 "${courseSubject}" 吗？此操作无法撤销。`;
+    
+    wixWindow.openLightbox('confirmationDialog', {
+        title: '确认取消课程',
+        message: confirmMessage,
+        courseId: courseId,
+        courseSubject: courseSubject
+    })
+    .then((result) => {
+        if (result && result.confirmed) {
+            cancelSpecificCourse(courseId, courseSubject);
+        }
+    })
+    .catch((error) => {
+        console.error('确认对话框错误:', error);
+    });
+}
+
+// 移除学生的所有课程
+function removeAllCoursesForStudent(studentId, studentName) {
+    wixData.get('Students', studentId)
+        .then((student) => {
+            // 清空学生的课程列表
+            student.courses = [];
+            student.lastModified = new Date();
+            
+            return wixData.update('Students', student);
+        })
+        .then((result) => {
+            showSuccessMessage(`已移除学生 "${studentName}" 的所有课程`);
+            
+            // 重新加载学生列表
+            loadStudentsToRepeater();
+            
+            // 更新统计数据
+            updateStatistics();
+            
+            console.log('学生所有课程已移除:', result);
+        })
+        .catch((error) => {
+            console.error('移除学生所有课程错误:', error);
+            showErrorMessage('移除课程失败，请重试');
+        });
+}
+
+// 取消特定课程
+function cancelSpecificCourse(courseId, courseSubject) {
+    wixData.get('Courses', courseId)
+        .then((course) => {
+            // 更新课程状态为已取消
+            course.status = 'cancelled';
+            course.cancellationDate = new Date();
+            course.lastModified = new Date();
+            
+            return wixData.update('Courses', course);
+        })
+        .then((result) => {
+            showSuccessMessage(`课程 "${courseSubject}" 已取消`);
+            
+            // 重新加载课程列表
+            loadCoursesToRepeater();
+            
+            // 更新统计数据
+            updateStatistics();
+            
+            console.log('课程已取消:', result);
+        })
+        .catch((error) => {
+            console.error('取消课程错误:', error);
+            showErrorMessage('取消课程失败，请重试');
+        });
 }
 
 // 打开 AP 学生模态框（替换原始 HTML 文件中的 openAPStudentModal 函数）
@@ -626,8 +794,197 @@ function openAPStudentModal() {
 
 // 打开删除 AP 学生模态框
 function openRemoveAPModal() {
-    // 实现删除 AP 学生逻辑
+    // 显示删除 AP 学生模态框
+    $w('#removeAPStudentLightbox').show();
+    
+    // 加载 AP 学生列表到 Repeater
+    loadAPStudentsToRepeater();
+    
     console.log('删除 AP 学生模态框已打开');
+}
+
+// 加载 AP 学生到 Repeater
+function loadAPStudentsToRepeater() {
+    // 设置 AP 学生 Repeater 的数据源
+    $w('#apStudentListRepeater').onItemReady(($item, itemData, index) => {
+        // 设置学生信息
+        $item('#studentNameText').text = `${itemData.firstName} ${itemData.lastName}`;
+        $item('#studentDetailsText').text = `${itemData.grade || 'N/A'} | ${itemData.course || 'N/A'}`;
+        
+        // 设置状态徽章
+        const statusBadge = $item('#statusBadge');
+        if (itemData.status === 'active') {
+            statusBadge.text = 'Active';
+            statusBadge.style.backgroundColor = '#28a745';
+        } else {
+            statusBadge.text = 'Paused';
+            statusBadge.style.backgroundColor = '#ffc107';
+        }
+        
+        // 设置移除按钮事件
+        $item('#removeStudentButton').onClick(() => {
+            confirmRemoveAPStudent(itemData._id, `${itemData.firstName} ${itemData.lastName}`);
+        });
+    });
+    
+    // 连接到 Students 数据集，过滤 AP 学生
+    $w('#apStudentListRepeater').data = [];
+    
+    // 查询 AP 学生数据
+    wixData.query('Students')
+        .eq('isAP', true)
+        .find()
+        .then((results) => {
+            $w('#apStudentListRepeater').data = results.items;
+            console.log('AP 学生列表已加载到 Repeater:', results.items.length);
+        })
+        .catch((error) => {
+            console.error('加载 AP 学生列表错误:', error);
+            showErrorMessage('加载 AP 学生列表失败');
+        });
+}
+
+// 确认移除 AP 学生
+function confirmRemoveAPStudent(studentId, studentName) {
+    const confirmMessage = `确定要从 AP 项目中移除学生 "${studentName}" 吗？此操作无法撤销。`;
+    
+    wixWindow.openLightbox('confirmationDialog', {
+        title: '确认移除 AP 学生',
+        message: confirmMessage,
+        studentId: studentId,
+        studentName: studentName
+    })
+    .then((result) => {
+        if (result && result.confirmed) {
+            removeAPStudent(studentId, studentName);
+        }
+    })
+    .catch((error) => {
+        console.error('确认对话框错误:', error);
+    });
+}
+
+// 移除 AP 学生
+function removeAPStudent(studentId, studentName) {
+    wixData.get('Students', studentId)
+        .then((student) => {
+            // 更新学生状态，移除 AP 标识
+            student.isAP = false;
+            student.apStatus = 'removed';
+            student.apRemovalDate = new Date();
+            
+            return wixData.update('Students', student);
+        })
+        .then((result) => {
+            showSuccessMessage(`学生 "${studentName}" 已从 AP 项目中移除`);
+            
+            // 重新加载 AP 学生列表
+            loadAPStudentsToRepeater();
+            
+            // 更新统计数据
+            updateStatistics();
+            
+            console.log('AP 学生已移除:', result);
+        })
+        .catch((error) => {
+            console.error('移除 AP 学生错误:', error);
+            showErrorMessage('移除 AP 学生失败，请重试');
+        });
+}
+
+// ==========================================
+// Repeater 搜索过滤功能
+// ==========================================
+
+// 过滤学生 Repeater
+function filterStudentRepeater() {
+    const searchTerm = $w('#studentSearchInput').value.toLowerCase();
+    
+    if (!searchTerm) {
+        // 如果搜索框为空，重新加载所有学生
+        loadStudentsToRepeater();
+        return;
+    }
+    
+    // 查询匹配的学生
+    wixData.query('Students')
+        .eq('status', 'active')
+        .find()
+        .then((results) => {
+            // 客户端过滤
+            const filteredStudents = results.items.filter(student => {
+                const fullName = `${student.firstName} ${student.lastName}`.toLowerCase();
+                const email = (student.email || '').toLowerCase();
+                return fullName.includes(searchTerm) || email.includes(searchTerm);
+            });
+            
+            $w('#studentListRepeater').data = filteredStudents;
+            console.log('学生搜索结果:', filteredStudents.length);
+        })
+        .catch((error) => {
+            console.error('搜索学生错误:', error);
+        });
+}
+
+// 过滤课程 Repeater
+function filterCourseRepeater() {
+    const searchTerm = $w('#courseSearchInput2').value.toLowerCase();
+    
+    if (!searchTerm) {
+        // 如果搜索框为空，重新加载所有课程
+        loadCoursesToRepeater();
+        return;
+    }
+    
+    // 查询匹配的课程
+    wixData.query('Courses')
+        .eq('status', 'active')
+        .find()
+        .then((results) => {
+            // 客户端过滤
+            const filteredCourses = results.items.filter(course => {
+                const subject = (course.subject || '').toLowerCase();
+                const courseId = (course.courseId || course._id || '').toLowerCase();
+                return subject.includes(searchTerm) || courseId.includes(searchTerm);
+            });
+            
+            $w('#courseListRepeater').data = filteredCourses;
+            console.log('课程搜索结果:', filteredCourses.length);
+        })
+        .catch((error) => {
+            console.error('搜索课程错误:', error);
+        });
+}
+
+// 过滤 AP 学生 Repeater
+function filterAPStudentRepeater() {
+    const searchTerm = $w('#apStudentSearchInput').value.toLowerCase();
+    
+    if (!searchTerm) {
+        // 如果搜索框为空，重新加载所有 AP 学生
+        loadAPStudentsToRepeater();
+        return;
+    }
+    
+    // 查询匹配的 AP 学生
+    wixData.query('Students')
+        .eq('isAP', true)
+        .find()
+        .then((results) => {
+            // 客户端过滤
+            const filteredStudents = results.items.filter(student => {
+                const fullName = `${student.firstName} ${student.lastName}`.toLowerCase();
+                const course = (student.course || '').toLowerCase();
+                const grade = (student.grade || '').toLowerCase();
+                return fullName.includes(searchTerm) || course.includes(searchTerm) || grade.includes(searchTerm);
+            });
+            
+            $w('#apStudentListRepeater').data = filteredStudents;
+            console.log('AP 学生搜索结果:', filteredStudents.length);
+        })
+        .catch((error) => {
+            console.error('搜索 AP 学生错误:', error);
+        });
 }
 
 // 提交添加学生

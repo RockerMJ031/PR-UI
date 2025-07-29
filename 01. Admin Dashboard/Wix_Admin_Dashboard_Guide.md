@@ -384,6 +384,35 @@ The course management system has been updated to support multiple students per c
    - Remove student options: remove all courses / remove specific courses
    - Tab navigation
 
+**Important Implementation Note for Student Lists:**
+When implementing "Remove all courses for student" and "Remove specific course" functionality, the student and course lists should use **Wix Repeater components** instead of JavaScript-generated dynamic lists:
+
+**Remove All Courses for Student:**
+- **Add:** Elements → Lists & Grids → Repeater
+- **Repeater ID:** `studentListRepeater`
+- **Connect to:** Students Dataset
+- **Display Fields:** Student name, email, course count
+- **Item Template:** Include "Remove All Courses" button for each student
+- **Pagination:** Enable with 10 students per page
+- **Search:** Add search input connected to repeater filter
+
+**Remove Specific Course:**
+- **Add:** Elements → Lists & Grids → Repeater  
+- **Repeater ID:** `courseListRepeater`
+- **Connect to:** Courses Dataset
+- **Display Fields:** Course ID, subject, student names
+- **Item Template:** Include "Cancel Course" button for each course
+- **Pagination:** Enable with 10 courses per page
+- **Search:** Add search input connected to repeater filter
+
+**Repeater Configuration:**
+- **Layout:** Vertical list layout
+- **Spacing:** 10px between items
+- **Animation:** Fade in on load
+- **Responsive:** Stack on mobile devices
+- **Filtering:** Real-time search functionality
+- **Sorting:** Alphabetical by name/course ID
+
 #### Step 6.4: AP Student Registration Modal
 **Replaces:** `apStudentModal` from original HTML file
 1. **Add:** Elements → Popups & Lightboxes → Lightbox
@@ -404,23 +433,28 @@ The course management system has been updated to support multiple students per c
    - Header with title and close button
    - Instructions text: "Select a student to remove:"
    - Warning text: "Click on any student below to remove them from the AP program. This action cannot be undone."
-   - Dynamic student list container: `apStudentsListContainer`
-   - AP student list (displays name, grade, course and status)
-   - Status badges (Active/Paused)
-   - Removal confirmation functionality
-   - Each student item should include:
-     - Student name and details
-     - Status badge (Active/Paused)
-     - Remove button with confirmation
 
-**Student List Item Structure:**
-- Container: `studentItemContainer`
-- Student Info Section:
-  - Student Name: `studentNameText` (Font: 16px, bold)
-  - Student Details: `studentDetailsText` (Grade | Course, Font: 14px, color: #666)
-- Student Actions Section:
-  - Status Badge: `statusBadge` (Active: green, Paused: orange)
-  - Remove Button: `removeStudentButton` (Red background, white text)
+**AP Student List Implementation with Wix Repeater:**
+- **Add:** Elements → Lists & Grids → Repeater
+- **Repeater ID:** `apStudentListRepeater`
+- **Connect to:** Students Dataset (filtered for isAP = true)
+- **Display Fields:** Student name, grade, course, status
+- **Item Template Structure:**
+  - Student Info Section:
+    - Student Name: `studentNameText` (Font: 16px, bold)
+    - Student Details: `studentDetailsText` (Grade | Course, Font: 14px, color: #666)
+  - Student Actions Section:
+    - Status Badge: `statusBadge` (Active: green, Paused: orange)
+    - Remove Button: `removeStudentButton` (Red background, white text)
+- **Pagination:** Enable with 10 students per page
+- **Search:** Add search input for filtering by name or course
+- **Responsive:** Stack elements on mobile devices
+- **Animation:** Fade in/out on item removal
+
+**Repeater Event Handling:**
+- **Remove Button Click:** Trigger confirmation dialog
+- **Confirmation:** Remove student from dataset and refresh repeater
+- **Real-time Updates:** Automatically update student count and list
 
 ### Phase 7: Form Creation (90 minutes)
 
