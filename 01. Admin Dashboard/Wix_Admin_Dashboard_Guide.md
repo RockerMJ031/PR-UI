@@ -312,15 +312,93 @@ Create the following datasets to support dashboard functionality:
 - HTML `studentModal` → Wix `studentManagementLightbox`
 - HTML `apStudentModal` → Wix `apStudentRegistrationLightbox`
 
+#### Universal Lightbox Configuration Guidelines
+**These settings apply to ALL Lightboxes in the dashboard:**
+
+**1. Scrollbar Implementation:**
+- **Open Lightbox** in Studio Editor or Editor X
+- **Select the Lightbox** (or container inside it)
+- **Go to:** Inspector → Layout → Overflow content
+- **Set to:** Scroll with direction "Vertical"
+- **Set Height:** Fixed height (e.g., 600px) or max-height: 100vh
+- **Result:** Browser automatically generates vertical scrollbar when content exceeds height
+
+**Alternative Method:**
+- Place a **Container** inside the Lightbox
+- Set container's overflow to "Scroll"
+- Put all content inside this container
+
+**2. Dropdown Menu Implementation:**
+- **Add:** Elements → User Input → Dropdown
+- **Position:** Inside Lightbox content area
+- **Configuration:**
+  - Set dropdown options via "Manage Options" in Inspector
+  - Connect to dataset if dynamic options needed
+  - Style to match Lightbox theme
+
+**3. Mobile Responsiveness:**
+- **Repeat overflow-scroll settings** in mobile layout
+- **Lock page scroll** so only Lightbox scrolls
+- **Test on mobile devices** to ensure proper functionality
+
+**4. Optional Styling:**
+- Install **Scrollbar app** from Wix App Market for custom scrollbar styling
+- Maintain consistent styling across all Lightboxes
+
+**Key Points:**
+- Scrollbar is NOT a widget - it's generated automatically
+- Set "Overflow content = Scroll" when content exceeds element height
+- Apply these settings to ALL dashboard Lightboxes for consistency
+
 **Course Data Structure Update:**
 The course management system has been updated to support multiple students per course (up to 6 students). The new data structure groups students by class ID and subject, allowing for more efficient management of group classes.
+
+#### Step 6.0: Main Course Management Modal
+**Primary Implementation:** Course Management System
+1. **Add:** Elements → Popups & Lightboxes → Lightbox
+2. **Lightbox ID:** `courseManagementLightbox`
+3. **Title:** "Course Management"
+4. **Lightbox Configuration:**
+   - **Size:** 800px width × 600px height
+   - **Overflow:** Set to "Scroll" with "Vertical" direction
+   - **Background:** White with subtle shadow
+5. **Content Structure:**
+   - **Modal Header:**
+     - Title: "Course Management"
+     - Close button (×) in top-right corner
+   - **Modal Body:**
+     - **Search Bar Section:**
+       - **Add:** Elements → User Input → Text Input
+       - **Input ID:** `courseSearchInput`
+       - **Placeholder:** "Search by Student Name, Subject, or Class ID..."
+       - **Position:** Top of modal body
+       - **Search Logic:** Real-time filtering using `onInput` event
+       - **Filter Function:** Searches through course ID, subject, and student names
+       - **Implementation:** Hide/show course items based on search term match
+     - **Filter Dropdown Section:**
+       - **Add:** Elements → User Input → Dropdown
+       - **Dropdown ID:** `courseFilterDropdown`
+       - **Options:** "All Courses", "Active", "Pending", "Cancelled"
+       - **Position:** Next to search bar
+     - **Course List Container:**
+       - **Container ID:** `courseListContainer`
+       - **Content:** Dynamic course list populated from dataset
+       - **Display Format:** Course cards showing Class ID, subject, student count, and action buttons
+       - **Actions:** Each course includes "Extend" and "Cancel" buttons
+       - **Scrolling:** Automatic vertical scroll when content exceeds container height
+   - **Action Buttons:**
+     - Close button: `closeCourseModalBtn` (secondary style)
 
 #### Step 6.1: Course Extension Modal
 **New Implementation:** Enhanced Course Extension Request System
 1. **Add:** Elements → Popups & Lightboxes → Lightbox
 2. **Lightbox ID:** `courseExtensionLightbox`
 3. **Title:** "Course Extension Request"
-4. **Content Structure:**
+4. **Lightbox Configuration:**
+   - **Size:** 600px width × 500px height
+   - **Overflow:** Set to "Scroll" with "Vertical" direction
+   - **Background:** White with subtle shadow
+5. **Content Structure:**
    - **Modal Header:**
      - Title: "Course Extension Request"
      - Close button (×) in top-right corner
@@ -329,6 +407,10 @@ The course management system has been updated to support multiple students per c
        - Dynamically populated with selected course details
        - Shows course ID, subject, and student information
      - **Extension Form Section:**
+       - **Extension Type Dropdown:**
+         - **Add:** Elements → User Input → Dropdown
+         - **Dropdown ID:** `extensionTypeDropdown`
+         - **Options:** "1 Week", "2 Weeks", "1 Month", "Custom"
        - **Extend Until Date:** Date input field with label "Extend Course Until:"
          - Input ID: `extensionEndDate`
          - Required field with date validation
@@ -350,7 +432,11 @@ The course management system has been updated to support multiple students per c
 1. **Add:** Elements → Popups & Lightboxes → Lightbox
 2. **Lightbox ID:** `courseCancellationLightbox`
 3. **Title:** "Course Cancellation"
-4. **Content Structure:**
+4. **Lightbox Configuration:**
+   - **Size:** 700px width × 650px height
+   - **Overflow:** Set to "Scroll" with "Vertical" direction
+   - **Background:** White with subtle shadow
+5. **Content Structure:**
    - **Modal Header:**
      - Title: "Course Cancellation"
      - Close button (×) in top-right corner
@@ -359,16 +445,25 @@ The course management system has been updated to support multiple students per c
        - Two-week notice requirement warning
        - Important notice styling with alert icon
      - **Course Selection:**
+       - **Add:** Elements → User Input → Dropdown
+       - **Dropdown ID:** `courseSelectionDropdown`
        - Dropdown menu showing "Class ID - Subject (X students)" format
        - Real-time course details display upon selection
      - **Selected Course Details:**
        - Course ID, subject, and student count
        - Complete list of all students with remaining lesson counts
        - Multi-column layout for courses with multiple students
+       - **Scrollable container** for long student lists
      - **Cancellation Form:**
        - **Cancellation Date:** Date input with label "Cancel From:"
-       - **Cancellation Reason:** Textarea field
-         - Placeholder: "Please provide the reason for course cancellation..."
+       - **Cancellation Reason:** Dropdown with predefined options
+         - **Add:** Elements → User Input → Dropdown
+         - **Dropdown ID:** `cancellationReasonDropdown`
+         - **Options:** "Student Request", "Instructor Unavailable", "Low Enrollment", "Technical Issues", "Other"
+       - **Additional Details:** Textarea field
+         - **Add:** Elements → User Input → Text Box
+         - **Text Area ID:** `cancellationDetailsTextArea`
+         - Placeholder: "Please provide additional details about the cancellation..."
          - Required field for documentation
    - **Action Buttons:**
      - Cancel button (secondary style)
@@ -379,7 +474,44 @@ The course management system has been updated to support multiple students per c
 1. **Add:** Elements → Popups & Lightboxes → Lightbox
 2. **Lightbox ID:** `studentManagementLightbox`
 3. **Title:** "Student Management"
-4. **Content:** Multi-state container including:
+4. **Lightbox Configuration:**
+   - **Size:** 900px width × 700px height
+   - **Overflow:** Set to "Scroll" with "Vertical" direction
+   - **Background:** White with subtle shadow
+5. **Content Structure:**
+   - **Modal Header:**
+     - Title: "Student Management"
+     - Close button (×) in top-right corner
+   - **Modal Body:**
+     - **Search and Filter Section:**
+       - **Search Bar:**
+         - **Add:** Elements → User Input → Text Input
+         - **Input ID:** `studentSearchInput`
+         - **Placeholder:** "Search by Student Name or Email..."
+         - **Position:** Top left of filter section
+       - **Status Filter Dropdown:**
+         - **Add:** Elements → User Input → Dropdown
+         - **Dropdown ID:** `studentStatusDropdown`
+         - **Options:** "All Students", "Active", "Inactive", "Pending"
+         - **Position:** Next to search bar
+       - **Grade Filter Dropdown:**
+         - **Add:** Elements → User Input → Dropdown
+         - **Dropdown ID:** `studentGradeDropdown`
+         - **Options:** "All Grades", "Grade 9", "Grade 10", "Grade 11", "Grade 12", "College"
+         - **Position:** Right side of filter section
+       - **Search Logic:** Real-time filtering using `onInput` event
+       - **Filter Function:** Searches through student name and email fields
+       - **Implementation:** Hide/show student items based on search term match
+     - **Student List Container:**
+       - **Container ID:** `studentListContainer`
+       - **Content:** Dynamic student list using Wix Repeater
+       - **Display Format:** Student cards showing name, email, contact info, and action buttons
+       - **Actions:** Each student includes "Edit" and "View Details" buttons
+       - **Scrolling:** Automatic vertical scroll when content exceeds container height
+   - **Action Buttons:**
+     - Add New Student button: `addStudentBtn` (primary style)
+     - Close button: `closeStudentModalBtn` (secondary style)
+6. **Content:** Multi-state container including:
    - Add student form containing basic information, academic information and SEND status
    - Remove student options: remove all courses / remove specific courses
    - Tab navigation
@@ -394,7 +526,14 @@ When implementing "Remove all courses for student" and "Remove specific course" 
 - **Display Fields:** Student name, email, course count
 - **Item Template:** Include "Remove All Courses" button for each student
 - **Pagination:** Enable with 10 students per page
-- **Search:** Add search input connected to repeater filter
+- **Search Bar Implementation:**
+  - **Add:** Elements → User Input → Text Input
+  - **Input ID:** `studentSearchInput`
+  - **Placeholder:** "Search student name..."
+  - **Position:** Above repeater
+  - **Search Logic:** Real-time filtering using `onInput` event
+  - **Filter Function:** Searches through student name and email fields
+  - **Implementation:** Hide/show repeater items based on search term match
 
 **Remove Specific Course:**
 - **Add:** Elements → Lists & Grids → Repeater  
@@ -403,7 +542,14 @@ When implementing "Remove all courses for student" and "Remove specific course" 
 - **Display Fields:** Course ID, subject, student names
 - **Item Template:** Include "Cancel Course" button for each course
 - **Pagination:** Enable with 10 courses per page
-- **Search:** Add search input connected to repeater filter
+- **Search Bar Implementation:**
+  - **Add:** Elements → User Input → Text Input
+  - **Input ID:** `courseSearchInput`
+  - **Placeholder:** "Search course, student or Class ID..."
+  - **Position:** Above repeater
+  - **Search Logic:** Multi-field search functionality
+  - **Filter Function:** Searches through course ID, subject, and student names
+  - **Implementation:** Real-time filtering with case-insensitive text matching
 
 **Repeater Configuration:**
 - **Layout:** Vertical list layout
@@ -418,21 +564,84 @@ When implementing "Remove all courses for student" and "Remove specific course" 
 1. **Add:** Elements → Popups & Lightboxes → Lightbox
 2. **Lightbox ID:** `apStudentRegistrationLightbox`
 3. **Title:** "Alternative Provision Student Registration"
-4. **Content:**
-   - Student information form (OEAS framework)
-   - SEND file upload (supports PDF, DOC, DOCX, TXT formats)
-   - Education plan selection (Core Subjects, Core Plus, All Subjects + Therapy, Blueprint)
-   - Additional questions (home supervision, support duration)
+4. **Lightbox Configuration:**
+   - **Size:** 1000px width × 800px height
+   - **Overflow:** Set to "Scroll" with "Vertical" direction
+   - **Background:** White with subtle shadow
+5. **Content Structure:**
+   - **Progress Indicator:**
+     - **Add:** Elements → Media & Content → Progress Bar
+     - **Progress Bar ID:** `registrationProgressBar`
+     - **Steps:** "Basic Info", "Guardian Info", "Education Background", "Special Needs", "Confirmation"
+   - **Multi-Step Form Sections:**
+     - **Step 1: Basic Information**
+       - Student name, age, date of birth inputs
+       - **Gender Selection Dropdown:**
+         - **Add:** Elements → User Input → Dropdown
+         - **Options:** "Male", "Female", "Other", "Prefer not to say"
+     - **Step 2: Guardian Information**
+       - Guardian contact details
+       - **Relationship Dropdown:**
+         - **Add:** Elements → User Input → Dropdown
+         - **Options:** "Parent", "Guardian", "Foster Parent", "Social Worker", "Other"
+     - **Step 3: Education Background**
+       - **Education Plan Dropdown:**
+         - **Add:** Elements → User Input → Dropdown
+         - **Options:** "Core Subjects", "Core Plus", "All Subjects + Therapy", "Blueprint"
+       - **Previous School Type Dropdown:**
+         - **Add:** Elements → User Input → Dropdown
+         - **Options:** "Mainstream", "Special School", "Home Education", "Alternative Provision", "Other"
+     - **Step 4: Special Needs Assessment**
+       - **EHCP Status Dropdown:**
+         - **Add:** Elements → User Input → Dropdown
+         - **Options:** "Yes", "No", "In Progress"
+       - **SEND Status Multi-Select:**
+         - **Add:** Elements → User Input → Dropdown (Multi-select)
+         - **Options:** "SpLD", "SLCN", "SEMH", "ASD", "VI", "HI", "MSI", "PD", "NSA", "OTH", "DS"
+       - **Support Duration Dropdown:**
+         - **Add:** Elements → User Input → Dropdown
+         - **Options:** "Less than 4 weeks", "4-12 weeks", "1-6 months", "6+ months", "Long-term"
+       - **Home Supervision Dropdown:**
+         - **Add:** Elements → User Input → Dropdown
+         - **Options:** "Yes - Adult supervision", "No - Independent study", "Partial supervision"
+     - **File Upload Section:**
+       - EHCP file upload (PDF, DOC, DOCX, TXT formats)
+       - Medical reports upload
+     - **Scrollable Content:** All form sections with automatic vertical scroll
+   - **Navigation Buttons:**
+     - Previous/Next step buttons
+     - Save Draft functionality
+     - Submit registration button
 
 #### Step 6.5: Remove AP Student Modal
 **New Feature:** Remove AP Student functionality
 1. **Add:** Elements → Popups & Lightboxes → Lightbox
 2. **Lightbox ID:** `removeAPStudentLightbox`
 3. **Title:** "Remove AP Student"
-4. **Content:**
-   - Header with title and close button
-   - Instructions text: "Select a student to remove:"
-   - Warning text: "Click on any student below to remove them from the AP program. This action cannot be undone."
+4. **Lightbox Configuration:**
+   - **Size:** 700px width × 600px height
+   - **Overflow:** Set to "Scroll" with "Vertical" direction
+   - **Background:** White with subtle shadow
+5. **Content Structure:**
+   - **Modal Header:**
+     - Title: "Remove AP Student"
+     - Close button (×) in top-right corner
+   - **Instructions Section:**
+     - Instructions text: "Select a student to remove:"
+     - Warning text: "Click on any student below to remove them from the AP program. This action cannot be undone."
+   - **Filter Section:**
+     - **Status Filter Dropdown:**
+       - **Add:** Elements → User Input → Dropdown
+       - **Dropdown ID:** `apStudentStatusFilter`
+       - **Options:** "All Students", "Active", "Paused", "Pending"
+       - **Position:** Top of student list
+     - **Grade Filter Dropdown:**
+       - **Add:** Elements → User Input → Dropdown
+       - **Dropdown ID:** `apStudentGradeFilter`
+       - **Options:** "All Grades", "Year 7", "Year 8", "Year 9", "Year 10", "Year 11"
+   - **Student List Container:**
+     - **Scrollable container** for long student lists
+     - **Automatic vertical scroll** when content exceeds container height
 
 **AP Student List Implementation with Wix Repeater:**
 - **Add:** Elements → Lists & Grids → Repeater
@@ -768,6 +977,41 @@ Create complete form in AP Student Lightbox:
 2. **Auto-Close Conditions:**
    - Modal should close automatically when all students are removed
    - Show final confirmation message before closing
+
+---
+
+## Important Implementation Notes
+
+### Universal Lightbox Requirements Summary
+**These configurations MUST be applied to ALL Lightboxes in the dashboard:**
+
+1. **Scrollbar Configuration:**
+   - Set "Overflow content" to "Scroll" with "Vertical" direction
+   - Define fixed height or max-height for automatic scrollbar generation
+   - Apply same settings to mobile layout for cross-device compatibility
+
+2. **Dropdown Menu Implementation:**
+   - Use consistent dropdown styling across all modals
+   - Implement proper option management and data binding
+   - Ensure dropdowns are accessible and responsive
+
+3. **Content Organization:**
+   - Structure content in scrollable containers when needed
+   - Maintain consistent spacing and layout patterns
+   - Implement proper form validation and user feedback
+
+4. **Mobile Responsiveness:**
+   - Test all Lightboxes on mobile devices
+   - Ensure touch-friendly interface elements
+   - Verify scrolling behavior on different screen sizes
+
+**Key Benefits:**
+- Consistent user experience across all dashboard modals
+- Improved accessibility and usability
+- Professional appearance with proper content management
+- Seamless functionality on all devices
+
+**Remember:** The scrollbar is automatically generated by the browser when content exceeds the container height - no additional components needed!
 
 ### Phase 9: EHCP File Upload Implementation (60 minutes)
 
