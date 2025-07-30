@@ -2456,29 +2456,58 @@ function filterCourses() {
 }
 
 // 处理工单提交
-function handleTicketSubmission() {
-    // 实现工单提交逻辑
-    console.log('工单提交已点击');
-    
-    // 获取当前用户信息
-    const currentUser = getCurrentUser();
-    const clientId = currentUser.id;
-    const clientName = currentUser.name;
-    const email = currentUser.email;
-    
-    // 构建Lark工单提交表单URL，包含预填充的用户信息
-    const larkTicketFormUrl = `https://anycross.larksuite.com/base/form/share?token=xxxx&client_id=${clientId}&clientName=${encodeURIComponent(clientName)}&email=${encodeURIComponent(email)}`;
-    
-    // 在新窗口打开Lark表单
-    wixWindow.openLightbox('ticketSubmissionLightbox', {
-        url: larkTicketFormUrl,
-        clientId: clientId,
-        clientName: clientName,
-        email: email
-    });
-    
-    // 记录工单提交事件到统计数据
-    updateTicketStatistics('submitted');
+async function handleTicketSubmission() {
+    try {
+        // 实现工单提交逻辑
+        console.log('工单提交已点击');
+        
+        // 获取当前用户信息
+        const currentUser = getCurrentUser();
+        const clientId = currentUser.id;
+        const clientName = currentUser.name;
+        const email = currentUser.email;
+        
+        // 从CMS-6 Admins集合获取当前管理员的工单提交链接
+        const adminResult = await wixData.query('Admins')
+            .eq('userId', clientId)
+            .find();
+        
+        let ticketSubmissionUrl;
+        
+        if (adminResult.items.length > 0 && adminResult.items[0].ticketSubmissionLink) {
+            // 使用CMS中配置的工单提交链接
+            const baseUrl = adminResult.items[0].ticketSubmissionLink;
+            // 在URL中添加预填充的用户信息参数
+            const urlParams = new URLSearchParams({
+                client_id: clientId,
+                clientName: clientName,
+                email: email
+            });
+            
+            // 检查URL是否已包含参数
+            const separator = baseUrl.includes('?') ? '&' : '?';
+            ticketSubmissionUrl = `${baseUrl}${separator}${urlParams.toString()}`;
+        } else {
+            // 如果CMS中没有配置链接，使用默认的Lark表单URL
+            ticketSubmissionUrl = `https://anycross.larksuite.com/base/form/share?token=xxxx&client_id=${clientId}&clientName=${encodeURIComponent(clientName)}&email=${encodeURIComponent(email)}`;
+            console.warn('未在CMS-6中找到ticketSubmissionLink，使用默认URL');
+        }
+        
+        // 在新窗口打开工单提交表单
+        wixWindow.openLightbox('ticketSubmissionLightbox', {
+            url: ticketSubmissionUrl,
+            clientId: clientId,
+            clientName: clientName,
+            email: email
+        });
+        
+        // 记录工单提交事件到统计数据
+        updateTicketStatistics('submitted');
+        
+    } catch (error) {
+        console.error('处理工单提交错误:', error);
+        showErrorMessage('无法打开工单提交表单，请稍后再试');
+    }
 }
 
 // 处理状态检查

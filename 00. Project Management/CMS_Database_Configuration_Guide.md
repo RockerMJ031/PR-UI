@@ -420,6 +420,8 @@ This document details the database collection configuration required for the tut
   teacherSCRReportUrl: "text", // Teacher SCR Report URL
   teacherSCRReportPassword: "text", // Default: TeacherSCR2024
   
+  // Ticket submission link - Used for submitTicketBtn in Admin Dashboard
+  ticketSubmissionLink: "text", // Ticket Submission URL
   
   _createdDate: "text",
   _updatedDate: "text"
