@@ -1435,11 +1435,11 @@
                         Manage course extensions and cancellations
                     </p>
                     <div class="action-buttons">
-                        <button class="btn btn-primary" onclick="openCourseModal('extend')">
+                        <button class="btn btn-primary" onclick="openExtensionLightbox()">
                             <i class="fas fa-plus"></i>
                             Course Extension
                         </button>
-                        <button class="btn btn-secondary" onclick="openCourseModal('cancel')">
+                        <button class="btn btn-secondary" onclick="openCancellationLightbox()">
                             <i class="fas fa-times"></i>
                             Cancel Course
                         </button>
@@ -1662,20 +1662,134 @@
     </div>
 
     <!-- Course Management Modal -->
-    <div id="courseModal" class="modal">
-        <div class="modal-content">
+    <!-- Course Extension Lightbox -->
+    <div id="courseExtensionLightbox" class="modal">
+        <div class="modal-content extension-lightbox">
             <div class="modal-header">
-                <h2 id="modalTitle">Course Management</h2>
-                <span class="close" onclick="closeCourseModal()">&times;</span>
+                <h2>Course Extension</h2>
+                <span class="close" onclick="closeExtensionLightbox()">&times;</span>
             </div>
             <div class="modal-body">
-                <div class="search-bar">
-                    <input type="text" id="searchInput" placeholder="Search by Student Name, Subject, or Class ID..." onkeyup="filterCourses()">
-                    <i class="fas fa-search"></i>
+                <div class="lightbox-layout">
+                    <div class="left-panel">
+                        <div class="search-bar">
+                            <input type="text" id="extensionSearchInput" placeholder="Search by Student Name, Subject, or Class ID..." onkeyup="filterExtensionStudents()">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="student-list-container">
+                            <div class="student-list" id="extensionCourseList">
+                                <!-- Student items will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="right-panel">
+                        <div id="extensionDetailsPanel" class="details-panel" style="display: none;">
+                            <h3>Extension Details</h3>
+                            <div id="selectedExtensionCourseInfo" class="selected-course-info"></div>
+                            
+                            <div class="extension-form">
+                                <div class="form-group">
+                                    <label for="extensionEndDate"><strong>Extend Course Until:</strong></label>
+                                    <input type="date" id="extensionEndDate" class="extension-date-input" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="updatedFocusArea"><strong>Updated Focus Area:</strong></label>
+                                    <textarea id="updatedFocusArea" class="focus-area-textarea" placeholder="Please describe the updated focus areas or learning objectives for the extended period..." required></textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="extensionDescription"><strong>Detailed Description of Course Extension:</strong></label>
+                                    <textarea id="extensionDescription" class="extension-description-textarea" placeholder="Please provide a detailed description of your course extension, including reasons for extension, specific goals, and any additional requirements..." required></textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="extension-actions">
+                                <button class="btn btn-secondary" onclick="clearExtensionSelection()">Clear Selection</button>
+                                <button class="btn btn-success" id="submitExtensionBtn" onclick="submitExtensionRequest()">
+                                    <i class="fas fa-paper-plane"></i>
+                                    Submit Extension Request
+                                </button>
+                            </div>
+                        </div>
+                        <div id="extensionPlaceholder" class="placeholder-panel">
+                            <i class="fas fa-mouse-pointer"></i>
+                            <p>Select a course from the left to configure extension details</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="course-list-container">
-                    <div class="course-list" id="courseList">
-                        <!-- Course items will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Course Cancellation Lightbox -->
+    <div id="courseCancellationLightbox" class="modal">
+        <div class="modal-content cancellation-modal">
+            <div class="modal-header">
+                <h2>Course Cancellation</h2>
+                <span class="close" id="closeCancellationModalBtn">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="lightbox-layout">
+                    <div class="left-panel">
+                        <div class="search-bar">
+                            <input type="text" id="cancellationSearchInput" placeholder="Search by Student Name, Subject, or Class ID..." onkeyup="filterCancellationCourses()">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="course-list-container">
+                            <div class="course-list" id="cancellationCourseList">
+                                <!-- Course items will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="right-panel">
+                        <div id="cancellationDetailsPanel" class="details-panel" style="display: none;">
+                            <div class="cancellation-course-info">
+                                <div class="cancellation-course-header">
+                                    <div class="cancellation-course-title" id="selectedCancellationCourseTitle">Course Title</div>
+                                    <div class="cancellation-course-subject" id="selectedCancellationCourseSubject">Subject</div>
+                                    <div class="cancellation-student-count" id="selectedCancellationStudentCount">(0 students)</div>
+                                </div>
+                                <div style="margin-bottom: 15px; color: #6c757d; font-size: 14px;">
+                                    <i class="fas fa-users"></i> Students in this course:
+                                </div>
+                                <div class="cancellation-students-list" id="selectedCancellationStudentsList">
+                                    <!-- Students will be populated here -->
+                                </div>
+                            </div>
+                            
+                            <div class="cancellation-form">
+                                <div class="form-group">
+                                    <label for="cancellationStartDate">Cancellation Start Date:</label>
+                                    <input type="date" id="cancellationStartDate" class="cancellation-date-input">
+                                    <div class="form-note">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span>Two weeks advance notice required. Date will be auto-adjusted if needed.</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="cancellationReasonTextarea">Reason for Cancellation:</label>
+                                    <textarea id="cancellationReasonTextarea" class="reason-textarea" placeholder="Please provide detailed reason for course cancellation..." required></textarea>
+                                    <div class="form-note">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span>Please provide a comprehensive explanation for the cancellation request.</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="cancellation-actions">
+                                <button class="btn btn-secondary" id="closeCancellationModalBtn2">Cancel</button>
+                                <button class="btn btn-danger" id="confirmCancellationBtn">
+                                    <i class="fas fa-times"></i>
+                                    Confirm Cancellation
+                                </button>
+                            </div>
+                        </div>
+                        <div id="cancellationPlaceholder" class="placeholder-panel">
+                            <i class="fas fa-mouse-pointer"></i>
+                            <p>Select a course from the left to configure cancellation details</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1796,103 +1910,9 @@
         </div>
     </div>
 
-    <!-- Course Cancellation Confirmation Modal -->
-    <div id="courseCancellationLightbox" class="modal">
-        <div class="modal-content cancellation-modal">
-            <div class="modal-header">
-                <h2>Course Cancellation</h2>
-                <span class="close" id="closeCancellationModalBtn">&times;</span>
-            </div>
-            <div class="modal-body">
-                <div class="cancellation-info">
-                    <div class="cancellation-warning">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <span>Two Week Notice Required</span>
-                    </div>
-                    <p>Course cancellation requires a minimum of two weeks advance notice. If you select a start date within two weeks, the system will automatically adjust it to ensure the two-week notice period is met.</p>
-                </div>
-                
-                <div class="course-selection">
-                    <label for="cancellationCourseDropdown"><strong>Select Course to Cancel:</strong></label>
-                    <select id="cancellationCourseDropdown" class="course-dropdown">
-                        <option value="">Choose a course...</option>
-                    </select>
-                </div>
-                
-                <div class="cancellation-start-time">
-                    <label for="cancellationStartDate"><strong>Cancellation Start Date:</strong></label>
-                    <input type="date" id="cancellationStartDate" class="cancellation-date-input">
-                    <div class="cancellation-note">
-                        <i class="fas fa-info-circle"></i>
-                        <span>If the selected date is within two weeks from today, the system will automatically adjust it to two weeks from now.</span>
-                    </div>
-                </div>
-                
-                <div class="cancellation-details" id="cancellationDetails" style="display: none;">
-                    <h4>Course Information:</h4>
-                    <div id="selectedCourseInfo"></div>
-                    <div class="cancellation-date" id="cancellationDate"></div>
-                </div>
-                
-                <div class="reason-section">
-                    <label for="cancellationReasonTextarea"><strong>Reason for Cancellation:</strong></label>
-                    <textarea id="cancellationReasonTextarea" class="reason-textarea" placeholder="Please provide the reason for course cancellation..."></textarea>
-                </div>
-                
-                <div class="confirmation-actions">
-                    <button class="btn btn-secondary" id="closeCancellationModalBtn">Cancel</button>
-                    <button class="btn btn-danger" id="confirmCancellationBtn">
-                        <i class="fas fa-times"></i>
-                        Confirm Cancellation
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Course Extension Details Modal -->
-    <div id="courseExtensionModal" class="modal">
-        <div class="modal-content extension-modal">
-            <div class="modal-header">
-                <h2>Course Extension Request</h2>
-                <span class="close" id="closeExtensionModalBtn">&times;</span>
-            </div>
-            <div class="modal-body">
-                <div class="extension-course-info" id="extensionCourseInfo">
-                    <!-- Course information will be populated here -->
-                </div>
-                
-                <div class="extension-form">
-                    <div class="form-group">
-                        <label for="extensionEndDate"><strong>Extend Course Until:</strong></label>
-                        <input type="date" id="extensionEndDate" class="extension-date-input" required>
-                        <div class="form-note">
-                            <i class="fas fa-info-circle"></i>
-                            <span>Please select the new end date for the course extension.</span>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="updatedFocusArea"><strong>Updated Focus Area:</strong></label>
-                        <textarea id="updatedFocusArea" class="focus-area-textarea" placeholder="Please describe the updated focus areas or learning objectives for the extended period..." required></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="extensionDescription"><strong>Detailed Description of Course Extension:</strong></label>
-                        <textarea id="extensionDescription" class="extension-description-textarea" placeholder="Please provide a detailed description of your course extension, including reasons for extension, specific goals, and any additional requirements..." required></textarea>
-                    </div>
-                </div>
-                
-                <div class="extension-actions">
-                    <button class="btn btn-secondary" id="closeExtensionModalBtn2">Cancel</button>
-                    <button class="btn btn-success" id="submitExtensionBtn">
-                        <i class="fas fa-paper-plane"></i>
-                        Submit Extension Request
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+
+
 
     <!-- AP Student Registration Modal -->
     <div id="apStudentModal" class="modal">
@@ -2152,6 +2172,7 @@
                 subject: 'English',
                 courseId: 'ENG-002',
                 students: [
+                    { name: 'James Smith', qtyLessons: 45 },
                     { name: 'Michael Brown', qtyLessons: 67 },
                     { name: 'Isabella Davis', qtyLessons: 65 },
                     { name: 'Oliver Wilson', qtyLessons: 63 },
@@ -2174,6 +2195,7 @@
                 subject: 'Physics',
                 courseId: 'PHY-004',
                 students: [
+                    { name: 'James Smith', qtyLessons: 38 },
                     { name: 'Amelia Rodriguez', qtyLessons: 59 },
                     { name: 'Benjamin Lee', qtyLessons: 56 },
                     { name: 'Grace Kim', qtyLessons: 54 },
@@ -2185,6 +2207,7 @@
                 subject: 'Mathematics',
                 courseId: 'MAT-007',
                 students: [
+                    { name: 'James Smith', qtyLessons: 42 },
                     { name: 'Lily Zhang', qtyLessons: 39 },
                     { name: 'Noah Johnson', qtyLessons: 37 },
                     { name: 'Zoe Williams', qtyLessons: 35 }
@@ -2209,26 +2232,279 @@
             }
         ];
 
-        let currentAction = '';
+        let selectedExtensionStudent = null;
+        let selectedCancellationCourse = null;
 
-        function openCourseModal(action) {
-            currentAction = action;
-            const modal = document.getElementById('courseModal');
-            const modalTitle = document.getElementById('modalTitle');
-            
-            if (action === 'extend') {
-                modalTitle.textContent = 'Course Extension';
-            } else if (action === 'cancel') {
-                modalTitle.textContent = 'Course Cancellation';
-            }
-            
-            populateCourseList();
+        // Course Extension Lightbox Functions
+        function openExtensionLightbox() {
+            const modal = document.getElementById('courseExtensionLightbox');
+            populateExtensionStudentList();
             modal.style.display = 'block';
         }
 
-        function closeCourseModal() {
-            const modal = document.getElementById('courseModal');
+        function closeExtensionLightbox() {
+            const modal = document.getElementById('courseExtensionLightbox');
             modal.style.display = 'none';
+            clearExtensionSelection();
+        }
+
+        function populateExtensionStudentList() {
+            const courseList = document.getElementById('extensionCourseList');
+            courseList.innerHTML = '';
+            
+            // 按课程分组显示学生
+            courseData.forEach(course => {
+                const courseItem = createExtensionStudentItem(course);
+                courseList.appendChild(courseItem);
+            });
+        }
+
+        // 从CMS获取所有学生数据的函数
+        function getAllStudentsFromCMS() {
+            // 这里应该调用实际的CMS API来获取学生数据
+            // 目前使用模拟数据，实际实现时需要替换为真实的CMS调用
+            const allStudents = [];
+            
+            // 从现有课程数据中提取所有学生（临时解决方案）
+            courseData.forEach(course => {
+                course.students.forEach(student => {
+                    allStudents.push({
+                        id: student.id || `${course.classId}_${student.name}`,
+                        name: student.name,
+                        classId: course.classId,
+                        subject: course.subject,
+                        qtyLessons: student.qtyLessons
+                    });
+                });
+            });
+            
+            return allStudents;
+        }
+
+        function createExtensionStudentItem(courseGroup) {
+            const item = document.createElement('div');
+            item.className = 'course-item';
+            
+            // 将学生名字组合成逗号分隔的字符串
+            const studentNames = courseGroup.students.map(s => s.name).join(', ');
+            
+            item.innerHTML = `
+                <div class="course-info">
+                    <div class="course-header">
+                        <div class="course-id">${courseGroup.classId}</div>
+                        <div class="course-subject">${courseGroup.subject}</div>
+                        <div class="student-count">
+                            <div class="student-number">${courseGroup.students.length}</div>
+                            <div class="student-text">students</div>
+                        </div>
+                    </div>
+                    <div class="students-display">
+                        <span class="student-names">${studentNames}</span>
+                    </div>
+                </div>
+                <div class="course-actions">
+                    <button class="action-btn extend-btn" onclick="selectExtensionCourse('${courseGroup.classId}')">
+                        <i class="fas fa-plus"></i>
+                        Select
+                    </button>
+                </div>
+            `;
+            return item;
+        }
+
+        function selectExtensionCourse(classId) {
+            selectedExtensionStudent = courseData.find(c => c.classId === classId);
+            if (selectedExtensionStudent) {
+                populateExtensionDetails(selectedExtensionStudent);
+                document.getElementById('extensionDetailsPanel').style.display = 'block';
+                document.getElementById('extensionPlaceholder').style.display = 'none';
+                
+                // Highlight selected course
+                document.querySelectorAll('#extensionCourseList .course-item').forEach(item => {
+                    item.classList.remove('selected');
+                });
+                event.target.closest('.course-item').classList.add('selected');
+            }
+        }
+
+        function populateExtensionDetails(course) {
+            const courseInfoContainer = document.getElementById('selectedExtensionCourseInfo');
+            
+            // 生成学生姓名文字列表
+            const studentNames = course.students.map(student => student.name).join(', ');
+            
+            courseInfoContainer.innerHTML = `
+                <div class="extension-course-header">
+                    <div class="extension-course-title">${course.classId}</div>
+                    <div class="extension-course-subject">${course.subject}</div>
+                    <div class="student-count">(${course.students.length} students)</div>
+                </div>
+                <div class="students-text-display">
+                    ${studentNames}
+                </div>
+            `;
+            
+            // Set default extension date (3 months from now)
+            const defaultDate = new Date();
+            defaultDate.setMonth(defaultDate.getMonth() + 3);
+            document.getElementById('extensionEndDate').value = defaultDate.toISOString().split('T')[0];
+        }
+
+        function clearExtensionSelection() {
+            selectedExtensionStudent = null;
+            document.getElementById('extensionDetailsPanel').style.display = 'none';
+            document.getElementById('extensionPlaceholder').style.display = 'block';
+            document.getElementById('extensionEndDate').value = '';
+            document.getElementById('updatedFocusArea').value = '';
+            document.getElementById('extensionDescription').value = '';
+            
+            document.querySelectorAll('#extensionCourseList .course-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+        }
+
+        function submitExtensionRequest() {
+            if (!selectedExtensionStudent) {
+                alert('Please select a student first.');
+                return;
+            }
+            
+            const endDate = document.getElementById('extensionEndDate').value;
+            const focusArea = document.getElementById('updatedFocusArea').value;
+            const description = document.getElementById('extensionDescription').value;
+            
+            if (!endDate || !focusArea || !description) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            alert(`Extension request submitted for ${selectedExtensionStudent.name}`);
+            closeExtensionLightbox();
+        }
+
+        function filterExtensionStudents() {
+            const searchTerm = document.getElementById('extensionSearchInput').value.toLowerCase();
+            const courseItems = document.querySelectorAll('#extensionCourseList .course-item');
+            
+            courseItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Course Cancellation Lightbox Functions
+        function openCancellationLightbox() {
+            const modal = document.getElementById('courseCancellationLightbox');
+            populateCancellationCourseList();
+            modal.style.display = 'block';
+        }
+
+        function closeCancellationLightbox() {
+            const modal = document.getElementById('courseCancellationLightbox');
+            modal.style.display = 'none';
+            clearCancellationSelection();
+        }
+
+        function populateCancellationCourseList() {
+            const courseList = document.getElementById('cancellationCourseList');
+            courseList.innerHTML = '';
+            
+            courseData.forEach(course => {
+                const courseItem = createCancellationCourseItem(course);
+                courseList.appendChild(courseItem);
+            });
+        }
+
+        function createCancellationCourseItem(course) {
+            const item = document.createElement('div');
+            item.className = 'course-item';
+            
+            // 将学生名字组合成逗号分隔的字符串
+            const studentNames = course.students.map(s => s.name).join(', ');
+            
+            item.innerHTML = `
+                <div class="course-info">
+                    <div class="course-header">
+                        <div class="course-id">${course.classId}</div>
+                        <div class="course-subject">${course.subject}</div>
+                        <div class="student-count">
+                            <div class="student-number">${course.students.length}</div>
+                            <div class="student-text">students</div>
+                        </div>
+                    </div>
+                    <div class="students-display">
+                        <span class="student-names">${studentNames}</span>
+                    </div>
+                </div>
+                <div class="course-actions">
+                    <button class="action-btn cancel-btn" onclick="selectCancellationCourse('${course.classId}')">
+                        <i class="fas fa-times"></i>
+                        Select
+                    </button>
+                </div>
+            `;
+            return item;
+        }
+
+
+
+        function clearCancellationSelection() {
+            selectedCancellationCourse = null;
+            document.getElementById('cancellationDetailsPanel').style.display = 'none';
+            document.getElementById('cancellationPlaceholder').style.display = 'flex';
+            document.getElementById('cancellationStartDate').value = '';
+            document.getElementById('cancellationReasonTextarea').value = '';
+            
+            document.querySelectorAll('#cancellationCourseList .course-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+        }
+
+        function confirmCancellation() {
+            if (!selectedCancellationCourse) {
+                alert('Please select a course first.');
+                return;
+            }
+            
+            const startDate = document.getElementById('cancellationStartDate').value;
+            const reason = document.getElementById('cancellationReasonTextarea').value;
+            
+            if (!startDate || !reason) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            // Check if date is at least 2 weeks from now
+            const selectedDate = new Date(startDate);
+            const twoWeeksFromNow = new Date();
+            twoWeeksFromNow.setDate(twoWeeksFromNow.getDate() + 14);
+            
+            if (selectedDate < twoWeeksFromNow) {
+                alert('Cancellation date has been adjusted to meet the two-week notice requirement.');
+                document.getElementById('cancellationStartDate').value = twoWeeksFromNow.toISOString().split('T')[0];
+                return;
+            }
+            
+            alert(`Cancellation confirmed for ${selectedCancellationCourse.classId}`);
+            closeCancellationLightbox();
+        }
+
+        function filterCancellationCourses() {
+            const searchTerm = document.getElementById('cancellationSearchInput').value.toLowerCase();
+            const courseItems = document.querySelectorAll('#cancellationCourseList .course-item');
+            
+            courseItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
         }
 
         function populateCourseList() {
@@ -2292,197 +2568,120 @@
             });
         }
 
-        function handleCourseAction(classId, action) {
-            if (action === 'extend') {
-                // Open course extension details modal
-                openCourseExtensionModal(classId);
-                closeCourseModal();
-            } else if (action === 'cancel') {
-                // Open course cancellation modal instead of simple confirm
-                openCourseCancellationModal();
-                closeCourseModal();
-            }
+
+        
+
+        
+        // Course Cancellation Modal Functions
+        function openCourseCancellationModal() {
+            // Load cancellable courses
+            loadCancellableCourses();
+            
+            // Show the modal
+            document.getElementById('courseCancellationLightbox').style.display = 'block';
+            
+            console.log('Course cancellation modal opened');
         }
 
-        // Course Extension Modal Functions
-        function openCourseExtensionModal(classId) {
-            const modal = document.getElementById('courseExtensionModal');
+        function closeCancellationModal() {
+            document.getElementById('courseCancellationLightbox').style.display = 'none';
+            clearCancellationSelection();
+        }
+
+        function loadCancellableCourses() {
+            const courseList = document.getElementById('cancellationCourseList');
+            courseList.innerHTML = '';
+            
+            courseData.forEach(course => {
+                const courseItem = createCancellationCourseItem(course);
+                courseList.appendChild(courseItem);
+            });
+        }
+
+        function selectCancellationCourse(classId) {
+            // 找到对应的课程数据
             const course = courseData.find(c => c.classId === classId);
+            if (!course) return;
             
-            if (course) {
-                populateExtensionCourseInfo(course);
-                setDefaultExtensionDate();
-                modal.style.display = 'block';
-            }
-        }
-
-        function closeExtensionModal() {
-            const modal = document.getElementById('courseExtensionModal');
-            modal.style.display = 'none';
-            // Reset form
-            document.getElementById('extensionEndDate').value = '';
-            document.getElementById('updatedFocusArea').value = '';
-            document.getElementById('extensionDescription').value = '';
-        }
-
-        function populateExtensionCourseInfo(course) {
-            const courseInfoContainer = document.getElementById('extensionCourseInfo');
+            selectedCancellationCourse = course;
             
-            const studentsHtml = course.students.map(student => 
-                `<div class="extension-student-item">
-                    <span class="extension-student-name">${student.name}</span>
-                    <span class="extension-lessons-count">${student.qtyLessons} lessons remaining</span>
-                </div>`
-            ).join('');
+            // Update selected course display
+            document.getElementById('selectedCancellationCourseTitle').textContent = course.classId;
+            document.getElementById('selectedCancellationCourseSubject').textContent = course.subject;
             
+            // Update student count
             const studentCount = course.students.length;
-            const studentCountText = studentCount === 1 ? '1 student' : `${studentCount} students`;
+            const studentCountText = studentCount === 1 ? '(1 student)' : `(${studentCount} students)`;
+            document.getElementById('selectedCancellationStudentCount').textContent = studentCountText;
             
-            courseInfoContainer.innerHTML = `
-                <div class="extension-course-header">
-                    <div class="extension-course-title">${course.classId}</div>
-                    <div class="extension-course-subject">${course.subject}</div>
-                </div>
-                <div style="margin-bottom: 10px; color: #6c757d; font-size: 14px;">
-                    <i class="fas fa-users"></i> ${studentCountText}
-                </div>
-                <div class="extension-students-list">
-                    ${studentsHtml}
-                </div>
+            // Update students list - display as comma-separated text
+            const studentsText = course.students.map(student => student.name).join(', ');
+            
+            document.getElementById('selectedCancellationStudentsList').innerHTML = `
+                <div class="students-text-display">${studentsText}</div>
             `;
-        }
-
-        function setDefaultExtensionDate() {
-            const today = new Date();
-            const threeMonthsFromNow = new Date(today.getTime() + (90 * 24 * 60 * 60 * 1000));
-            const dateInput = document.getElementById('extensionEndDate');
-            dateInput.value = threeMonthsFromNow.toISOString().split('T')[0];
-        }
-
-        function submitExtensionRequest() {
-            const extensionEndDate = document.getElementById('extensionEndDate').value;
-            const updatedFocusArea = document.getElementById('updatedFocusArea').value;
-            const extensionDescription = document.getElementById('extensionDescription').value;
             
-            if (!extensionEndDate || !updatedFocusArea || !extensionDescription) {
+            // Show details panel
+            document.getElementById('cancellationDetailsPanel').style.display = 'block';
+            document.getElementById('cancellationPlaceholder').style.display = 'none';
+            
+            // Update course item selection
+            document.querySelectorAll('#cancellationCourseList .course-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // 找到被点击的课程项并添加选中状态
+            const courseItems = document.querySelectorAll('#cancellationCourseList .course-item');
+            courseItems.forEach(item => {
+                const courseIdElement = item.querySelector('.course-id');
+                if (courseIdElement && courseIdElement.textContent === classId) {
+                    item.classList.add('selected');
+                }
+            });
+        }
+
+        function clearCancellationSelection() {
+            selectedCancellationCourse = null;
+            document.getElementById('cancellationDetailsPanel').style.display = 'none';
+            document.getElementById('cancellationPlaceholder').style.display = 'block';
+            document.getElementById('cancellationStartDate').value = '';
+            document.getElementById('cancellationReasonTextarea').value = '';
+            
+            // Clear selection
+            document.querySelectorAll('#cancellationCourseList .course-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+        }
+
+        function confirmCourseCancellation() {
+            if (!selectedCancellationCourse) {
+                alert('Please select a course first.');
+                return;
+            }
+            
+            const startDate = document.getElementById('cancellationStartDate').value;
+            const reason = document.getElementById('cancellationReasonTextarea').value;
+            
+            if (!startDate || !reason) {
                 alert('Please fill in all required fields.');
                 return;
             }
             
-            // In real implementation, this would send data to backend
-            const extensionData = {
-                extensionEndDate,
-                updatedFocusArea,
-                extensionDescription,
-                timestamp: new Date().toISOString()
-            };
-            
-            console.log('Extension request submitted:', extensionData);
-            
-            // Show success message
-            alert('Course extension request has been submitted successfully!');
-            
-            // Close modal
-            closeExtensionModal();
-        }
-
-        // Course Cancellation Modal Functions
-        function openCourseCancellationModal() {
-            const modal = document.getElementById('courseCancellationLightbox');
-            loadCancellableCourses();
-            setDefaultCancellationDate();
-            modal.style.display = 'block';
-        }
-        
-        function closeCancellationModal() {
-            const modal = document.getElementById('courseCancellationLightbox');
-            modal.style.display = 'none';
-            // Reset form
-            document.getElementById('cancellationCourseDropdown').value = '';
-            document.getElementById('cancellationReasonTextarea').value = '';
-            document.getElementById('cancellationStartDate').value = '';
-            document.getElementById('cancellationDetails').style.display = 'none';
-        }
-        
-        function setDefaultCancellationDate() {
-            const today = new Date();
-            const twoWeeksFromNow = new Date(today.getTime() + (14 * 24 * 60 * 60 * 1000));
-            const dateInput = document.getElementById('cancellationStartDate');
-            dateInput.value = twoWeeksFromNow.toISOString().split('T')[0];
-        }
-        
-        function validateAndAdjustCancellationDate() {
-            const dateInput = document.getElementById('cancellationStartDate');
-            const selectedDate = new Date(dateInput.value);
-            const today = new Date();
-            const twoWeeksFromNow = new Date(today.getTime() + (14 * 24 * 60 * 60 * 1000));
+            // Check if date is at least 2 weeks from now
+            const selectedDate = new Date(startDate);
+            const twoWeeksFromNow = new Date();
+            twoWeeksFromNow.setDate(twoWeeksFromNow.getDate() + 14);
             
             if (selectedDate < twoWeeksFromNow) {
-                dateInput.value = twoWeeksFromNow.toISOString().split('T')[0];
-                alert('The selected date has been automatically adjusted to meet the two-week notice requirement.');
-            }
-        }
-        
-        function loadCancellableCourses() {
-            const dropdown = document.getElementById('cancellationCourseDropdown');
-            dropdown.innerHTML = '<option value="">Choose a course...</option>';
-            
-            courseData.forEach(course => {
-                const studentCount = course.students.length;
-                const studentCountText = studentCount === 1 ? '1 student' : `${studentCount} students`;
-                const option = document.createElement('option');
-                option.value = course.classId;
-                option.textContent = `${course.classId} - ${course.subject} (${studentCountText})`;
-                dropdown.appendChild(option);
-            });
-        }
-        
-        function calculateCancellationDate() {
-            const today = new Date();
-            const cancellationDate = new Date(today.getTime() + (14 * 24 * 60 * 60 * 1000)); // Add 14 days
-            return cancellationDate;
-        }
-        
-        function formatDate(date) {
-            const options = { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            };
-            return date.toLocaleDateString('en-GB', options);
-        }
-        
-        function confirmCourseCancellation() {
-            const selectedCourse = document.getElementById('cancellationCourseDropdown').value;
-            const reason = document.getElementById('cancellationReasonTextarea').value.trim();
-            const startDate = document.getElementById('cancellationStartDate').value;
-            
-            if (!selectedCourse) {
-                alert('Please select a course to cancel.');
+                alert('Cancellation date has been adjusted to meet the two-week notice requirement.');
+                document.getElementById('cancellationStartDate').value = twoWeeksFromNow.toISOString().split('T')[0];
                 return;
             }
             
-            if (!startDate) {
-                alert('Please select a cancellation start date.');
-                return;
-            }
-            
-            if (!reason) {
-                alert('Please provide a reason for cancellation.');
-                return;
-            }
-            
-            const cancellationDate = new Date(startDate);
-            const formattedDate = formatDate(cancellationDate);
-            
-            if (confirm(`Confirm cancellation of course ${selectedCourse}?\n\nCancellation will take effect on: ${formattedDate}\n\nReason: ${reason}`)) {
-                // In real implementation, this would save to database
-                alert(`Course ${selectedCourse} has been scheduled for cancellation on ${formattedDate}.\n\nNotifications will be sent to all relevant parties.`);
-                closeCancellationModal();
-            }
+            alert(`Cancellation confirmed for ${selectedCancellationCourse.classId}`);
+            closeCancellationModal();
         }
-        
+
         // Event listeners for cancellation modal
         document.addEventListener('DOMContentLoaded', function() {
             // Cancel Course button
@@ -2493,48 +2692,8 @@
                 });
             }
             
-            // Course selection change handler
-            document.getElementById('cancellationCourseDropdown').addEventListener('change', function() {
-                const selectedCourseId = this.value;
-                const detailsDiv = document.getElementById('cancellationDetails');
-                const courseInfoDiv = document.getElementById('selectedCourseInfo');
-                const dateDiv = document.getElementById('cancellationDate');
-                
-                if (selectedCourseId) {
-                    const course = courseData.find(c => c.classId === selectedCourseId);
-                    if (course) {
-                        // Create students list HTML
-                        const studentsListHtml = course.students.map(student => 
-                            `<div class="student-info-item">
-                                <span class="student-name">${student.name}</span>
-                                <span class="student-lessons">${student.qtyLessons} lessons</span>
-                            </div>`
-                        ).join('');
-                        
-                        const studentCount = course.students.length;
-                        const studentCountText = studentCount === 1 ? '1 student' : `${studentCount} students`;
-                        
-                        courseInfoDiv.innerHTML = `
-                            <p><strong>Class ID:</strong> ${course.classId}</p>
-                            <p><strong>Subject:</strong> ${course.subject}</p>
-                            <p><strong>Students:</strong> ${studentCountText}</p>
-                            <div class="students-info-list">
-                                ${studentsListHtml}
-                            </div>
-                        `;
-                        
-                        const cancellationDate = calculateCancellationDate();
-                        dateDiv.textContent = `Cancellation Date: ${formatDate(cancellationDate)}`;
-                        
-                        detailsDiv.style.display = 'block';
-                    }
-                } else {
-                    detailsDiv.style.display = 'none';
-                }
-            });
-            
             // Close modal buttons
-            document.querySelectorAll('#closeCancellationModalBtn').forEach(btn => {
+            document.querySelectorAll('#closeCancellationModalBtn, #closeCancellationModalBtn2').forEach(btn => {
                 btn.addEventListener('click', closeCancellationModal);
             });
             
@@ -2542,7 +2701,41 @@
             document.getElementById('confirmCancellationBtn').addEventListener('click', confirmCourseCancellation);
             
             // Cancellation start date change handler
-            document.getElementById('cancellationStartDate').addEventListener('change', validateAndAdjustCancellationDate);
+            document.getElementById('cancellationStartDate').addEventListener('change', function() {
+                const selectedDate = new Date(this.value);
+                const twoWeeksFromNow = new Date();
+                twoWeeksFromNow.setDate(twoWeeksFromNow.getDate() + 14);
+                
+                if (selectedDate < twoWeeksFromNow) {
+                    this.value = twoWeeksFromNow.toISOString().split('T')[0];
+                    alert('Date adjusted to meet two-week notice requirement.');
+                }
+            });
+            
+            // Click outside modal to close - Course Cancellation
+            document.getElementById('courseCancellationLightbox').addEventListener('click', function(event) {
+                if (event.target === this) {
+                    closeCancellationModal();
+                }
+            });
+            
+            // Search functionality for cancellation modal
+            const cancellationSearchInput = document.getElementById('cancellationSearchInput');
+            if (cancellationSearchInput) {
+                cancellationSearchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
+                    const courseItems = document.querySelectorAll('#cancellationCourseList .course-item');
+                    
+                    courseItems.forEach(item => {
+                        const text = item.textContent.toLowerCase();
+                        if (text.includes(searchTerm)) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            }
         });
 
         // Close modal when clicking outside of it
@@ -2580,7 +2773,7 @@
                 name: 'James Smith',
                 email: 'james.smith@email.com',
                 phone: '+44 7234 567890',
-                courses: ['AS-APY-Y9-EL-ENGLISH', 'AS-STY-Y7-DG-MATHS']
+                courses: ['AS-APY-Y9-EL-ENGLISH', 'AS-STY-Y7-DG-MATHS', 'AS-APY-Y9-EL-PHYSICS']
             },
             {
                 id: 'STU-003',
@@ -2642,7 +2835,103 @@
         function showRemoveSpecificCourses() {
             document.getElementById('removeAllSection').style.display = 'none';
             document.getElementById('removeSpecificSection').style.display = 'block';
-            populateSpecificCourseList();
+            populateStudentListForSpecificCourses();
+        }
+
+        function populateStudentListForSpecificCourses() {
+            const courseList = document.getElementById('specificCourseList');
+            courseList.innerHTML = '';
+            
+            studentData.forEach(student => {
+                const studentItem = createStudentItemForSpecificCourses(student);
+                courseList.appendChild(studentItem);
+            });
+        }
+
+        function createStudentItemForSpecificCourses(student) {
+            const fragment = document.createDocumentFragment();
+            
+            // Get student's courses from courseData
+            const studentCourses = [];
+            courseData.forEach(course => {
+                const studentInCourse = course.students.find(s => s.name === student.name);
+                if (studentInCourse) {
+                    studentCourses.push({
+                        classId: course.classId,
+                        subject: course.subject,
+                        studentName: student.name
+                    });
+                }
+            });
+            
+            // Create separate item for each course
+            studentCourses.forEach(course => {
+                const item = document.createElement('div');
+                item.className = 'course-item';
+                
+                const totalCourses = studentCourses.length;
+                const courseText = totalCourses === 1 ? '1 course' : `${totalCourses} courses`;
+                
+                item.innerHTML = `
+                    <div class="course-info">
+                        <div class="course-header">
+                            <span class="class-id">${student.name}</span>
+                            <span class="qty-lessons">${courseText}</span>
+                        </div>
+                        <div class="course-details">
+                            <div class="detail-row">
+                                <span class="label">Student ID:</span>
+                                <span class="value">${student.id}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Email:</span>
+                                <span class="value">${student.email}</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Course:</span>
+                                <span class="value">${course.classId}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="course-actions">
+                        <button class="action-btn cancel-btn" 
+                                onclick="handleRemoveSpecificCourse('${course.classId}', '${course.studentName}')">
+                            <i class="fas fa-times"></i>
+                            Cancel Course
+                        </button>
+                    </div>
+                `;
+                fragment.appendChild(item);
+            });
+            
+            return fragment;
+        }
+
+        function showStudentCoursesForRemoval(studentId) {
+            const student = studentData.find(s => s.id === studentId);
+            if (!student) return;
+            
+            const courseList = document.getElementById('specificCourseList');
+            courseList.innerHTML = '';
+            
+            // Add back button
+            const backButton = document.createElement('div');
+            backButton.className = 'back-button-container';
+            backButton.innerHTML = `
+                <button class="action-btn back-btn" onclick="populateStudentListForSpecificCourses()">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Students
+                </button>
+                <h3>Courses for ${student.name}</h3>
+            `;
+            courseList.appendChild(backButton);
+            
+            // Show student's courses
+            const studentCourses = courseData.filter(course => course.studentName === student.name);
+            studentCourses.forEach(course => {
+                const courseItem = createSpecificCourseItem(course);
+                courseList.appendChild(courseItem);
+            });
         }
 
         function populateStudentList() {
@@ -2771,11 +3060,31 @@
             }
         }
 
-        function handleRemoveSpecificCourse(classId) {
+        function handleRemoveSpecificCourse(classId, studentName) {
             const course = courseData.find(c => c.classId === classId);
-            if (confirm(`Are you sure you want to cancel ${course.studentName}'s ${course.subject} course (${classId})?`)) {
-                alert(`Course ${classId} has been cancelled`);
-                closeStudentModal();
+            if (confirm(`Are you sure you want to cancel ${studentName}'s ${course.subject} course (${classId})?`)) {
+                // Remove student from course's student list
+                const courseIndex = courseData.findIndex(c => c.classId === classId);
+                if (courseIndex > -1) {
+                    const studentIndex = courseData[courseIndex].students.findIndex(s => s.name === studentName);
+                    if (studentIndex > -1) {
+                        courseData[courseIndex].students.splice(studentIndex, 1);
+                    }
+                }
+                
+                // Remove course from student's course list
+                const student = studentData.find(s => s.name === studentName);
+                if (student) {
+                    const studentCourseIndex = student.courses.findIndex(c => c.includes(course.subject.toUpperCase()));
+                    if (studentCourseIndex > -1) {
+                        student.courses.splice(studentCourseIndex, 1);
+                    }
+                }
+                
+                alert(`${course.subject} course has been cancelled for ${studentName}`);
+                
+                // Refresh the student list
+                populateStudentListForSpecificCourses();
             }
         }
 
@@ -3247,29 +3556,64 @@
 
         .course-header {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start;
             align-items: center;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            flex-wrap: nowrap;
+            gap: 1rem;
         }
 
-        .class-id {
+        .course-id {
             font-weight: 700;
             font-size: 1.1rem;
             color: var(--primary-color);
         }
 
-        .subject {
+        .course-subject {
             font-weight: 600;
             font-size: 1rem;
             color: var(--text-primary);
         }
 
         .student-count {
+            display: flex;
+            flex-direction: row;
+            align-items: baseline;
+            gap: 0.3rem;
+            background: linear-gradient(135deg, #f8f9ff 0%, #e8ecff 100%);
+            border: 1px solid #e0e6ff;
+            border-radius: 12px;
+            padding: 0.4rem 0.8rem;
             font-size: 0.85rem;
             color: var(--text-secondary);
             font-weight: 500;
+            line-height: 1.2;
+            box-shadow: 0 2px 4px rgba(102, 51, 153, 0.1);
+        }
+
+        .student-number {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .student-text {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .students-display {
+            margin-top: 0.5rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #e8ecf4;
+        }
+
+        .student-names {
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            line-height: 1.4;
+            display: block;
         }
 
         .students-list {
@@ -3330,6 +3674,18 @@
             font-size: 0.8rem;
             color: var(--text-secondary);
             font-weight: 500;
+        }
+
+        .students-text-display {
+            margin-top: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: #f8f9ff;
+            border-radius: 8px;
+            border-left: 3px solid var(--primary-color);
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            font-weight: 500;
+            line-height: 1.4;
         }
 
         .qty-lessons {
@@ -3397,6 +3753,66 @@
 
         .action-btn:hover::before {
             left: 100%;
+        }
+
+        .back-button-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, #f8f9ff, #fff);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, var(--secondary-color), #6c757d);
+            color: white;
+            min-width: auto;
+            padding: 8px 16px;
+        }
+
+        .back-btn:hover {
+            background: linear-gradient(135deg, #5a6268, #545b62);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        .back-button-container h3 {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .view-btn {
+            background: linear-gradient(135deg, var(--info-color), #20c997);
+            color: white;
+        }
+
+        .cancel-btn {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            border: none;
+            margin: 2px;
+            font-size: 0.85rem;
+        }
+
+        .cancel-btn:hover {
+            background: linear-gradient(135deg, #c82333, #bd2130);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+        }
+
+        .cancel-btn i {
+            margin-right: 5px;
+        }
+
+        .view-btn:hover {
+            background: linear-gradient(135deg, #138496, #1e7e34);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(23, 162, 184, 0.3);
         }
 
         .extend-btn {
@@ -3664,138 +4080,522 @@
 
         /* Course Cancellation Modal Styles */
         .cancellation-modal {
-            max-width: 600px;
+            max-width: 1400px;
+            width: 95%;
         }
-        
-        .cancellation-info {
-            background: linear-gradient(135deg, #fff5f5, #fff);
-            border: 2px solid var(--danger-color);
+
+        .cancellation-modal .lightbox-layout {
+            display: flex;
+            gap: 30px;
+            height: 600px;
+        }
+
+        .cancellation-modal .left-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cancellation-modal .right-panel {
+            flex: 1;
+            position: relative;
+        }
+
+        .cancellation-modal .search-bar {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .cancellation-modal .search-bar input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border: 2px solid #e8ecf4;
             border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 25px;
+            font-size: 14px;
+            background: white;
+            transition: all 0.3s ease;
         }
-        
-        .cancellation-warning {
+
+        .cancellation-modal .search-bar input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 51, 153, 0.1);
+        }
+
+        .cancellation-modal .search-bar i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+
+        .cancellation-modal .course-list-container {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .cancellation-modal .details-panel {
+            height: 100%;
+            overflow-y: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 16px;
+            border: 2px solid #e8ecf4;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        #cancellationCourseList .course-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            margin-bottom: 16px;
+            background: white;
+            border: 2px solid #e8ecf4;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        #cancellationCourseList .course-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(135deg, var(--primary-color), #8b5cf6);
+            transition: all 0.3s ease;
+        }
+
+        #cancellationCourseList .course-item:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 8px 25px rgba(102, 51, 153, 0.15);
+            transform: translateY(-3px);
+        }
+
+        #cancellationCourseList .course-item:hover::before {
+            width: 8px;
+        }
+
+        #cancellationCourseList .course-item.selected {
+            border-color: var(--primary-color);
+            background: linear-gradient(135deg, #f8f9ff, #fff);
+            box-shadow: 0 8px 25px rgba(102, 51, 153, 0.2);
+        }
+
+        #cancellationCourseList .course-item.selected::before {
+            width: 8px;
+        }
+
+        #cancellationCourseList .course-info {
+            flex: 1;
+        }
+
+        #cancellationCourseList .course-header {
             display: flex;
             align-items: center;
-            gap: 12px;
-            color: var(--danger-color);
-            font-weight: 600;
-            margin-bottom: 15px;
+            gap: 15px;
+            margin-bottom: 12px;
         }
-        
-        .cancellation-warning i {
-            font-size: 1.5rem;
-        }
-        
-        .cancellation-details {
-            background: white;
+
+        #cancellationCourseList .course-id {
+            background: linear-gradient(135deg, var(--primary-color), #8b5cf6);
+            color: white;
+            padding: 6px 12px;
             border-radius: 8px;
-            padding: 15px;
-            margin: 15px 0;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(102, 51, 153, 0.3);
         }
-        
-        .cancellation-date {
+
+        #cancellationCourseList .course-subject {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        #cancellationCourseList .student-count {
+            display: flex;
+            align-items: center;
+            gap: 6px;
             background: linear-gradient(135deg, #e3f2fd, #bbdefb);
             color: var(--info-color);
-            padding: 12px 20px;
-            border-radius: 8px;
-            margin: 15px 0;
+            padding: 6px 12px;
+            border-radius: 20px;
             font-weight: 600;
-            text-align: center;
         }
-        
-        .course-selection {
-            margin-bottom: 25px;
+
+        #cancellationCourseList .student-number {
+            background: linear-gradient(135deg, var(--primary-color), #8b5cf6);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            box-shadow: 0 2px 6px rgba(102, 51, 153, 0.3);
         }
-        
-        .course-dropdown {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 1rem;
-            background: white;
-            transition: border-color 0.3s ease;
+
+        #cancellationCourseList .student-text {
+            font-size: 13px;
+            color: var(--info-color);
+            font-weight: 600;
         }
-        
-        .course-dropdown:focus {
-            outline: none;
-            border-color: var(--primary-color);
+
+        #cancellationCourseList .students-display {
+            color: #6b7280;
+            font-size: 14px;
+            margin-top: 8px;
         }
-        
-        .cancellation-start-time {
-            margin-bottom: 25px;
+
+        #cancellationCourseList .course-actions {
+            margin-left: 20px;
         }
-        
-        .cancellation-date-input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 1rem;
-            background: white;
-            transition: border-color 0.3s ease;
-            margin-bottom: 10px;
-        }
-        
-        .cancellation-date-input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-        
-        .cancellation-note {
+
+        #cancellationCourseList .action-btn {
             display: flex;
             align-items: center;
             gap: 8px;
-            color: var(--info-color);
-            font-size: 0.9rem;
-            background: linear-gradient(135deg, #e3f2fd, #f8f9fa);
-            padding: 10px 15px;
-            border-radius: 6px;
-            border-left: 4px solid var(--info-color);
+            padding: 12px 20px;
+            background: linear-gradient(135deg, var(--primary-color), #8b5cf6);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-        
-        .cancellation-note i {
-            font-size: 1rem;
+
+        #cancellationCourseList .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
         }
-        
-        .reason-section {
+
+        #cancellationCourseList .action-btn:hover {
+            background: linear-gradient(135deg, var(--primary-dark), #7c3aed);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102, 51, 153, 0.3);
+        }
+
+        #cancellationCourseList .action-btn:hover::before {
+            left: 100%;
+        }
+
+        #cancellationCourseList .action-btn i {
+            font-size: 14px;
+        }
+
+        .cancellation-course-info {
+            background: linear-gradient(135deg, #f8f9ff, #fff);
+            border: 2px solid #e8ecf4;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cancellation-course-info::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), #8b5cf6, var(--info-color));
+        }
+
+        .cancellation-course-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e8ecf4;
+        }
+
+        .cancellation-course-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cancellation-course-subject {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 25px;
+            font-size: 13px;
+            font-weight: 700;
+            box-shadow: 0 3px 10px rgba(220, 53, 69, 0.3);
+            letter-spacing: 0.5px;
+        }
+
+        .cancellation-students-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .cancellation-student-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: #f8f9ff;
+            border-left: 3px solid var(--primary-color);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .cancellation-student-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 51, 153, 0.1);
+        }
+
+        .cancellation-student-name {
+            font-weight: 600;
+            color: #333;
+            font-size: 15px;
+        }
+
+        .cancellation-lessons-count {
+            color: var(--text-light);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .cancellation-form {
+            margin-bottom: 30px;
+        }
+
+        .cancellation-form .form-group {
             margin-bottom: 25px;
         }
-        
-        .reason-textarea {
+
+        .cancellation-form label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .cancellation-date-input {
             width: 100%;
-            min-height: 100px;
-            padding: 15px;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 1rem;
+            padding: 14px 16px;
+            border: 2px solid #e8ecf4;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .cancellation-date-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(102, 51, 153, 0.15);
+            outline: none;
+            transform: translateY(-1px);
+        }
+
+        .reason-textarea,
+        .cancellation-description-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 16px;
+            border: 2px solid #e8ecf4;
+            border-radius: 12px;
+            font-size: 15px;
             font-family: inherit;
             resize: vertical;
-            transition: border-color 0.3s ease;
+            transition: all 0.3s ease;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            line-height: 1.6;
         }
-        
-        .reason-textarea:focus {
-            outline: none;
+
+        .cancellation-description-textarea {
+            min-height: 140px;
+        }
+
+        .reason-textarea:focus,
+        .cancellation-description-textarea:focus {
             border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(102, 51, 153, 0.15);
+            outline: none;
+            transform: translateY(-1px);
         }
-        
-        .confirmation-actions {
+
+        .form-note {
             display: flex;
-            gap: 15px;
-            justify-content: flex-end;
-            margin-top: 30px;
+            align-items: center;
+            margin-top: 8px;
+            color: var(--text-light);
+            font-size: 13px;
+            background: #f8f9ff;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border-left: 3px solid var(--info-color);
         }
-        
-        .btn-danger {
-            background: linear-gradient(135deg, var(--danger-color), #c82333);
+
+        .form-note i {
+            margin-right: 8px;
+            color: var(--info-color);
+        }
+
+        .cancellation-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            padding-top: 25px;
+            border-top: 2px solid #e8ecf4;
+        }
+
+        .cancellation-actions .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .cancellation-actions .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .cancellation-actions .btn:hover::before {
+            left: 100%;
+        }
+
+        .cancellation-actions .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #495057);
             color: white;
         }
-        
-        .btn-danger:hover {
+
+        .cancellation-actions .btn-secondary:hover {
+            background: linear-gradient(135deg, #5a6268, #343a40);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(108, 117, 125, 0.3);
+        }
+
+        .cancellation-actions .btn-danger {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+        }
+
+        .cancellation-actions .btn-danger:hover {
             background: linear-gradient(135deg, #c82333, #a71e2a);
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.3);
+        }
+
+        /* 占位符面板样式 */
+        .placeholder-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 400px;
+            background: linear-gradient(135deg, #f8f9ff, #fff);
+            border: 2px dashed #e8ecf4;
+            border-radius: 16px;
+            color: var(--text-light);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .placeholder-panel i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            opacity: 0.7;
+        }
+
+        .placeholder-panel p {
+            font-size: 16px;
+            font-weight: 500;
+            margin: 0;
+            color: var(--text-light);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .cancellation-modal .lightbox-layout {
+                flex-direction: column;
+                height: auto;
+                gap: 20px;
+            }
+
+            .cancellation-modal .left-panel,
+            .cancellation-modal .right-panel {
+                flex: none;
+            }
+
+            .cancellation-modal .course-list-container {
+                max-height: 300px;
+            }
+
+            .cancellation-modal .details-panel {
+                height: auto;
+                min-height: 400px;
+            }
+
+            #cancellationCourseList .course-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            #cancellationCourseList .course-actions {
+                margin-left: 0;
+                align-self: center;
+            }
+
+            .cancellation-students-list {
+                grid-template-columns: 1fr !important;
+            }
         }
 
         /* AP学生列表样式 */

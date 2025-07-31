@@ -433,7 +433,56 @@ window.addEventListener('beforeunload', () => {
 /*
 === 按钮和元素引用名字 ===
 
-表单元素 IDs:
+根据 element-references.md 更新的元素 IDs:
+
+Search Section:
+- searchInput: 搜索输入框
+- searchBtn: 搜索按钮
+
+Course Repeater Section:
+- courseRepeater: 课程重复器
+- courseContainer: 课程容器
+- courseId: 课程ID
+- courseName: 课程名称
+- courseSubject: 课程科目
+- studentCountNumber: 学生数量数字 (加粗)
+- studentCountText: 学生数量文字 ("students")
+- studentNames: 学生姓名文本字段
+
+Student Repeater Section:
+- studentRepeater: 学生重复器
+- studentContainer: 学生容器
+- studentInfo: 合并的学生信息文本字段
+- extendBtn: 延期按钮
+
+Extension Details Panel:
+- extensionDetailsPanel: 延期详情面板
+- extensionPlaceholder: 延期占位符
+- selectedExtensionCourseInfo: 选中的延期课程信息
+- extensionCourseHeader: 延期课程标题
+- extensionCourseTitle: 延期课程标题
+- extensionCourseSubject: 延期课程科目
+- extensionStudentsList: 延期学生列表
+- extensionStudentInfo: 合并的学生信息文本字段
+
+Extension Form Elements:
+- extensionEndDate: 延期结束日期
+- updatedFocusArea: 更新的重点领域
+- extensionDescription: 延期描述
+
+Button Elements:
+- closeBtn: 关闭按钮
+- searchBtn: 搜索按钮
+- extendBtn: 延期按钮
+- clearSelectionBtn: 清除选择按钮
+- submitExtensionBtn: 提交延期按钮
+
+Modal/Lightbox Elements:
+- courseExtensionLightbox: 课程延期灯箱
+- extensionCourseList: 延期课程列表
+- extensionSearchInput: 延期搜索输入框
+
+传统表单元素 IDs (保持兼容):
 - courseInfo: 课程信息容器
 - courseTitle: 课程标题
 - courseDetails: 课程详情
@@ -451,23 +500,4 @@ window.addEventListener('beforeunload', () => {
 - approvalRequired: 需要批准选择框
 - notifyStudents: 通知学生复选框
 - additionalNotes: 额外备注
-
-按钮功能:
-- Cancel: 取消按钮 (链接到course-management.html)
-- Submit Extension Request: 提交延期请求按钮
-
-CSS类名:
-- .course-info: 课程信息
-- .course-title: 课程标题
-- .course-details: 课程详情
-- .extension-form: 延期表单
-- .form-select: 表单选择框
-- .form-input: 表单输入框
-- .form-textarea: 表单文本域
-- .students-list: 学生列表
-- .btn: 按钮基础样式
-- .btn-secondary: 次要按钮
-- .btn-primary: 主要按钮
-- .form-group: 表单组
-- .form-label: 表单标签
 */
