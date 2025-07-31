@@ -237,21 +237,7 @@ Create dynamic statistics cards that update based on student type:
      - `submitTicketBtn` ("Submit Ticket") - Links to Lark form
      - `checkTicketStatusBtn` ("Check Status")
 
-3. **AP Student Card:**
-   - Container: `apStudentCard`
-   - Title: "AP Students"
-   - Description: "Manage AP student registration"
-   - Button Group:
-     - `addAPStudentBtn` ("Add AP Student")
-     - `removeAPStudentBtn` ("Remove AP Student")
 
-4. **Ticket System Card:**
-   - Container: `ticketSystemCard`
-   - Title: "Ticket System"
-   - Description: "Submit and track tickets"
-   - Button Group:
-     - `submitTicketBtn` ("Submit Ticket")
-     - `checkStatusBtn` ("Check Status")
 
 ### Phase 4.2: Pricing Plans (30 minutes)
 
