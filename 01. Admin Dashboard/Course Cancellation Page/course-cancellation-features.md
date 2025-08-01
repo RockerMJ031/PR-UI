@@ -21,14 +21,14 @@ The Course Cancellation Page allows administrators to cancel courses that need t
 - `cancelBtn`: Cancel course button
 
 ### Cancellation Details Panel
-- `extensionDetailsPanel`: Main details panel container
-- `extensionPlaceholder`: Placeholder content container
-- `extensionPlaceholderText`: Placeholder instruction text
-- `extensionPlaceholderIcon`: Placeholder icon element
-- `selectedExtensionCourseInfo`: Selected course information panel
-- `extensionCourseHeader`: Course header section
-- `extensionCourseTitle`: Selected course title
-- `extensionCourseSubject`: Selected course subject
+- `cancellationDetailsPanel`: Main details panel container
+- `cancellationPlaceholder`: Placeholder content container
+- `cancellationPlaceholderText`: Placeholder instruction text
+- `cancellationPlaceholderIcon`: Placeholder icon element
+- `selectedCancellationCourseInfo`: Selected course information panel
+- `cancellationCourseHeader`: Course header section
+- `cancellationCourseTitle`: Selected course title
+- `cancellationCourseSubject`: Selected course subject
 - `students-text-display`: Student names display area
 
 ### Cancellation Form Elements
@@ -76,9 +76,9 @@ The Course Cancellation Page allows administrators to cancel courses that need t
 - Retrieves student assignment data from CMS-2 (Import74 - Student Course Assignment Collection)
 - Fetches student details from CMS-7 (Students Collection)
 **Display Result**:
-- Hides `extensionPlaceholder` containing `extensionPlaceholderText` and `extensionPlaceholderIcon`
-- Shows `selectedExtensionCourseInfo` panel
-- Displays `extensionCourseTitle` and `extensionCourseSubject` in `extensionCourseHeader`
+- Hides `cancellationPlaceholder` containing `cancellationPlaceholderText` and `cancellationPlaceholderIcon`
+- Shows `selectedCancellationCourseInfo` panel
+- Displays `cancellationCourseTitle` and `cancellationCourseSubject` in `cancellationCourseHeader`
 - Populates `students-text-display` with detailed student information
 
 ### Feature 3: Cancellation Configuration
@@ -110,8 +110,8 @@ The Course Cancellation Page allows administrators to cancel courses that need t
 **User Action**: Click on `clearSelectionBtn` (if available)
 **CMS Data Source**: No CMS operation
 **Display Result**:
-- Clears `selectedExtensionCourseInfo`
-- Shows `extensionPlaceholder` with `extensionPlaceholderText` and `extensionPlaceholderIcon`
+- Clears `selectedCancellationCourseInfo`
+- Shows `cancellationPlaceholder` with `cancellationPlaceholderText` and `cancellationPlaceholderIcon`
 - Resets all form fields (`cancellationStartDate`, `reasonForCancellation`)
 
 ### Feature 6: Modal Management
@@ -168,9 +168,9 @@ The Course Cancellation Page allows administrators to cancel courses that need t
 - 从CMS-2（Import74 - 学生课程分配集合）检索学生分配数据
 - 从CMS-7（学生集合）获取学生详细信息
 **显示结果**：
-- 隐藏包含 `extensionPlaceholderText` 和 `extensionPlaceholderIcon` 的 `extensionPlaceholder`
-- 显示 `selectedExtensionCourseInfo` 面板
-- 在 `extensionCourseHeader` 中显示 `extensionCourseTitle` 和 `extensionCourseSubject`
+- 隐藏包含 `cancellationPlaceholderText` 和 `cancellationPlaceholderIcon` 的 `cancellationPlaceholder`
+- 显示 `selectedCancellationCourseInfo` 面板
+- 在 `cancellationCourseHeader` 中显示 `cancellationCourseTitle` 和 `cancellationCourseSubject`
 - 用详细学生信息填充 `students-text-display`
 
 ### 功能3：取消配置
@@ -202,8 +202,8 @@ The Course Cancellation Page allows administrators to cancel courses that need t
 **用户操作**：点击 `clearSelectionBtn`（如果可用）
 **CMS数据源**：无CMS操作
 **显示结果**：
-- 清除 `selectedExtensionCourseInfo`
-- 显示带有 `extensionPlaceholderText` 和 `extensionPlaceholderIcon` 的 `extensionPlaceholder`
+- 清除 `selectedCancellationCourseInfo`
+- 显示带有 `cancellationPlaceholderText` 和 `cancellationPlaceholderIcon` 的 `cancellationPlaceholder`
 - 重置所有表单字段（`cancellationStartDate`、`reasonForCancellation`）
 
 ### 功能6：模态框管理
