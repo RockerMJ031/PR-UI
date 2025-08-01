@@ -1,47 +1,125 @@
 // Course Cancellation Page JavaScript
 // Handles course cancellation form functionality and data management
+// 
+// 主要功能：
+// 功能0：页面加载和初始课程显示 - 通过wix_id从CMS-6获取schoolID，然后从CMS-3获取课程数据
+// 功能1：课程搜索和显示 - 从CMS-3获取课程信息，从CMS-2获取学生数据，支持搜索过滤
+// 
+// CMS数据源：
+// - CMS-6 (Admins Collection): 用户身份验证，通过userId(wix_id)获取schoolID
+// - CMS-3 (Classes Collection): 课程信息，包含class_id、subject、schoolID
+// - CMS-2 (Students Collection): 学生信息，包含name、class_id、status
+
+// 导入Wix API
+import wixUsers from 'wix-users';
+import wixData from 'wix-data';
 
 class CourseCancellationManager {
     constructor() {
         this.selectedCourse = null;
         this.studentsData = [];
+        this.courseData = null;
+        this.userSchoolID = null;
         this.init();
     }
 
-    init() {
-        this.loadCourseData();
+    async init() {
+        await this.authenticateUser();
+        await this.loadCourseData();
         this.setupEventListeners();
         this.setupFormValidation();
         this.setupDateConstraints();
     }
 
-    loadCourseData() {
-        // Try to get course data from sessionStorage (from course management page)
-        const storedCourse = sessionStorage.getItem('selectedCourse');
-        
-        if (storedCourse) {
-            this.selectedCourse = JSON.parse(storedCourse);
-        } else {
-            // Fallback sample data if no course selected
-            this.selectedCourse = {
-                id: 'AS-APY-Y9-EL-BIOLOGY',
-                subject: 'Biology',
-                name: 'Advanced Biology A-Level',
-                status: 'Active',
-                studentCount: 3,
-                totalLessons: 24,
-                startDate: '2024-01-15',
-                endDate: '2024-06-15',
-                students: [
-                    { name: 'Oliver Thompson', lessons: 8 },
-                    { name: 'Emma Wilson', lessons: 8 },
-                    { name: 'James Brown', lessons: 8 }
-                ]
-            };
+    // 功能0：用户身份验证 - 通过wix_id获取schoolID
+    async authenticateUser() {
+        try {
+            // 获取当前用户的wix_id
+            const currentUser = await wixUsers.getCurrentUser();
+            if (!currentUser) {
+                console.error('用户未登录');
+                return;
+            }
+            
+            const wixId = currentUser.id;
+            
+            // 查询CMS-6 (Admins Collection) 获取schoolID
+            const adminQuery = wixData.query('Admins')
+                .eq('userId', wixId)
+                .limit(1);
+            
+            const adminResults = await adminQuery.find();
+            
+            if (adminResults.items.length > 0) {
+                this.userSchoolID = adminResults.items[0].schoolID;
+                console.log('用户schoolID:', this.userSchoolID);
+            } else {
+                console.error('未找到用户的学校信息');
+                // 使用默认schoolID进行测试
+                this.userSchoolID = 'DEFAULT_SCHOOL';
+            }
+        } catch (error) {
+            console.error('用户身份验证失败:', error);
+            // 使用默认schoolID进行测试
+            this.userSchoolID = 'DEFAULT_SCHOOL';
         }
+    }
 
-        this.displayCourseInfo();
-        this.displayStudents();
+    // 功能0：页面加载和初始课程显示 - 从CMS获取课程数据
+    async loadCourseData() {
+        try {
+            if (!this.userSchoolID) {
+                console.error('用户schoolID未获取');
+                return;
+            }
+
+            // 从CMS-3 (Classes Collection) 查询课程数据，根据schoolID过滤
+            const classesQuery = wixData.query('Classes')
+                .eq('schoolID', this.userSchoolID)
+                .limit(50); // 限制返回数量
+            
+            const classesResults = await classesQuery.find();
+            
+            if (classesResults.items.length > 0) {
+                // 获取唯一的class_id列表
+                const uniqueClassIds = [...new Set(classesResults.items.map(item => item.class_id))];
+                
+                // 为每个唯一的class_id创建课程对象
+                this.courseData = uniqueClassIds.map(classId => {
+                    const classItem = classesResults.items.find(item => item.class_id === classId);
+                    return {
+                        id: classItem.class_id,
+                        subject: classItem.subject,
+                        schoolID: classItem.schoolID
+                    };
+                });
+                
+                console.log('加载的课程数据:', this.courseData);
+            } else {
+                console.log('未找到课程数据');
+                this.courseData = [];
+            }
+            
+            // 显示课程列表
+             await this.displayCourseRepeater();
+            
+        } catch (error) {
+            console.error('加载课程数据失败:', error);
+            // 使用备用数据
+            this.courseData = [
+                {
+                    id: 'AS-APY-Y9-EL-BIOLOGY',
+                    subject: 'Biology',
+                    schoolID: this.userSchoolID
+                },
+                {
+                    id: 'AS-APY-Y10-EL-CHEMISTRY', 
+                    subject: 'Chemistry',
+                    schoolID: this.userSchoolID
+                }
+            ];
+            this.displayCourseRepeater();
+        }
     }
 
 
@@ -275,57 +353,91 @@ class CourseCancellationManager {
 
 
 
-    handleSearch() {
+    async handleSearch() {
         const searchInput = document.getElementById('searchInput');
         const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
         
         // Filter and display courses based on search term
         // This would typically fetch from CMS-3 (Import86 - Course Information Management Collection)
         console.log('Searching for courses:', searchTerm);
-        this.displayCourseRepeater(searchTerm);
+        await this.displayCourseRepeater(searchTerm);
     }
 
-    displayCourseRepeater(searchTerm = '') {
+    // 功能1：课程搜索和显示 - 从CMS获取完整课程和学生数据
+    async displayCourseRepeater(searchTerm = '') {
         const courseRepeater = document.getElementById('courseRepeater');
         if (!courseRepeater) return;
 
-        // Sample course data - would come from CMS in real implementation
-        const sampleCourses = [
-            {
-                id: 'AS-APY-Y9-EL-BIOLOGY',
-                name: 'Advanced Biology',
-                subject: 'Biology',
-                studentCount: 3,
-                students: ['Oliver Thompson', 'Emma Wilson', 'James Brown']
-            },
-            {
-                id: 'AS-APY-Y10-EL-CHEMISTRY',
-                name: 'Advanced Chemistry',
-                subject: 'Chemistry',
-                studentCount: 5,
-                students: ['Alice Johnson', 'Bob Smith', 'Carol Davis', 'David Lee', 'Eva Martinez']
-            }
-        ];
+        if (!this.courseData || this.courseData.length === 0) {
+            courseRepeater.innerHTML = '<div>暂无课程数据</div>';
+            return;
+        }
 
-        const filteredCourses = sampleCourses.filter(course => 
-            course.name.toLowerCase().includes(searchTerm) ||
-            course.subject.toLowerCase().includes(searchTerm) ||
-            course.id.toLowerCase().includes(searchTerm)
-        );
+        try {
+            // 为每个课程获取学生数据
+            const coursesWithStudents = await Promise.all(
+                this.courseData.map(async (course) => {
+                    // 从CMS-2 (Students Collection) 查询学生数据
+                    const studentsQuery = wixData.query('Students')
+                        .eq('class_id', course.id)
+                        .eq('status', 'Activated')
+                        .limit(100);
+                    
+                    const studentsResults = await studentsQuery.find();
+                    
+                    const students = studentsResults.items.map(student => student.name);
+                    
+                    return {
+                        ...course,
+                        studentCount: studentsResults.items.length,
+                        students: students
+                    };
+                })
+            );
 
-        courseRepeater.innerHTML = filteredCourses.map(course => `
-            <div class="courseContainer" data-course-id="${course.id}">
-                <div id="courseId">${course.id}</div>
-                <div id="courseName">${course.name}</div>
-                <div id="courseSubject">${course.subject}</div>
-                <div><span id="studentCountNumber">${course.studentCount}</span> <span id="studentCountText">students</span></div>
-                <div id="studentNames">${course.students.join(', ')}</div>
-                <button id="cancelBtn" class="btn btn-danger">Cancel</button>
-            </div>
-        `).join('');
+            // 根据搜索词过滤课程
+            const filteredCourses = coursesWithStudents.filter(course => {
+                const searchLower = searchTerm.toLowerCase();
+                return course.id.toLowerCase().includes(searchLower) ||
+                       course.subject.toLowerCase().includes(searchLower) ||
+                       course.students.some(student => student.toLowerCase().includes(searchLower));
+            });
 
-        // Re-attach event listeners for new cancel buttons
-        this.setupEventListeners();
+            // 生成HTML
+            courseRepeater.innerHTML = filteredCourses.map(course => `
+                <div class="courseContainer" data-course-id="${course.id}">
+                    <div id="courseId">${course.id}</div>
+                    <div id="courseSubject">${course.subject}</div>
+                    <div><span id="studentCountNumber">${course.studentCount}</span> <span id="studentCountText">students</span></div>
+                    <div id="studentNames">${course.students.join(', ')}</div>
+                    <button id="cancelBtn" class="btn btn-danger">Cancel</button>
+                </div>
+            `).join('');
+
+            // Re-attach event listeners for new cancel buttons
+            this.setupEventListeners();
+            
+        } catch (error) {
+            console.error('显示课程列表失败:', error);
+            // 使用备用数据显示
+            const fallbackCourses = this.courseData.filter(course => {
+                const searchLower = searchTerm.toLowerCase();
+                return course.id.toLowerCase().includes(searchLower) ||
+                       course.subject.toLowerCase().includes(searchLower);
+            });
+            
+            courseRepeater.innerHTML = fallbackCourses.map(course => `
+                <div class="courseContainer" data-course-id="${course.id}">
+                    <div id="courseId">${course.id}</div>
+                    <div id="courseSubject">${course.subject}</div>
+                    <div><span id="studentCountNumber">0</span> <span id="studentCountText">students</span></div>
+                    <div id="studentNames">暂无学生数据</div>
+                    <button id="cancelBtn" class="btn btn-danger">Cancel</button>
+                </div>
+            `).join('');
+            
+            this.setupEventListeners();
+        }
     }
 
     handleCourseSelection(e) {
@@ -527,9 +639,9 @@ class CourseCancellationManager {
     }
 
     // Initialize the course cancellation manager when page loads
-    initializePage() {
+    async initializePage() {
         // Set up initial state
-        this.displayCourseRepeater();
+        await this.displayCourseRepeater();
         
         // Show placeholder initially
         const extensionPlaceholder = document.getElementById('extensionPlaceholder');
@@ -547,9 +659,9 @@ class CourseCancellationManager {
 }
 
 // Initialize the course cancellation manager when the page loads
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     const manager = new CourseCancellationManager();
-    manager.initializePage();
+    await manager.initializePage();
 });
 
 // Add CSS for error styling and lightbox

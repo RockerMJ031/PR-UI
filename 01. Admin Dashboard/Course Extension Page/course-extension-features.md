@@ -18,6 +18,17 @@ Confirmation Lightbox Elements:
 
 ## Feature Flow Description
 
+### Feature 0: Page Load and Initial Course Display
+**User Action**: Page automatically loads
+**CMS Data Source**:
+- Read current user information from CMS-6 (Admins Collection) to get user's `schoolID`
+- Use `wixData.query('Import86')` to query CMS-3 (Import86 - Course Information Management Collection), searching for records where `schoolID` matches current user's `schoolID`
+**Display Result**:
+- Automatically extract all unique `class_id` values from matching courses
+- Display school-specific course list in repeater
+- Filter courses based on school ID matching, ensuring users can only see courses from their school
+- Provide pre-filtered data foundation for subsequent course search and extension operations
+
 ### Feature 1: Course Search and Display
 **User Action**: Click on `searchInput` field and enter search criteria
 **CMS Data Source**: Reads from CMS-3 (Import86 - Course Information Management Collection)
@@ -91,6 +102,17 @@ Confirmation Lightbox Elements:
 
 ## 功能流程描述
 
+
+### 功能0：页面加载和初始课程显示
+**用户操作**：页面自动加载
+**CMS数据源**：
+- 从CMS-6（Admins Collection）读取当前用户信息以获取用户的 `schoolID`
+- 使用 `wixData.query('Import86')` 查询CMS-3（Import86 - Course Information Management Collection），搜索 `schoolID` 与当前用户 `schoolID` 匹配的记录
+**显示结果**：
+- 自动提取匹配课程的所有唯一 `class_id` 值
+- 在 repeater 中显示学校特定的课程列表
+- 基于学校ID匹配过滤课程，确保用户只能看到其所在学校的课程
+- 为后续的课程搜索和延期操作提供预过滤的数据基础
 ### 功能1：课程搜索和显示
 **用户操作**：点击 `searchInput` 字段并输入搜索条件
 **CMS数据源**：从CMS-3（Import86 - 课程信息管理集合）读取数据

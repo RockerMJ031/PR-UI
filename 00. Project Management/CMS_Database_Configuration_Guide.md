@@ -243,6 +243,7 @@ This document details the database collection configuration required for the tut
   agenda: "text", // Course agenda
   prerequisites: ["text"], // Prerequisites
   c4No: "text", // Lark system course ID
+  schoolID: "text", // School ID - REQUIRED TO ADD TO WIX CMS
   lastSyncWithLark: "text", // Last sync time with Lark
   syncStatus: "text", // synced, pending, failed
   _createdDate: "text",
@@ -414,6 +415,7 @@ This document details the database collection configuration required for the tut
   lastLogin: "text", // Last login time
   managedStudents: "number", // Number of managed students
   joinDate: "text", // Join date
+  schoolID: "text", // School ID - REQUIRED TO ADD TO WIX CMS
   
   // Report links and passwords - Updated from Lark PRT Operation C01.Client Info
   studentSessionReportUrl: "text", // Student Session Report URL

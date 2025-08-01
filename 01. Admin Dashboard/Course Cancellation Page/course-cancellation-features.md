@@ -39,14 +39,35 @@ The Course Cancellation Page allows administrators to cancel courses that need t
 
 ## Feature Flow Description
 
+### Feature 0: Page Load and Initial Course Display
+**User Action**: Page loads automatically
+**CMS Data Source**: 
+- **User Authentication**: Get current user's `wix_id` and query CMS-6 (Admins Collection) using `wixData.query('Admins').eq('userId', wix_id)` to get user's `schoolID`
+- **Course Data**: Query CMS-3 (Import86 - Course Information Management Collection) using `wixData.query('Import86').eq('schoolID', userSchoolID)` to get school-specific courses
+- **Student Count**: Queries CMS-2 (Import74 - Student Course Assignment Collection) to count students with matching `class_id` and `status: 'Activated'`
+- **Student Names**: Retrieves `student_name` from CMS-2 records with matching `class_id` and `status: 'Activated'`
+**Display Result**: 
+- Automatically displays school-specific courses in `courseRepeater`
+- `courseId`: Shows CMS-3 `class_id` field
+- `courseSubject`: Shows CMS-3 `subject` field
+- `studentCountNumber`: Displays count of CMS-2 records with matching `class_id` and `status: 'Activated'`
+- `studentCountText`: Fixed text "students"
+- `studentNames`: Lists `student_name` from CMS-2 records with matching `class_id` and `status: 'Activated'`
+- Filters courses based on school ID matching to ensure users only see courses from their school
+
 ### Feature 1: Course Search and Display
 **User Action**: Click on `searchInput` field and enter search criteria
-**CMS Data Source**: Reads from CMS-3 (Import86 - Course Information Management Collection)
+**CMS Data Source**: 
+- **Course Information**: Reads from CMS-3 (Import86 - Course Information Management Collection)
+- **Student Count**: Queries CMS-2 (Import74 - Student Course Assignment Collection) to count students with matching `class_id` and `status: 'Activated'`
+- **Student Names**: Retrieves `student_name` from CMS-2 records with matching `class_id` and `status: 'Activated'`
 **Display Result**: 
 - Filters and displays matching courses in `courseRepeater`
-- Shows `courseId`, `courseName`, `courseSubject` for each course
-- Displays `studentCountNumber` and `studentCountText` showing enrolled student count
-- Lists `studentNames` as comma-separated text for each course
+- `courseId`: Shows CMS-3 `class_id` field
+- `courseSubject`: Shows CMS-3 `subject` field
+- `studentCountNumber`: Displays count of CMS-2 records with matching `class_id` and `status: 'Activated'`
+- `studentCountText`: Fixed text "students"
+- `studentNames`: Lists `student_name` from CMS-2 records with matching `class_id` and `status: 'Activated'`
 
 ### Feature 2: Course Selection for Cancellation
 **User Action**: Click on `cancelBtn` ("Cancel" button) for a specific course
@@ -110,14 +131,35 @@ The Course Cancellation Page allows administrators to cancel courses that need t
 
 ## 功能流程描述
 
+### 功能0：页面加载和初始课程显示
+**用户操作**：页面自动加载
+**CMS数据源**：
+- **用户身份验证**：获取当前用户的 `wix_id`，使用 `wixData.query('Admins').eq('userId', wix_id)` 查询CMS-6（管理员集合）以获取用户的 `schoolID`
+- **课程数据**：使用 `wixData.query('Import86').eq('schoolID', userSchoolID)` 查询CMS-3（Import86 - 课程信息管理集合），获取学校特定的课程
+- **学生数量**：查询CMS-2（Import74 - 学生课程分配集合）统计与 `class_id` 匹配且 `status: 'Activated'` 的学生数量
+- **学生姓名**：从CMS-2中与 `class_id` 匹配且 `status: 'Activated'` 的记录中获取 `student_name`
+**显示结果**：
+- 在 `courseRepeater` 中自动显示学校特定的课程
+- `courseId`：显示CMS-3中的 `class_id` 字段
+- `courseSubject`：显示CMS-3中的 `subject` 字段
+- `studentCountNumber`：显示CMS-2中与 `class_id` 匹配且 `status: 'Activated'` 的记录数量
+- `studentCountText`：固定文本 "students"
+- `studentNames`：列出CMS-2中与 `class_id` 匹配且 `status: 'Activated'` 的记录中的 `student_name`
+- 基于学校ID匹配过滤课程，确保用户只能看到其所在学校的课程
+
 ### 功能1：课程搜索和显示
 **用户操作**：点击 `searchInput` 字段并输入搜索条件
-**CMS数据源**：从CMS-3（Import86 - 课程信息管理集合）读取数据
+**CMS数据源**：
+- **课程信息**：从CMS-3（Import86 - 课程信息管理集合）读取数据
+- **学生数量**：查询CMS-2（Import74 - 学生课程分配集合）统计与 `class_id` 匹配且 `status: 'Activated'` 的学生数量
+- **学生姓名**：从CMS-2中与 `class_id` 匹配且 `status: 'Activated'` 的记录中获取 `student_name`
 **显示结果**：
 - 在 `courseRepeater` 中过滤并显示匹配的课程
-- 为每个课程显示 `courseId`、`courseName`、`courseSubject`
-- 显示 `studentCountNumber` 和 `studentCountText` 展示已注册学生数量
-- 将 `studentNames` 以逗号分隔的文本形式列出每个课程的学生
+- `courseId`：显示CMS-3中的 `class_id` 字段
+- `courseSubject`：显示CMS-3中的 `subject` 字段
+- `studentCountNumber`：显示CMS-2中与 `class_id` 匹配且 `status: 'Activated'` 的记录数量
+- `studentCountText`：固定文本 "students"
+- `studentNames`：列出CMS-2中与 `class_id` 匹配且 `status: 'Activated'` 的记录中的 `student_name`
 
 ### 功能2：选择课程进行取消
 **用户操作**：点击特定课程的 `cancelBtn`（"Cancel" 按钮）

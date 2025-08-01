@@ -10,7 +10,6 @@
 - `courseRepeater`
 - `courseContainer`
 - `courseId`
-- `courseName`
 - `courseSubject`
 - `studentCountNumber` (bold number)
 - `studentCountText` (normal text "students")
