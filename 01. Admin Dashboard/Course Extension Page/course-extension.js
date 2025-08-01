@@ -1,9 +1,17 @@
 // Course Extension Page JavaScript
 // Handles course extension form functionality and data management
+// 功能0：页面加载和初始课程显示 - 用户身份验证、从CMS获取课程和学生数据
+// 功能1：课程搜索和显示 - 在courseRepeater中过滤和显示课程
+// CMS数据源：CMS-6(用户身份验证)、CMS-3(课程信息)、CMS-2(学生信息)
+
+import wixUsers from 'wix-users';
+import wixData from 'wix-data';
 
 class CourseExtensionManager {
     constructor() {
         this.selectedCourse = null;
+        this.userSchoolID = null;
+        this.courses = [];
         this.extensionFees = {
             standard: 50,
             extended: 100,
@@ -12,40 +20,258 @@ class CourseExtensionManager {
         this.init();
     }
 
-    init() {
-        this.loadCourseData();
+    async init() {
+        await this.authenticateUser();
+        await this.loadCourseData();
+        await this.initializePage();
         this.setupEventListeners();
         this.setupFormValidation();
-        this.setupDateConstraints();
     }
 
-    loadCourseData() {
-        // Try to get course data from sessionStorage (from course management page)
-        const storedCourse = sessionStorage.getItem('selectedCourse');
-        
-        if (storedCourse) {
-            this.selectedCourse = JSON.parse(storedCourse);
-        } else {
-            // Fallback sample data if no course selected
-            this.selectedCourse = {
-                id: 'AS-APY-Y9-EL-BIOLOGY',
-                subject: 'Biology',
-                status: 'Active',
-                studentCount: 3,
-                totalLessons: 24,
-                startDate: '2024-01-15',
-                endDate: '2024-06-15',
-                students: [
-                    { name: 'Oliver Thompson', lessons: 8 },
-                    { name: 'Emma Wilson', lessons: 8 },
-                    { name: 'James Brown', lessons: 8 }
-                ]
-            };
+    async authenticateUser() {
+        try {
+            const currentUser = await wixUsers.getCurrentUser();
+            if (currentUser && currentUser.id) {
+                const wix_id = currentUser.id;
+                
+                const adminQuery = await wixData.query('Admins')
+                    .eq('userId', wix_id)
+                    .find();
+                
+                if (adminQuery.items.length > 0) {
+                    this.userSchoolID = adminQuery.items[0].schoolID;
+                } else {
+                    console.warn('User not found in Admins collection, using default schoolID');
+                    this.userSchoolID = 'DEFAULT_SCHOOL';
+                }
+            } else {
+                console.warn('No current user found, using default schoolID');
+                this.userSchoolID = 'DEFAULT_SCHOOL';
+            }
+        } catch (error) {
+            console.error('Error authenticating user:', error);
+            this.userSchoolID = 'DEFAULT_SCHOOL';
         }
+    }
 
-        this.displayCourseInfo();
-        this.populateCurrentEndDate();
-        this.displayStudents();
+    async loadCourseData() {
+        try {
+            if (!this.userSchoolID) {
+                console.warn('No userSchoolID available, using fallback data');
+                this.courses = this.getFallbackCourses();
+                return;
+            }
+
+            // Query CMS-3 for courses matching user's schoolID
+            const courseQuery = await wixData.query('Import86')
+                .eq('schoolID', this.userSchoolID)
+                .find();
+
+            if (courseQuery.items.length > 0) {
+                // Extract unique class_id values and create course objects
+                const uniqueClassIds = [...new Set(courseQuery.items.map(item => item.class_id))];
+                
+                this.courses = uniqueClassIds.map(classId => {
+                    const courseData = courseQuery.items.find(item => item.class_id === classId);
+                    return {
+                        courseId: courseData.class_id,
+                        courseName: courseData.class_id, // Using class_id as course name
+                        courseSubject: courseData.subject,
+                        schoolID: courseData.schoolID
+                    };
+                });
+            } else {
+                console.warn('No courses found for schoolID:', this.userSchoolID);
+                this.courses = this.getFallbackCourses();
+            }
+        } catch (error) {
+            console.error('Error loading course data:', error);
+            this.courses = this.getFallbackCourses();
+        }
+    }
+
+    getFallbackCourses() {
+        return [
+            {
+                courseId: 'AS-APY-Y9-EL-BIOLOGY',
+                courseName: 'AS-APY-Y9-EL-BIOLOGY',
+                courseSubject: 'Biology',
+                schoolID: this.userSchoolID || 'DEFAULT_SCHOOL'
+            },
+            {
+                courseId: 'AS-APY-Y9-EL-CHEMISTRY',
+                courseName: 'AS-APY-Y9-EL-CHEMISTRY', 
+                courseSubject: 'Chemistry',
+                schoolID: this.userSchoolID || 'DEFAULT_SCHOOL'
+            }
+        ];
+    }
+
+    async initializePage() {
+        await this.displayCourseRepeater();
+        this.hideExtensionPlaceholder();
+    }
+
+    hideExtensionPlaceholder() {
+        const placeholder = document.getElementById('extensionPlaceholder');
+        if (placeholder) {
+            placeholder.style.display = 'block'; // Show placeholder initially
+        }
+    }
+
+    async displayCourseRepeater(searchTerm = '') {
+        try {
+            const courseRepeater = document.getElementById('courseRepeater');
+            if (!courseRepeater) {
+                console.warn('courseRepeater element not found');
+                return;
+            }
+
+            // Filter courses based on search term
+            let filteredCourses = this.courses;
+            if (searchTerm) {
+                filteredCourses = this.courses.filter(course => 
+                    course.courseId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    course.courseSubject.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+            }
+
+            // Get student data for each course
+            const coursesWithStudents = await Promise.all(
+                filteredCourses.map(async (course) => {
+                    try {
+                        const studentQuery = await wixData.query('Import74')
+                            .eq('class_id', course.courseId)
+                            .eq('status', 'Activated')
+                            .find();
+
+                        const studentNames = studentQuery.items.map(item => item.student_name);
+                        const studentCount = studentQuery.items.length;
+
+                        return {
+                            ...course,
+                            studentCountNumber: studentCount,
+                            studentCountText: 'students',
+                            studentNames: studentNames.join(', ')
+                        };
+                    } catch (error) {
+                        console.error(`Error fetching students for course ${course.courseId}:`, error);
+                        return {
+                            ...course,
+                            studentCountNumber: 0,
+                            studentCountText: 'students',
+                            studentNames: 'No students found'
+                        };
+                    }
+                })
+            );
+
+            // Generate HTML for course repeater
+            const courseHTML = coursesWithStudents.map(course => `
+                <div class="course-item" data-course-id="${course.courseId}">
+                    <div class="course-info">
+                        <div class="course-header">
+                            <span class="course-id">${course.courseId}</span>
+                            <span class="course-subject">${course.courseSubject}</span>
+                        </div>
+                        <div class="student-info">
+                            <span class="student-count">
+                                <strong>${course.studentCountNumber}</strong> ${course.studentCountText}
+                            </span>
+                            <div class="student-names">${course.studentNames}</div>
+                        </div>
+                    </div>
+                    <button class="extend-btn" data-course-id="${course.courseId}">
+                        Extend
+                    </button>
+                </div>
+            `).join('');
+
+            courseRepeater.innerHTML = courseHTML;
+
+            // Add event listeners to extend buttons
+            const extendButtons = courseRepeater.querySelectorAll('.extend-btn');
+            extendButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const courseId = e.target.getAttribute('data-course-id');
+                    this.handleCourseSelection(courseId);
+                });
+            });
+
+        } catch (error) {
+            console.error('Error displaying course repeater:', error);
+            // Show fallback content
+            const courseRepeater = document.getElementById('courseRepeater');
+            if (courseRepeater) {
+                courseRepeater.innerHTML = '<div class="error-message">Error loading courses. Please try again.</div>';
+            }
+        }
+    }
+
+    async handleCourseSelection(courseId) {
+        try {
+            // Find the selected course
+            const course = this.courses.find(c => c.courseId === courseId);
+            if (!course) {
+                console.error('Course not found:', courseId);
+                return;
+            }
+
+            // Get detailed course and student information
+            const courseQuery = await wixData.query('Import86')
+                .eq('class_id', courseId)
+                .find();
+
+            const studentQuery = await wixData.query('Import74')
+                .eq('class_id', courseId)
+                .eq('status', 'Activated')
+                .find();
+
+            // Prepare selected course data
+            this.selectedCourse = {
+                id: courseId,
+                subject: course.courseSubject,
+                status: 'Active',
+                studentCount: studentQuery.items.length,
+                totalLessons: 24, // Default value
+                startDate: '2024-01-15', // Default value
+                endDate: '2024-06-15', // Default value
+                students: studentQuery.items.map(item => ({
+                    name: item.student_name,
+                    lessons: 8 // Default value
+                }))
+            };
+
+            // Hide placeholder and show course info
+            this.showSelectedCourseInfo();
+            this.displayCourseInfo();
+            this.populateCurrentEndDate();
+            this.displayStudents();
+            this.setupDateConstraints();
+
+        } catch (error) {
+            console.error('Error handling course selection:', error);
+        }
+    }
+
+    showSelectedCourseInfo() {
+        const placeholder = document.getElementById('extensionPlaceholder');
+        const courseInfo = document.getElementById('selectedExtensionCourseInfo');
+        
+        if (placeholder) {
+            placeholder.style.display = 'none';
+        }
+        if (courseInfo) {
+            courseInfo.style.display = 'block';
+        }
+    }
+
+    async handleSearch() {
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            const searchTerm = searchInput.value.trim();
+            await this.displayCourseRepeater(searchTerm);
+        }
     }
 
     displayCourseInfo() {
@@ -99,36 +325,70 @@ class CourseExtensionManager {
     }
 
     setupEventListeners() {
-        // Extension type change
-        document.getElementById('extensionType').addEventListener('change', (e) => {
-            this.handleExtensionTypeChange(e.target.value);
-        });
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        
+        if (searchInput) {
+            searchInput.addEventListener('input', async () => {
+                await this.handleSearch();
+            });
+            searchInput.addEventListener('keypress', async (e) => {
+                if (e.key === 'Enter') {
+                    await this.handleSearch();
+                }
+            });
+        }
+        
+        if (searchBtn) {
+            searchBtn.addEventListener('click', async () => {
+                await this.handleSearch();
+            });
+        }
 
-        // New end date change
-        document.getElementById('newEndDate').addEventListener('change', (e) => {
-            this.validateNewEndDate(e.target.value);
-            this.calculateExtensionFee();
-        });
+        // Extension form event listeners (only add if elements exist)
+        const extensionType = document.getElementById('extensionType');
+        if (extensionType) {
+            extensionType.addEventListener('change', (e) => {
+                this.handleExtensionTypeChange(e.target.value);
+            });
+        }
 
-        // Additional lessons change
-        document.getElementById('additionalLessons').addEventListener('input', (e) => {
-            this.calculateExtensionFee();
-        });
+        const newEndDate = document.getElementById('newEndDate');
+        if (newEndDate) {
+            newEndDate.addEventListener('change', (e) => {
+                this.validateNewEndDate(e.target.value);
+                this.calculateExtensionFee();
+            });
+        }
 
-        // Extension reason change
-        document.getElementById('extensionReason').addEventListener('change', (e) => {
-            this.handleReasonChange(e.target.value);
-        });
+        const additionalLessons = document.getElementById('additionalLessons');
+        if (additionalLessons) {
+            additionalLessons.addEventListener('input', (e) => {
+                this.calculateExtensionFee();
+            });
+        }
 
-        // Form submission
-        document.getElementById('extensionForm').addEventListener('submit', (e) => {
-            this.handleFormSubmission(e);
-        });
+        const extensionReason = document.getElementById('extensionReason');
+        if (extensionReason) {
+            extensionReason.addEventListener('change', (e) => {
+                this.handleReasonChange(e.target.value);
+            });
+        }
 
-        // Detailed reason input
-        document.getElementById('detailedReason').addEventListener('input', (e) => {
-            this.validateDetailedReason(e.target.value);
-        });
+        const extensionForm = document.getElementById('extensionForm');
+        if (extensionForm) {
+            extensionForm.addEventListener('submit', (e) => {
+                this.handleFormSubmission(e);
+            });
+        }
+
+        const detailedReason = document.getElementById('detailedReason');
+        if (detailedReason) {
+            detailedReason.addEventListener('input', (e) => {
+                this.validateDetailedReason(e.target.value);
+            });
+        }
     }
 
     setupFormValidation() {
@@ -512,8 +772,9 @@ class CourseExtensionManager {
 }
 
 // Initialize the course extension manager when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    new CourseExtensionManager();
+document.addEventListener('DOMContentLoaded', async () => {
+    const manager = new CourseExtensionManager();
+    // The manager will initialize itself asynchronously
 });
 
 // Handle browser back button

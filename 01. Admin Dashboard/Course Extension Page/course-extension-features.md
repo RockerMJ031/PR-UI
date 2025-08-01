@@ -21,13 +21,18 @@ Confirmation Lightbox Elements:
 ### Feature 0: Page Load and Initial Course Display
 **User Action**: Page automatically loads
 **CMS Data Source**:
-- Read current user information from CMS-6 (Admins Collection) to get user's `schoolID`
-- Use `wixData.query('Import86')` to query CMS-3 (Import86 - Course Information Management Collection), searching for records where `schoolID` matches current user's `schoolID`
+- **User Authentication**: Get current user's `wix_id`, use `wixData.query('Admins').eq('userId', wix_id)` to query CMS-6 (Admins Collection) to obtain user's `schoolID`
+- **Course Data**: Use `wixData.query('Import86').eq('schoolID', userSchoolID)` to query CMS-3 (Import86 - Course Information Management Collection) to get school-specific courses
+- **Student Count**: Query CMS-2 (Import74 - Student Course Assignment Collection) to count students matching `class_id` with `status: 'Activated'`
+- **Student Names**: Retrieve `student_name` from CMS-2 records matching `class_id` with `status: 'Activated'`
 **Display Result**:
-- Automatically extract all unique `class_id` values from matching courses
-- Display school-specific course list in repeater
+- Automatically display school-specific courses in `courseRepeater`
+- `courseId`: Display `class_id` field from CMS-3
+- `courseSubject`: Display `subject` field from CMS-3
+- `studentCountNumber`: Display count of records from CMS-2 matching `class_id` with `status: 'Activated'`
+- `studentCountText`: Fixed text "students"
+- `studentNames`: List `student_name` from CMS-2 records matching `class_id` with `status: 'Activated'`
 - Filter courses based on school ID matching, ensuring users can only see courses from their school
-- Provide pre-filtered data foundation for subsequent course search and extension operations
 
 ### Feature 1: Course Search and Display
 **User Action**: Click on `searchInput` field and enter search criteria
@@ -106,13 +111,18 @@ Confirmation Lightbox Elements:
 ### 功能0：页面加载和初始课程显示
 **用户操作**：页面自动加载
 **CMS数据源**：
-- 从CMS-6（Admins Collection）读取当前用户信息以获取用户的 `schoolID`
-- 使用 `wixData.query('Import86')` 查询CMS-3（Import86 - Course Information Management Collection），搜索 `schoolID` 与当前用户 `schoolID` 匹配的记录
+- **用户身份验证**：获取当前用户的 `wix_id`，使用 `wixData.query('Admins').eq('userId', wix_id)` 查询CMS-6（管理员集合）以获取用户的 `schoolID`
+- **课程数据**：使用 `wixData.query('Import86').eq('schoolID', userSchoolID)` 查询CMS-3（Import86 - 课程信息管理集合），获取学校特定的课程
+- **学生数量**：查询CMS-2（Import74 - 学生课程分配集合）统计与 `class_id` 匹配且 `status: 'Activated'` 的学生数量
+- **学生姓名**：从CMS-2中与 `class_id` 匹配且 `status: 'Activated'` 的记录中获取 `student_name`
 **显示结果**：
-- 自动提取匹配课程的所有唯一 `class_id` 值
-- 在 repeater 中显示学校特定的课程列表
+- 在 `courseRepeater` 中自动显示学校特定的课程
+- `courseId`：显示CMS-3中的 `class_id` 字段
+- `courseSubject`：显示CMS-3中的 `subject` 字段
+- `studentCountNumber`：显示CMS-2中与 `class_id` 匹配且 `status: 'Activated'` 的记录数量
+- `studentCountText`：固定文本 "students"
+- `studentNames`：列出CMS-2中与 `class_id` 匹配且 `status: 'Activated'` 的记录中的 `student_name`
 - 基于学校ID匹配过滤课程，确保用户只能看到其所在学校的课程
-- 为后续的课程搜索和延期操作提供预过滤的数据基础
 ### 功能1：课程搜索和显示
 **用户操作**：点击 `searchInput` 字段并输入搜索条件
 **CMS数据源**：从CMS-3（Import86 - 课程信息管理集合）读取数据
