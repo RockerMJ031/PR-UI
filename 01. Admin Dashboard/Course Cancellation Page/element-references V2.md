@@ -17,14 +17,14 @@
 - `cancelBtn`
 
 ### Cancellation Details Panel (After Course Selection)
-- `extensionDetailsPanel`
-- `extensionPlaceholder`
-- `extensionPlaceholderText` (placeholder text: "Select a course from the left to configure extension details")
-- `extensionPlaceholderIcon` (placeholder icon element)
-- `selectedExtensionCourseInfo`
-- `extensionCourseHeader`
-- `extensionCourseTitle`
-- `extensionCourseSubject`
+- `cancellationDetailsPanel`
+- `cancellationPlaceholder`
+- `cancellationPlaceholderText` (placeholder text: "Select a course from the left to configure cancellation details")
+- `cancellationPlaceholderIcon` (placeholder icon element)
+- `selectedCancellationCourseInfo`
+- `cancellationCourseHeader`
+- `cancellationCourseTitle`
+- `cancellationCourseSubject`
 - `students-text-display` (student names displayed as comma-separated text)
 
 ### Cancellation Form Elements

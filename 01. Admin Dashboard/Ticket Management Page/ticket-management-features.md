@@ -36,6 +36,35 @@ Ticket Elements:
 
 ## Feature Flow Description
 
+### Feature 0: Page Load and Initial Ticket Display
+**User Action**: Access Ticket Management page
+**CMS Data Source**: 
+- CMS-6 (Admins Collection) for user authentication and schoolID
+- CMS-8 (Tickets Collection) for ticket data
+**Data Filtering**:
+- Authenticates current user and retrieves schoolID from CMS-6
+- Queries CMS-8 for tickets where school field matches user's schoolID
+- Filters tickets by status (Open, In Progress, Resolved)
+- Sorts tickets by priority and submission date
+**Display Result**:
+- Shows ticket management interface with loading state management
+- Displays ticket summary statistics in `summary-cards`:
+  - Total tickets count in `.card-number`
+  - Open tickets count with status styling
+  - In Progress tickets count with progress indicator
+  - Resolved tickets count with completion styling
+- Populates `ticket-list` repeater with ticket information:
+  - Ticket ID mapped to CMS-8 `ticketId` in `.ticket-id`
+  - Ticket title mapped to CMS-8 `title` in `.ticket-title`
+  - Ticket description mapped to CMS-8 `description` in `.ticket-description`
+  - Submitter information mapped to CMS-8 `submitterName` and `submitterEmail` in `.ticket-submitter`
+  - Submission date mapped to CMS-8 `submissionDate` in `.ticket-date`
+  - Status badge mapped to CMS-8 `status` in `.ticket-status`
+  - Priority badge mapped to CMS-8 `priority` in `.ticket-priority`
+- Includes error handling for failed data loads
+- Provides fallback data display for network issues
+- Shows empty state message when no tickets are found
+
 ### Feature 1: Modal Opening and Ticket Display
 **User Action**: Open Ticket Management modal
 **CMS Data Source**: Reads from CMS-8 (Tickets Collection)
@@ -137,6 +166,35 @@ Ticket Elements:
 票据管理页面允许管理员通过综合界面查看和管理支持票据。此页面提供票据状态概览、详细票据信息显示和票据管理功能，具有过滤和状态跟踪功能。
 
 ## 功能流程描述
+
+### 功能0：页面加载和初始票据显示
+**用户操作**：访问票据管理页面
+**CMS数据源**：
+- CMS-6（管理员集合）用于用户身份验证和schoolID
+- CMS-8（票据集合）用于票据数据
+**数据过滤**：
+- 验证当前用户身份并从CMS-6检索schoolID
+- 查询CMS-8中school字段与用户schoolID匹配的票据
+- 按状态过滤票据（开放、进行中、已解决）
+- 按优先级和提交日期排序票据
+**显示结果**：
+- 显示带有加载状态管理的票据管理界面
+- 在 `summary-cards` 中显示票据摘要统计：
+  - `.card-number` 中的总票据数
+  - 带有状态样式的开放票据数
+  - 带有进度指示器的进行中票据数
+  - 带有完成样式的已解决票据数
+- 在 `ticket-list` repeater中填充票据信息：
+  - `.ticket-id` 中映射到CMS-8 `ticketId` 的票据ID
+  - `.ticket-title` 中映射到CMS-8 `title` 的票据标题
+  - `.ticket-description` 中映射到CMS-8 `description` 的票据描述
+  - `.ticket-submitter` 中映射到CMS-8 `submitterName` 和 `submitterEmail` 的提交者信息
+  - `.ticket-date` 中映射到CMS-8 `submissionDate` 的提交日期
+  - `.ticket-status` 中映射到CMS-8 `status` 的状态徽章
+  - `.ticket-priority` 中映射到CMS-8 `priority` 的优先级徽章
+- 包含数据加载失败的错误处理
+- 为网络问题提供备用数据显示
+- 当未找到票据时显示空状态消息
 
 ### 功能1：模态框打开和票据显示
 **用户操作**：打开票据管理模态框
