@@ -757,6 +757,247 @@
         }
 
         /* Course Extension Modal Styles */
+        .extension-lightbox {
+            max-width: 1400px !important;
+            width: 95% !important;
+        }
+
+        .extension-lightbox .lightbox-layout {
+            display: flex;
+            gap: 30px;
+            height: 600px;
+        }
+
+        .extension-lightbox .left-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .extension-lightbox .right-panel {
+            flex: 1;
+            position: relative;
+        }
+
+        .extension-lightbox .search-bar {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .extension-lightbox .search-bar input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border: 2px solid #e8ecf4;
+            border-radius: 12px;
+            font-size: 14px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .extension-lightbox .search-bar input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 51, 153, 0.1);
+        }
+
+        .extension-lightbox .search-bar i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+
+        .extension-lightbox .student-list-container {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .extension-lightbox .details-panel {
+            height: 100%;
+            overflow-y: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 16px;
+            border: 2px solid #e8ecf4;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .extension-lightbox .placeholder-panel {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border-radius: 16px;
+            border: 2px dashed #e8ecf4;
+            color: var(--text-light);
+            text-align: center;
+        }
+
+        .extension-lightbox .placeholder-panel i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        #extensionCourseList .course-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            margin-bottom: 16px;
+            background: white;
+            border: 2px solid #e8ecf4;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        #extensionCourseList .course-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(135deg, var(--primary-color), #8b5cf6);
+            transition: all 0.3s ease;
+        }
+
+        #extensionCourseList .course-item:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 8px 25px rgba(102, 51, 153, 0.15);
+            transform: translateY(-3px);
+        }
+
+        #extensionCourseList .course-item:hover::before {
+            width: 8px;
+        }
+
+        #extensionCourseList .course-item.selected {
+            border-color: var(--primary-color);
+            background: linear-gradient(135deg, #f8f9ff, #fff);
+            box-shadow: 0 8px 25px rgba(102, 51, 153, 0.2);
+        }
+
+        #extensionCourseList .course-item.selected::before {
+            width: 8px;
+        }
+
+        #extensionCourseList .course-info {
+            flex: 1;
+        }
+
+        #extensionCourseList .course-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 12px;
+        }
+
+        #extensionCourseList .course-id {
+            background: linear-gradient(135deg, var(--primary-color), #8b5cf6);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(102, 51, 153, 0.3);
+        }
+
+        #extensionCourseList .course-subject {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        #extensionCourseList .student-count {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            color: var(--info-color);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        #extensionCourseList .student-number {
+            background: linear-gradient(135deg, var(--primary-color), #8b5cf6);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            box-shadow: 0 2px 6px rgba(102, 51, 153, 0.3);
+        }
+
+        #extensionCourseList .student-text {
+            font-size: 13px;
+            color: var(--info-color);
+            font-weight: 600;
+        }
+
+        #extensionCourseList .students-display {
+            color: #6b7280;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        #extensionCourseList .course-actions {
+            margin-left: 20px;
+        }
+
+        #extensionCourseList .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, var(--primary-color), #8b5cf6);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        #extensionCourseList .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        #extensionCourseList .action-btn:hover {
+            background: linear-gradient(135deg, var(--primary-dark), #7c3aed);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(102, 51, 153, 0.3);
+        }
+
+        #extensionCourseList .action-btn:hover::before {
+            left: 100%;
+        }
+
         .extension-modal {
             max-width: 800px;
             width: 90%;
@@ -2305,7 +2546,7 @@
                 <div class="course-actions">
                     <button class="action-btn extend-btn" onclick="selectExtensionCourse('${courseGroup.classId}')">
                         <i class="fas fa-plus"></i>
-                        Select
+                        Extend
                     </button>
                 </div>
             `;

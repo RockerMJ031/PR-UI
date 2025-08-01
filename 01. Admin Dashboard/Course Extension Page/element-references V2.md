@@ -15,16 +15,13 @@
 - `studentCountNumber` (bold number)
 - `studentCountText` (normal text "students")
 - `studentNames` (student names text field)
-
-### Student Repeater Section
-- `studentRepeater`
-- `studentContainer`
-- `studentInfo` (merged student information text field)
 - `extendBtn`
 
 ### Extension Details Panel (After Course Selection)
 - `extensionDetailsPanel`
 - `extensionPlaceholder`
+- `extensionPlaceholderText` (placeholder text: "Select a course from the left to configure extension details")
+- `extensionPlaceholderIcon` (placeholder icon element)
 - `selectedExtensionCourseInfo`
 - `extensionCourseHeader`
 - `extensionCourseTitle`
@@ -35,11 +32,7 @@
 - `extensionEndDate` (date input without helper text)
 - `updatedFocusArea`
 - `extensionDescription`
-
-## Button Elements
 - `closeBtn`
-- `searchBtn`
-- `extendBtn`
 - `clearSelectionBtn`
 - `submitExtensionBtn`
 
