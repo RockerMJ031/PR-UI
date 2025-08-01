@@ -173,6 +173,7 @@ This document details the database collection configuration required for the tut
 {
   _id: "text",
   no: "text", // Assignment Number
+  studentId: "text", // Student ID from CMS-7 - REQUIRED TO ADD TO WIX CMS
   wix_id: "text", // Wix System Student ID
   student_name: "text", // Student Name
   student_email: "text", // Student Email
@@ -481,6 +482,7 @@ This document details the database collection configuration required for the tut
 {
   _id: "text",
   studentId: "text", // Student ID
+  studentName: "text", // Student full name - REQUIRED TO ADD TO WIX CMS
   registrationId: "text", // Related to CMS-1 registration record
   firstName: "text",
   lastName: "text",

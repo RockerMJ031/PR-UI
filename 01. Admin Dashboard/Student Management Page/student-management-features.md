@@ -32,6 +32,27 @@ Success Elements:
 
 ## Feature Flow Description
 
+### Feature 0: Page Load and Initial Student Display
+**User Action**: User accesses the Student Management page
+**CMS Data Source**: 
+- CMS-6 (Admins Collection) for user authentication and schoolID
+- CMS-7 (Students Collection) for student data
+**Display Result**: 
+- Authenticates current user and retrieves schoolID from CMS-6
+- Queries CMS-7 for students matching the user's schoolID
+- Filters students with status "active" or "Activated"
+- Displays student management interface with:
+  - Student list in `studentList` repeater showing:
+    - Student ID in `.student-id`
+    - Student name in `.student-name`
+    - Student email in `.student-email`
+    - Course count in `.course-count`
+    - Course list in `.course-list`
+    - Management action buttons
+  - Two option buttons: `removeAllCoursesBtn` and `removeSpecificCourseBtn`
+  - Search functionality with `searchInput` and `searchBtn`
+- Includes loading state management, error handling, and fallback data if no students are found
+
 ### Feature 1: Modal Opening and Student Display
 **User Action**: Open Student Management modal
 **CMS Data Source**: Reads from CMS-7 (Students Collection)
@@ -134,6 +155,27 @@ Success Elements:
 学生管理页面允许管理员通过综合界面管理学生课程注册。此页面提供移除学生所有课程或移除特定课程的选项，具有搜索功能和适当的确认步骤。
 
 ## 功能流程描述
+
+### 功能0：页面加载和初始学生显示
+**用户操作**：用户访问学生管理页面
+**CMS数据源**：
+- CMS-6（管理员集合）用于用户身份验证和schoolID
+- CMS-7（学生集合）用于学生数据
+**显示结果**：
+- 验证当前用户身份并从CMS-6检索schoolID
+- 查询CMS-7中与用户schoolID匹配的学生
+- 过滤状态为"active"或"Activated"的学生
+- 显示学生管理界面包含：
+  - `studentList` repeater中的学生列表显示：
+    - `.student-id` 中的学生ID（来自CMS-7的studentId字段）
+    - `.student-name` 中的学生姓名（来自CMS-7的studentName字段）
+    - `.student-email` 中的学生邮箱（来自CMS-7的email字段）
+    - `.course-count` 中的课程数量（从CMS-2中搜索该学生studentId且status为"Activated"的class_id数量）
+    - `.course-list` 中的课程列表（根据点击removeAllCoursesBtn显示"courses"或点击removeSpecificCourseBtn显示"course"，内容为CMS-2中的class_id）
+    - 管理操作按钮
+  - 两个选项按钮：`removeAllCoursesBtn` 和 `removeSpecificCourseBtn`
+  - 搜索功能包含 `searchInput` 和 `searchBtn`
+- 包括加载状态管理、错误处理和未找到学生时的备用数据
 
 ### 功能1：模态框打开和学生显示
 **用户操作**：打开学生管理模态框
