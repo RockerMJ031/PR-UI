@@ -24,6 +24,24 @@ Success Elements:
 
 ## Feature Flow Description
 
+### Feature 0: Page Load and Initial Student Display
+**User Action**: Page loads when administrator accesses the Remove AP Student functionality
+**CMS Data Source**: 
+- CMS-6 (Admins Collection) for user authentication and schoolID retrieval
+- CMS-7 (Students Collection) for student data based on schoolID
+**Display Result**: 
+- Authenticates current user and retrieves their schoolID from CMS-6
+- Loads all students associated with the user's schoolID from CMS-7
+- Displays students in `studentList` (Repeater container) with:
+  - Student ID in data attributes
+  - Student name in `.student-name`
+  - Student AP plan information in `.ap-plan`
+  - Status label (ACTIVE/PAUSED) in `.student-status`
+  - Remove button in `.remove-btn`
+- Shows loading state during data retrieval
+- Handles error states if data loading fails
+- Provides fallback data if no students are found
+
 ### Feature 1: Student Selection and Display
 **User Action**: Open Remove AP Student modal
 **CMS Data Source**: Reads from CMS-7 (Students Collection)
@@ -92,6 +110,24 @@ Success Elements:
 移除AP学生页面允许管理员从AP项目中移除学生。此页面提供了一个简单的界面，用于选择学生并通过适当的安全措施和确认步骤确认移除操作。
 
 ## 功能流程描述
+
+### 功能0：页面加载和初始学生显示
+**用户操作**：管理员访问移除AP学生功能时页面加载
+**CMS数据源**：
+- CMS-6（管理员集合）用于用户身份验证和schoolID获取
+- CMS-7（学生集合）根据schoolID获取学生数据
+**显示结果**：
+- 验证当前用户身份并从CMS-6获取其schoolID
+- 从CMS-7加载与用户schoolID关联的所有学生
+- 在 `studentList`（Repeater容器）中显示学生，包含：
+  - 数据属性中的学生ID
+  - `.student-name` 中的学生姓名
+  - `.ap-plan` 中的学生AP计划信息
+  - `.student-status` 中的状态标签（ACTIVE/PAUSED）
+  - `.remove-btn` 中的移除按钮
+- 数据检索期间显示加载状态
+- 如果数据加载失败则处理错误状态
+- 如果未找到学生则提供备用数据
 
 ### 功能1：学生选择和显示
 **用户操作**：打开移除AP学生模态框

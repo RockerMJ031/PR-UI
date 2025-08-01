@@ -510,6 +510,7 @@ This document details the database collection configuration required for the tut
   
   // AP student specific fields
   curriculum: "text", // Course category: "Core Subjects", "Core Subjects + PSHE Careers + PE and Art", "All Subjects + Therapy", "Purple Ruler Blueprint"
+  apPlan: "text", // AP Plan information for student - REQUIRED TO ADD TO WIX CMS
   apCourses: ["text"], // AP course list
   apExamDates: [{
     subject: "text", // AP subject
