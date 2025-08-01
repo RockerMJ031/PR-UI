@@ -295,7 +295,7 @@ class CourseExtensionManager {
         }
         
         const formData = this.collectFormData();
-        this.submitExtensionRequest(formData);
+        this.showConfirmationLightbox(formData);
     }
 
     validateForm() {
@@ -380,6 +380,97 @@ class CourseExtensionManager {
         }, 1500);
     }
 
+    showConfirmationLightbox(formData) {
+        // Create confirmation lightbox overlay
+        const overlay = document.createElement('div');
+        overlay.id = 'confirmationLightbox';
+        overlay.className = 'confirmation-overlay';
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        `;
+        
+        // Create confirmation modal
+        const modal = document.createElement('div');
+        modal.className = 'confirmation-modal';
+        modal.style.cssText = `
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        `;
+        
+        // Create title element
+        const title = document.createElement('h3');
+        title.id = 'confirmationTitle';
+        title.style.cssText = 'margin: 0 0 15px 0; color: #333;';
+        title.textContent = 'Extension Request Submitted';
+        
+        // Create message element
+        const message = document.createElement('p');
+        message.id = 'confirmationMessage';
+        message.style.cssText = 'margin: 0 0 20px 0; color: #666; line-height: 1.5;';
+        message.textContent = 'Thank you for your submission. A ticket has been generated and you will receive email updates on the progress.';
+        
+        // Create OK button
+        const okButton = document.createElement('button');
+        okButton.id = 'confirmationOkBtn';
+        okButton.style.cssText = `
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        `;
+        okButton.textContent = 'OK';
+        
+        // Assemble modal content
+        modal.appendChild(title);
+        modal.appendChild(message);
+        modal.appendChild(okButton);
+        
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+        
+        // Add event listener for OK button
+        okButton.addEventListener('click', () => {
+            document.body.removeChild(overlay);
+            // Close the extension modal and return to main course list view
+            const extensionModal = document.getElementById('courseExtensionLightbox');
+            if (extensionModal) {
+                extensionModal.style.display = 'none';
+            }
+            // In a real application, this would navigate back to the course list
+            console.log('Extension request submitted successfully');
+        });
+        
+        // Close on overlay click
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                document.body.removeChild(overlay);
+                // Close the extension modal and return to main course list view
+                const extensionModal = document.getElementById('courseExtensionLightbox');
+                if (extensionModal) {
+                    extensionModal.style.display = 'none';
+                }
+            }
+        });
+    }
+    
     showSuccessMessage() {
         // Create success alert
         const alert = document.createElement('div');

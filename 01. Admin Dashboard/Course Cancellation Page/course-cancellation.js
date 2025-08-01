@@ -1,6 +1,9 @@
+// Course Cancellation Page JavaScript
+// Handles course cancellation form functionality and data management
+
 class CourseCancellationManager {
     constructor() {
-        this.courseData = null;
+        this.selectedCourse = null;
         this.studentsData = [];
         this.init();
     }
@@ -9,66 +12,39 @@ class CourseCancellationManager {
         this.loadCourseData();
         this.setupEventListeners();
         this.setupFormValidation();
-        this.calculateImpact();
+        this.setupDateConstraints();
     }
 
     loadCourseData() {
-        // Try to get course data from sessionStorage (passed from course management page)
-        const storedCourseData = sessionStorage.getItem('selectedCourse');
+        // Try to get course data from sessionStorage (from course management page)
+        const storedCourse = sessionStorage.getItem('selectedCourse');
         
-        if (storedCourseData) {
-            this.courseData = JSON.parse(storedCourseData);
+        if (storedCourse) {
+            this.selectedCourse = JSON.parse(storedCourse);
         } else {
-            // Fallback sample data for testing
-            this.courseData = {
-                id: 'COURSE001',
-                title: 'Advanced Mathematics A-Level',
-                instructor: 'Dr. Sarah Johnson',
-                startDate: '2024-01-15',
-                endDate: '2024-06-30',
+            // Fallback sample data if no course selected
+            this.selectedCourse = {
+                id: 'AS-APY-Y9-EL-BIOLOGY',
+                subject: 'Biology',
+                name: 'Advanced Biology A-Level',
                 status: 'Active',
-                enrolledStudents: 15,
-                totalLessons: 40,
-                completedLessons: 12,
-                pricePerStudent: 1200,
-                totalRevenue: 18000,
-                schedule: 'Mon, Wed, Fri 10:00-11:30'
+                studentCount: 3,
+                totalLessons: 24,
+                startDate: '2024-01-15',
+                endDate: '2024-06-15',
+                students: [
+                    { name: 'Oliver Thompson', lessons: 8 },
+                    { name: 'Emma Wilson', lessons: 8 },
+                    { name: 'James Brown', lessons: 8 }
+                ]
             };
         }
 
-        // Generate sample students data
-        this.generateStudentsData();
         this.displayCourseInfo();
+        this.displayStudents();
     }
 
-    generateStudentsData() {
-        const sampleNames = [
-            'Emma Thompson', 'James Wilson', 'Sophie Chen', 'Michael Brown',
-            'Olivia Davis', 'William Garcia', 'Ava Martinez', 'Alexander Lee',
-            'Isabella Rodriguez', 'Benjamin Taylor', 'Mia Anderson', 'Lucas White',
-            'Charlotte Harris', 'Henry Clark', 'Amelia Lewis'
-        ];
 
-        this.studentsData = sampleNames.slice(0, this.courseData.enrolledStudents).map((name, index) => {
-            const lessonsAttended = Math.floor(Math.random() * (this.courseData.completedLessons + 1));
-            const paidAmount = this.courseData.pricePerStudent;
-            const refundPercentage = this.calculateRefundPercentage(lessonsAttended);
-            
-            return {
-                id: `STU${String(index + 1).padStart(3, '0')}`,
-                name: name,
-                email: `${name.toLowerCase().replace(' ', '.')}@email.com`,
-                phone: `+44 ${Math.floor(Math.random() * 9000000000) + 1000000000}`,
-                enrollmentDate: this.getRandomDate(this.courseData.startDate, new Date().toISOString().split('T')[0]),
-                lessonsAttended: lessonsAttended,
-                paidAmount: paidAmount,
-                refundPercentage: refundPercentage,
-                refundAmount: Math.round(paidAmount * (refundPercentage / 100)),
-                status: lessonsAttended > 0 ? 'Active' : 'Enrolled',
-                parentContact: Math.random() > 0.3 ? `parent.${name.toLowerCase().replace(' ', '.')}@email.com` : null
-            };
-        });
-    }
 
     calculateRefundPercentage(lessonsAttended) {
         const totalLessons = this.courseData.totalLessons;
@@ -89,49 +65,25 @@ class CourseCancellationManager {
     }
 
     displayCourseInfo() {
-        const courseTitle = document.getElementById('courseTitle');
-        const courseDetails = document.getElementById('courseDetails');
+        const extensionCourseTitle = document.getElementById('extensionCourseTitle');
+        const extensionCourseSubject = document.getElementById('extensionCourseSubject');
 
-        courseTitle.textContent = this.courseData.title;
+        if (extensionCourseTitle) {
+            extensionCourseTitle.textContent = `${this.selectedCourse.id} - ${this.selectedCourse.name}`;
+        }
+        
+        if (extensionCourseSubject) {
+            extensionCourseSubject.textContent = this.selectedCourse.subject;
+        }
+    }
 
-        courseDetails.innerHTML = `
-            <div class="detail-item">
-                <div class="detail-label">Course ID</div>
-                <div class="detail-value">${this.courseData.id}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">Instructor</div>
-                <div class="detail-value">${this.courseData.instructor}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">Start Date</div>
-                <div class="detail-value">${this.formatDate(this.courseData.startDate)}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">End Date</div>
-                <div class="detail-value">${this.formatDate(this.courseData.endDate)}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">Status</div>
-                <div class="detail-value">
-                    <span class="status-badge status-${this.courseData.status.toLowerCase()}">
-                        ${this.courseData.status}
-                    </span>
-                </div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">Enrolled Students</div>
-                <div class="detail-value">${this.courseData.enrolledStudents}</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">Progress</div>
-                <div class="detail-value">${this.courseData.completedLessons}/${this.courseData.totalLessons} lessons</div>
-            </div>
-            <div class="detail-item">
-                <div class="detail-label">Total Revenue</div>
-                <div class="detail-value">£${this.courseData.totalRevenue.toLocaleString()}</div>
-            </div>
-        `;
+    displayStudents() {
+        const studentsDisplay = document.getElementById('students-text-display');
+        
+        if (studentsDisplay) {
+            const studentNames = this.selectedCourse.students.map(student => student.name).join(', ');
+            studentsDisplay.textContent = studentNames;
+        }
     }
 
     calculateImpact() {
@@ -183,46 +135,64 @@ class CourseCancellationManager {
     }
 
     setupEventListeners() {
-        // Form submission
-        const form = document.getElementById('cancellationForm');
-        form.addEventListener('submit', (e) => this.handleFormSubmit(e));
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        
+        if (searchInput) {
+            searchInput.addEventListener('input', () => this.handleSearch());
+        }
+        
+        if (searchBtn) {
+            searchBtn.addEventListener('click', () => this.handleSearch());
+        }
 
-        // Refund policy change
-        const refundPolicy = document.getElementById('refundPolicy');
-        refundPolicy.addEventListener('change', () => this.updateRefundCalculations());
-
-        // Confirmation checkbox
-        const confirmCheckbox = document.getElementById('confirmCancellation');
-        const submitButton = document.getElementById('submitButton');
-        confirmCheckbox.addEventListener('change', () => {
-            submitButton.disabled = !confirmCheckbox.checked;
+        // Cancel button for course selection
+        const cancelBtns = document.querySelectorAll('[id="cancelBtn"]');
+        cancelBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => this.handleCourseSelection(e));
         });
 
-        // Date validation
-        const cancellationDate = document.getElementById('cancellationDate');
-        const lastClassDate = document.getElementById('lastClassDate');
-        
-        cancellationDate.addEventListener('change', () => this.validateDates());
-        lastClassDate.addEventListener('change', () => this.validateDates());
+        // Form submission
+        const submitCancellationBtn = document.getElementById('submitCancellationBtn');
+        if (submitCancellationBtn) {
+            submitCancellationBtn.addEventListener('click', (e) => this.handleFormSubmission(e));
+        }
 
-        // Set minimum dates
-        const today = new Date().toISOString().split('T')[0];
-        cancellationDate.min = today;
-        lastClassDate.min = today;
+        // Close button
+        const closeBtn = document.getElementById('closeBtn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => this.handleModalClose());
+        }
 
-        // Character count for detailed reason
-        const detailedReason = document.getElementById('detailedReason');
-        detailedReason.addEventListener('input', () => this.updateCharacterCount());
+        // Clear selection button
+        const clearSelectionBtn = document.getElementById('clearSelectionBtn');
+        if (clearSelectionBtn) {
+            clearSelectionBtn.addEventListener('click', () => this.clearSelection());
+        }
     }
 
     setupFormValidation() {
-        const form = document.getElementById('cancellationForm');
-        const inputs = form.querySelectorAll('input[required], select[required], textarea[required]');
+        const cancellationStartDate = document.getElementById('cancellationStartDate');
+        const reasonForCancellation = document.getElementById('reasonForCancellation');
         
-        inputs.forEach(input => {
-            input.addEventListener('blur', () => this.validateField(input));
-            input.addEventListener('input', () => this.clearFieldError(input));
-        });
+        if (cancellationStartDate) {
+            cancellationStartDate.addEventListener('blur', () => this.validateField(cancellationStartDate));
+            cancellationStartDate.addEventListener('input', () => this.clearFieldError(cancellationStartDate));
+        }
+        
+        if (reasonForCancellation) {
+            reasonForCancellation.addEventListener('blur', () => this.validateField(reasonForCancellation));
+            reasonForCancellation.addEventListener('input', () => this.clearFieldError(reasonForCancellation));
+        }
+    }
+
+    setupDateConstraints() {
+        const cancellationStartDate = document.getElementById('cancellationStartDate');
+        if (cancellationStartDate) {
+            const today = new Date().toISOString().split('T')[0];
+            cancellationStartDate.min = today;
+        }
     }
 
     validateField(field) {
@@ -301,154 +271,288 @@ class CourseCancellationManager {
         field.parentNode.appendChild(errorDiv);
     }
 
-    updateCharacterCount() {
-        const detailedReason = document.getElementById('detailedReason');
-        const helpText = detailedReason.parentNode.querySelector('.help-text');
-        const currentLength = detailedReason.value.length;
-        const minLength = 100;
+
+
+
+
+    handleSearch() {
+        const searchInput = document.getElementById('searchInput');
+        const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
         
-        if (currentLength < minLength) {
-            helpText.textContent = `Minimum 100 characters required. Current: ${currentLength}/100`;
-            helpText.style.color = 'var(--danger-color)';
-        } else {
-            helpText.textContent = `Character count: ${currentLength}`;
-            helpText.style.color = 'var(--text-muted)';
-        }
+        // Filter and display courses based on search term
+        // This would typically fetch from CMS-3 (Import86 - Course Information Management Collection)
+        console.log('Searching for courses:', searchTerm);
+        this.displayCourseRepeater(searchTerm);
     }
 
-    updateRefundCalculations() {
-        const refundPolicy = document.getElementById('refundPolicy').value;
-        const totalRefundAmount = document.getElementById('totalRefundAmount');
-        
-        let totalRefunds = 0;
-        
-        this.studentsData.forEach(student => {
-            switch (refundPolicy) {
-                case 'full-refund':
-                    student.refundAmount = student.paidAmount;
-                    student.refundPercentage = 100;
-                    break;
-                case 'partial-refund':
-                    // Keep original calculation based on lessons attended
-                    break;
-                case 'credit-only':
-                case 'no-refund':
-                    student.refundAmount = 0;
-                    student.refundPercentage = 0;
-                    break;
+    displayCourseRepeater(searchTerm = '') {
+        const courseRepeater = document.getElementById('courseRepeater');
+        if (!courseRepeater) return;
+
+        // Sample course data - would come from CMS in real implementation
+        const sampleCourses = [
+            {
+                id: 'AS-APY-Y9-EL-BIOLOGY',
+                name: 'Advanced Biology',
+                subject: 'Biology',
+                studentCount: 3,
+                students: ['Oliver Thompson', 'Emma Wilson', 'James Brown']
+            },
+            {
+                id: 'AS-APY-Y10-EL-CHEMISTRY',
+                name: 'Advanced Chemistry',
+                subject: 'Chemistry',
+                studentCount: 5,
+                students: ['Alice Johnson', 'Bob Smith', 'Carol Davis', 'David Lee', 'Eva Martinez']
             }
-            totalRefunds += student.refundAmount;
-        });
-        
-        totalRefundAmount.value = `£${totalRefunds.toLocaleString()}`;
-        
-        // Update display
-        this.calculateImpact();
+        ];
+
+        const filteredCourses = sampleCourses.filter(course => 
+            course.name.toLowerCase().includes(searchTerm) ||
+            course.subject.toLowerCase().includes(searchTerm) ||
+            course.id.toLowerCase().includes(searchTerm)
+        );
+
+        courseRepeater.innerHTML = filteredCourses.map(course => `
+            <div class="courseContainer" data-course-id="${course.id}">
+                <div id="courseId">${course.id}</div>
+                <div id="courseName">${course.name}</div>
+                <div id="courseSubject">${course.subject}</div>
+                <div><span id="studentCountNumber">${course.studentCount}</span> <span id="studentCountText">students</span></div>
+                <div id="studentNames">${course.students.join(', ')}</div>
+                <button id="cancelBtn" class="btn btn-danger">Cancel</button>
+            </div>
+        `).join('');
+
+        // Re-attach event listeners for new cancel buttons
+        this.setupEventListeners();
     }
 
-    handleFormSubmit(e) {
+    handleCourseSelection(e) {
+        const courseContainer = e.target.closest('.courseContainer');
+        const courseId = courseContainer.dataset.courseId;
+        
+        // Find the selected course data
+        // This would typically fetch detailed data from CMS-3, CMS-2, and CMS-7
+        this.selectedCourse = {
+            id: courseId,
+            name: courseContainer.querySelector('#courseName').textContent,
+            subject: courseContainer.querySelector('#courseSubject').textContent,
+            studentCount: parseInt(courseContainer.querySelector('#studentCountNumber').textContent),
+            students: courseContainer.querySelector('#studentNames').textContent.split(', ').map(name => ({ name: name.trim() }))
+        };
+
+        this.showCancellationDetails();
+    }
+
+    showCancellationDetails() {
+        // Hide placeholder and show selected course info
+        const extensionPlaceholder = document.getElementById('extensionPlaceholder');
+        const selectedExtensionCourseInfo = document.getElementById('selectedExtensionCourseInfo');
+        
+        if (extensionPlaceholder) {
+            extensionPlaceholder.style.display = 'none';
+        }
+        
+        if (selectedExtensionCourseInfo) {
+            selectedExtensionCourseInfo.style.display = 'block';
+        }
+
+        this.displayCourseInfo();
+        this.displayStudents();
+    }
+
+    handleFormSubmission(e) {
         e.preventDefault();
         
-        // Validate all required fields
-        const form = e.target;
-        const requiredFields = form.querySelectorAll('input[required], select[required], textarea[required]');
-        let isFormValid = true;
-        
-        requiredFields.forEach(field => {
-            if (!this.validateField(field)) {
-                isFormValid = false;
-            }
-        });
-        
-        if (!isFormValid) {
-            alert('Please correct the errors in the form before submitting.');
+        if (!this.validateForm()) {
             return;
         }
         
-        // Show confirmation dialog
-        const confirmSubmit = confirm(
-            `Are you absolutely sure you want to cancel this course?\n\n` +
-            `Course: ${this.courseData.title}\n` +
-            `Students affected: ${this.studentsData.length}\n` +
-            `Total refunds: £${this.studentsData.reduce((sum, s) => sum + s.refundAmount, 0).toLocaleString()}\n\n` +
-            `This action cannot be undone.`
-        );
+        const formData = this.collectFormData();
+        this.submitCancellationRequest(formData);
+    }
+
+    validateForm() {
+        const cancellationStartDate = document.getElementById('cancellationStartDate');
+        const reasonForCancellation = document.getElementById('reasonForCancellation');
         
-        if (confirmSubmit) {
-            this.submitCancellation(form);
+        let isValid = true;
+        
+        if (!this.validateField(cancellationStartDate)) {
+            isValid = false;
+        }
+        
+        if (!this.validateField(reasonForCancellation)) {
+            isValid = false;
+        }
+        
+        return isValid;
+    }
+
+    collectFormData() {
+        const cancellationStartDate = document.getElementById('cancellationStartDate');
+        const reasonForCancellation = document.getElementById('reasonForCancellation');
+        
+        return {
+            courseId: this.selectedCourse.id,
+            courseName: this.selectedCourse.name,
+            courseSubject: this.selectedCourse.subject,
+            cancellationStartDate: cancellationStartDate ? cancellationStartDate.value : '',
+            reasonForCancellation: reasonForCancellation ? reasonForCancellation.value : '',
+            affectedStudents: this.selectedCourse.students,
+            studentCount: this.selectedCourse.studentCount,
+            submittedAt: new Date().toISOString(),
+            submittedBy: 'Admin User'
+        };
+    }
+
+    submitCancellationRequest(formData) {
+        // Show loading state
+        const submitBtn = document.getElementById('submitCancellationBtn');
+        if (submitBtn) {
+            submitBtn.textContent = 'Processing...';
+            submitBtn.disabled = true;
+        }
+
+        // Simulate API call to submit cancellation request
+        setTimeout(() => {
+            console.log('Cancellation request submitted:', formData);
+            
+            // Store submission data for reference
+            sessionStorage.setItem('cancellationSubmission', JSON.stringify(formData));
+            
+            // Show confirmation lightbox
+            this.showConfirmationLightbox();
+            
+            // Reset button state
+            if (submitBtn) {
+                submitBtn.textContent = 'Submit Cancellation';
+                submitBtn.disabled = false;
+            }
+        }, 1500);
+    }
+
+    showConfirmationLightbox() {
+        // Create confirmation lightbox elements if they don't exist
+        let confirmationLightbox = document.getElementById('confirmationLightbox');
+        
+        if (!confirmationLightbox) {
+            confirmationLightbox = document.createElement('div');
+            confirmationLightbox.id = 'confirmationLightbox';
+            confirmationLightbox.className = 'lightbox-overlay';
+            
+            confirmationLightbox.innerHTML = `
+                <div class="lightbox-content">
+                    <h3 id="confirmationTitle">Cancellation Request Submitted</h3>
+                    <p id="confirmationMessage">
+                        Thank you for your submission. A ticket has been generated and you will be updated on the progress via email.
+                    </p>
+                    <button id="confirmationOkBtn" class="btn btn-primary">OK</button>
+                </div>
+            `;
+            
+            document.body.appendChild(confirmationLightbox);
+            
+            // Add event listener for OK button
+            const okBtn = confirmationLightbox.querySelector('#confirmationOkBtn');
+            okBtn.addEventListener('click', () => this.closeConfirmationLightbox());
+        }
+        
+        confirmationLightbox.style.display = 'flex';
+    }
+
+    closeConfirmationLightbox() {
+        const confirmationLightbox = document.getElementById('confirmationLightbox');
+        if (confirmationLightbox) {
+            confirmationLightbox.style.display = 'none';
+        }
+        
+        // Return to main course list view
+        this.returnToMainView();
+    }
+
+    returnToMainView() {
+        // Clear current selection
+        this.selectedCourse = null;
+        
+        // Hide course details and show placeholder
+        const extensionPlaceholder = document.getElementById('extensionPlaceholder');
+        const selectedExtensionCourseInfo = document.getElementById('selectedExtensionCourseInfo');
+        
+        if (extensionPlaceholder) {
+            extensionPlaceholder.style.display = 'block';
+        }
+        
+        if (selectedExtensionCourseInfo) {
+            selectedExtensionCourseInfo.style.display = 'none';
+        }
+        
+        // Clear form fields
+        this.resetForm();
+        
+        // Clear search and refresh course list
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.value = '';
+        }
+        
+        this.displayCourseRepeater();
+    }
+
+
+
+    clearSelection() {
+        this.returnToMainView();
+    }
+
+    handleModalClose() {
+        // Handle any modal close functionality
+        console.log('Modal close requested');
+    }
+
+    // Utility methods for date formatting and validation
+    formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+    }
+
+    isValidDate(dateString) {
+        const date = new Date(dateString);
+        return date instanceof Date && !isNaN(date);
+    }
+
+    // Initialize the course cancellation manager when page loads
+    initializePage() {
+        // Set up initial state
+        this.displayCourseRepeater();
+        
+        // Show placeholder initially
+        const extensionPlaceholder = document.getElementById('extensionPlaceholder');
+        const selectedExtensionCourseInfo = document.getElementById('selectedExtensionCourseInfo');
+        
+        if (extensionPlaceholder) {
+            extensionPlaceholder.style.display = 'block';
+        }
+        
+        if (selectedExtensionCourseInfo) {
+            selectedExtensionCourseInfo.style.display = 'none';
         }
     }
 
-    submitCancellation(form) {
-        const submitButton = document.getElementById('submitButton');
-        const originalText = submitButton.innerHTML;
-        
-        // Show loading state
-        submitButton.innerHTML = '⏳ Processing...';
-        submitButton.disabled = true;
-        
-        // Collect form data
-        const formData = new FormData(form);
-        const cancellationData = {
-            courseId: this.courseData.id,
-            courseTitle: this.courseData.title,
-            cancellationReason: document.getElementById('cancellationReason').value,
-            detailedReason: document.getElementById('detailedReason').value,
-            cancellationDate: document.getElementById('cancellationDate').value,
-            lastClassDate: document.getElementById('lastClassDate').value,
-            refundPolicy: document.getElementById('refundPolicy').value,
-            refundMethod: document.getElementById('refundMethod').value,
-            totalRefundAmount: document.getElementById('totalRefundAmount').value,
-            alternativeCourse: document.getElementById('alternativeCourse').value,
-            transferOption: document.getElementById('transferOption').value,
-            customMessage: document.getElementById('customMessage').value,
-            internalNotes: document.getElementById('internalNotes').value,
-            approvedBy: document.getElementById('approvedBy').value,
-            approvalDate: document.getElementById('approvalDate').value,
-            notifyStudents: document.getElementById('notifyStudents').checked,
-            notifyInstructors: document.getElementById('notifyInstructors').checked,
-            notifyParents: document.getElementById('notifyParents').checked,
-            affectedStudents: this.studentsData,
-            submittedAt: new Date().toISOString(),
-            submittedBy: 'Admin User' // This would come from authentication
-        };
-        
-        // Simulate API call
-        setTimeout(() => {
-            console.log('Course cancellation submitted:', cancellationData);
-            
-            // Show success message
-            alert(
-                `Course cancellation has been processed successfully!\n\n` +
-                `Course "${this.courseData.title}" has been cancelled.\n` +
-                `${this.studentsData.length} students will be notified.\n` +
-                `Refund processing will begin within 24 hours.`
-            );
-            
-            // Clear session storage
-            sessionStorage.removeItem('selectedCourse');
-            
-            // Redirect back to course management
-            window.location.href = '../Course Management Page/course-management.html';
-        }, 2000);
-    }
-
-    formatDate(dateString) {
-        const options = { 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-        };
-        return new Date(dateString).toLocaleDateString('en-GB', options);
-    }
 }
 
 // Initialize the course cancellation manager when the page loads
-document.addEventListener('DOMContentLoaded', () => {
-    new CourseCancellationManager();
+document.addEventListener('DOMContentLoaded', function() {
+    const manager = new CourseCancellationManager();
+    manager.initializePage();
 });
 
-// Add CSS for error styling
+// Add CSS for error styling and lightbox
 const style = document.createElement('style');
 style.textContent = `
     .form-input.error,
@@ -462,6 +566,38 @@ style.textContent = `
         color: var(--danger-color);
         font-size: 12px;
         margin-top: 4px;
+    }
+    
+    .lightbox-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+    
+    .lightbox-content {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        max-width: 400px;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .lightbox-content h3 {
+        margin-bottom: 1rem;
+        color: var(--primary-color);
+    }
+    
+    .lightbox-content p {
+        margin-bottom: 1.5rem;
+        color: var(--text-color);
     }
 `;
 document.head.appendChild(style);

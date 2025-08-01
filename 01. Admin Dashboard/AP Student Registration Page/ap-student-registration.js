@@ -2,6 +2,7 @@ class APStudentRegistrationManager {
     constructor() {
         this.formData = {};
         this.uploadedFiles = [];
+        this.wixFileData = null; // For Wix form file upload
         this.validationRules = {
             studentFirstName: { required: true, minLength: 2 },
             studentLastName: { required: true, minLength: 2 },
@@ -52,33 +53,111 @@ class APStudentRegistrationManager {
     }
 
     setupFileUpload() {
+        // Setup Wix form file upload element
+        const ehcpFileElement = document.getElementById('ehcpFile');
+        const fileRemoveBtn = document.getElementById('file-remove');
+        
+        if (ehcpFileElement) {
+            // Wix form file upload event listeners
+            ehcpFileElement.addEventListener('change', (e) => {
+                this.handleWixFileUpload(e);
+            });
+        }
+        
+        if (fileRemoveBtn) {
+            fileRemoveBtn.addEventListener('click', () => {
+                this.removeWixFile();
+            });
+        }
+        
+        // Setup traditional file upload as fallback
         const fileUpload = document.getElementById('fileUpload');
         const fileInput = document.getElementById('documentUpload');
-        const uploadedFilesContainer = document.getElementById('uploadedFiles');
+        
+        if (fileUpload && fileInput) {
+            // Click to upload
+            fileUpload.addEventListener('click', () => fileInput.click());
 
-        // Click to upload
-        fileUpload.addEventListener('click', () => fileInput.click());
+            // File input change
+            fileInput.addEventListener('change', (e) => {
+                this.handleFileUpload(e.target.files);
+            });
 
-        // File input change
-        fileInput.addEventListener('change', (e) => {
-            this.handleFileUpload(e.target.files);
-        });
+            // Drag and drop
+            fileUpload.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                fileUpload.classList.add('dragover');
+            });
 
-        // Drag and drop
-        fileUpload.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            fileUpload.classList.add('dragover');
-        });
+            fileUpload.addEventListener('dragleave', () => {
+                fileUpload.classList.remove('dragover');
+            });
 
-        fileUpload.addEventListener('dragleave', () => {
-            fileUpload.classList.remove('dragover');
-        });
+            fileUpload.addEventListener('drop', (e) => {
+                e.preventDefault();
+                fileUpload.classList.remove('dragover');
+                this.handleFileUpload(e.dataTransfer.files);
+            });
+        }
+    }
 
-        fileUpload.addEventListener('drop', (e) => {
-            e.preventDefault();
-            fileUpload.classList.remove('dragover');
-            this.handleFileUpload(e.dataTransfer.files);
-        });
+    handleWixFileUpload(event) {
+        // Handle Wix form file upload
+        const files = event.target.files;
+        if (!files || files.length === 0) return;
+        
+        const file = files[0]; // Wix form typically handles single file
+        const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+        const maxFileSize = 10 * 1024 * 1024; // 10MB
+        
+        // Validate file type
+        if (!allowedTypes.includes(file.type)) {
+            this.showNotification('Only PDF, DOC, and DOCX files are allowed for EHCP documents', 'error');
+            event.target.value = ''; // Clear the input
+            return;
+        }
+        
+        // Validate file size
+        if (file.size > maxFileSize) {
+            this.showNotification('File size must be less than 10MB', 'error');
+            event.target.value = ''; // Clear the input
+            return;
+        }
+        
+        // Store Wix media information
+        this.wixFileData = {
+            file: file,
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            uploadDate: new Date(),
+            wixMediaUrl: null // Will be populated by Wix
+        };
+        
+        this.showNotification(`EHCP document "${file.name}" uploaded successfully`, 'success');
+        
+        // Show file remove button
+        const removeBtn = document.getElementById('file-remove');
+        if (removeBtn) {
+            removeBtn.style.display = 'inline-block';
+        }
+    }
+    
+    removeWixFile() {
+        const ehcpFileElement = document.getElementById('ehcpFile');
+        if (ehcpFileElement) {
+            ehcpFileElement.value = '';
+        }
+        
+        this.wixFileData = null;
+        
+        // Hide file remove button
+        const removeBtn = document.getElementById('file-remove');
+        if (removeBtn) {
+            removeBtn.style.display = 'none';
+        }
+        
+        this.showNotification('EHCP document removed', 'info');
     }
 
     handleFileUpload(files) {
@@ -120,7 +199,10 @@ class APStudentRegistrationManager {
         });
 
         // Clear the input
-        document.getElementById('documentUpload').value = '';
+        const docUpload = document.getElementById('documentUpload');
+        if (docUpload) {
+            docUpload.value = '';
+        }
     }
 
     displayUploadedFile(fileData) {
@@ -310,9 +392,9 @@ class APStudentRegistrationManager {
             isValid = false;
         }
 
-        // Validate file uploads
-        if (this.uploadedFiles.length === 0) {
-            this.showNotification('Please upload at least one required document', 'error');
+        // Validate EHCP file upload (Wix form)
+        if (!this.wixFileData) {
+            this.showNotification('Please upload the required EHCP document', 'error');
             isValid = false;
         }
 
@@ -330,8 +412,14 @@ class APStudentRegistrationManager {
             classStartDate: formData.get('classStartDate'),
             
             // EHCP Documentation
-            ehcpStatus: formData.getAll('ehcpStatus'),
-            ehcpFile: formData.get('ehcpFile'),
+            ehcpStatus: formData.get('ehcpStatus'),
+            ehcpFile: this.wixFileData ? {
+                name: this.wixFileData.name,
+                size: this.wixFileData.size,
+                type: this.wixFileData.type,
+                uploadDate: this.wixFileData.uploadDate,
+                wixMediaUrl: this.wixFileData.wixMediaUrl
+            } : null,
             ehcpDetails: formData.get('ehcpDetails'),
             
             // Caseworker Information
@@ -358,7 +446,7 @@ class APStudentRegistrationManager {
             homeLessonsWithoutSupervision: formData.get('homeLessonsWithoutSupervision'),
             supportLongerThanFourWeeks: formData.get('supportLongerThanFourWeeks'),
             
-            // Files
+            // Additional Files (fallback)
             uploadedFiles: this.uploadedFiles.map(f => ({
                 name: f.name,
                 size: f.size,
@@ -369,7 +457,8 @@ class APStudentRegistrationManager {
             // Metadata
             studentId: this.generateStudentId(),
             submissionDate: new Date().toISOString(),
-            status: 'pending'
+            status: 'pending',
+            registrationType: 'AP_STUDENT'
         };
         
         return data;
@@ -423,20 +512,88 @@ class APStudentRegistrationManager {
     }
 
     async simulateSubmission(data) {
-        // Simulate network delay
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // Simulate random failure (10% chance)
-        if (Math.random() < 0.1) {
-            throw new Error('Network error');
+        try {
+            // Step 1: Store in CMS-7 (Students Collection)
+            await this.storeToCMS(data);
+            
+            // Step 2: Store file references in CMS-5 (DataSyncLogs)
+            if (data.ehcpFile) {
+                await this.storeFileReference(data);
+            }
+            
+            // Step 3: Send to Lark Anycross
+            await this.sendToLarkAnycross(data);
+            
+            // Store in localStorage for demo purposes
+            const submissions = JSON.parse(localStorage.getItem('apRegistrations') || '[]');
+            submissions.push(data);
+            localStorage.setItem('apRegistrations', JSON.stringify(submissions));
+            
+            return data;
+            
+        } catch (error) {
+            console.error('Submission error:', error);
+            throw new Error('Failed to submit registration: ' + error.message);
         }
+    }
+    
+    async storeToCMS(data) {
+        // Simulate CMS-7 (Students Collection) storage
+        console.log('Storing to CMS-7 (Students Collection):', data);
         
-        // Store in localStorage for demo purposes
-        const submissions = JSON.parse(localStorage.getItem('apRegistrations') || '[]');
-        submissions.push(data);
-        localStorage.setItem('apRegistrations', JSON.stringify(submissions));
+        // In real implementation, this would be a Wix Data API call
+        // await wixData.insert('Students', data);
         
-        return data;
+        await new Promise(resolve => setTimeout(resolve, 500));
+    }
+    
+    async storeFileReference(data) {
+        // Simulate CMS-5 (DataSyncLogs) file reference storage
+        const fileReference = {
+            studentId: data.studentId,
+            fileName: data.ehcpFile.name,
+            fileType: data.ehcpFile.type,
+            fileSize: data.ehcpFile.size,
+            wixMediaUrl: data.ehcpFile.wixMediaUrl,
+            uploadDate: data.ehcpFile.uploadDate,
+            documentType: 'EHCP',
+            status: 'active'
+        };
+        
+        console.log('Storing file reference to CMS-5 (DataSyncLogs):', fileReference);
+        
+        // In real implementation, this would be a Wix Data API call
+        // await wixData.insert('DataSyncLogs', fileReference);
+        
+        await new Promise(resolve => setTimeout(resolve, 300));
+    }
+    
+    async sendToLarkAnycross(data) {
+        const larkEndpoint = 'https://open-sg.larksuite.com/anycross/trigger/callback/MGQ0ZmQwNjJmZjAyZGJlNzM0YTRiMTQ1MDcwYTM1YjY1';
+        
+        const payload = {
+            type: 'AP_STUDENT_REGISTRATION',
+            timestamp: new Date().toISOString(),
+            data: data
+        };
+        
+        console.log('Sending to Lark Anycross:', payload);
+        
+        // Simulate HTTP POST to Lark Anycross
+        // In real implementation:
+        // const response = await fetch(larkEndpoint, {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json'
+        //     },
+        //     body: JSON.stringify(payload)
+        // });
+        // 
+        // if (!response.ok) {
+        //     throw new Error('Failed to send to Lark Anycross');
+        // }
+        
+        await new Promise(resolve => setTimeout(resolve, 800));
     }
 
     showSuccessModal(data) {
@@ -504,8 +661,22 @@ class APStudentRegistrationManager {
     resetForm() {
         if (confirm('Are you sure you want to reset the form? All entered data will be lost.')) {
             document.getElementById('apRegistrationForm').reset();
+            
+            // Clear file uploads
             this.uploadedFiles = [];
-            document.getElementById('uploadedFiles').innerHTML = '';
+            this.wixFileData = null;
+            
+            // Clear file upload displays
+            const uploadedFilesContainer = document.getElementById('uploadedFiles');
+            if (uploadedFilesContainer) {
+                uploadedFilesContainer.innerHTML = '';
+            }
+            
+            // Hide file remove button
+            const removeBtn = document.getElementById('file-remove');
+            if (removeBtn) {
+                removeBtn.style.display = 'none';
+            }
             
             // Clear validation states
             document.querySelectorAll('.form-group').forEach(group => {

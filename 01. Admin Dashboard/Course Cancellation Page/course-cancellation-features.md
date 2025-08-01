@@ -1,0 +1,173 @@
+# Course Cancellation Page - Feature Description
+
+## Overview
+The Course Cancellation Page allows administrators to cancel courses that need to be discontinued due to various reasons such as low enrollment, instructor unavailability, or other operational considerations. This page provides a comprehensive interface for searching, selecting, and configuring course cancellations with detailed student information and proper documentation.
+
+## Element Naming Reference
+
+### Search Section
+- `searchInput`: Course search input field
+- `searchBtn`: Search button
+
+### Course Repeater Section
+- `courseRepeater`: Container for course list
+- `courseContainer`: Individual course container
+- `courseId`: Course identification display
+- `courseName`: Course name display
+- `courseSubject`: Course subject display
+- `studentCountNumber`: Student count number (bold)
+- `studentCountText`: Student count text ("students")
+- `studentNames`: Student names text field
+- `cancelBtn`: Cancel course button
+
+### Cancellation Details Panel
+- `extensionDetailsPanel`: Main details panel container
+- `extensionPlaceholder`: Placeholder content container
+- `extensionPlaceholderText`: Placeholder instruction text
+- `extensionPlaceholderIcon`: Placeholder icon element
+- `selectedExtensionCourseInfo`: Selected course information panel
+- `extensionCourseHeader`: Course header section
+- `extensionCourseTitle`: Selected course title
+- `extensionCourseSubject`: Selected course subject
+- `students-text-display`: Student names display area
+
+### Cancellation Form Elements
+- `cancellationStartDate`: Cancellation effective date input
+- `reasonForCancellation`: Cancellation reason text area
+- `closeBtn`: Close modal button
+- `submitCancellationBtn`: Submit cancellation request button
+
+## Feature Flow Description
+
+### Feature 1: Course Search and Display
+**User Action**: Click on `searchInput` field and enter search criteria
+**CMS Data Source**: Reads from CMS-3 (Import86 - Course Information Management Collection)
+**Display Result**: 
+- Filters and displays matching courses in `courseRepeater`
+- Shows `courseId`, `courseName`, `courseSubject` for each course
+- Displays `studentCountNumber` and `studentCountText` showing enrolled student count
+- Lists `studentNames` as comma-separated text for each course
+
+### Feature 2: Course Selection for Cancellation
+**User Action**: Click on `cancelBtn` ("Cancel" button) for a specific course
+**CMS Data Source**: 
+- Reads detailed course information from CMS-3 (Import86)
+- Retrieves student assignment data from CMS-2 (Import74 - Student Course Assignment Collection)
+- Fetches student details from CMS-7 (Students Collection)
+**Display Result**:
+- Hides `extensionPlaceholder` containing `extensionPlaceholderText` and `extensionPlaceholderIcon`
+- Shows `selectedExtensionCourseInfo` panel
+- Displays `extensionCourseTitle` and `extensionCourseSubject` in `extensionCourseHeader`
+- Populates `students-text-display` with detailed student information
+
+### Feature 3: Cancellation Configuration
+**User Action**: Fill in cancellation details in the form
+**CMS Data Source**: No direct CMS read operation
+**Display Result**:
+- `cancellationStartDate`: Date picker for when the cancellation becomes effective
+- `reasonForCancellation`: Text area for detailed cancellation justification and explanation
+
+### Feature 4: Cancellation Submission
+**User Action**: Click on `submitCancellationBtn` (Submit Cancellation Request)
+**CMS Data Source**: 
+- Creates records in CMS-5 (DataSyncLogs) for tracking the cancellation operation with detailed user and course information
+- Sends cancellation request data to Lark Anycross via HTTP POST to: `https://open-sg.larksuite.com/anycross/trigger/callback/MGU2YzhkZjRlMDk5ZmY0ZDY2NDIyMjRmNjdmODY5NjYw`
+**Display Result**:
+- Validates all required fields are completed:
+  - `courseId` (course must be selected)
+  - `cancellationStartDate` (effective date must be selected)
+  - `reasonForCancellation` (detailed reason must be provided)
+- If validation passes, displays a confirmation lightbox with:
+  - Title: "Cancellation Request Submitted"
+  - Message: "Thank you for your submission. A ticket has been generated and you will receive email updates on the progress."
+  - Single action button: "OK"
+- Upon clicking "OK":
+  - Closes the cancellation modal
+  - Returns to the main course list view
+
+### Feature 5: Clear Selection
+**User Action**: Click on `clearSelectionBtn` (if available)
+**CMS Data Source**: No CMS operation
+**Display Result**:
+- Clears `selectedExtensionCourseInfo`
+- Shows `extensionPlaceholder` with `extensionPlaceholderText` and `extensionPlaceholderIcon`
+- Resets all form fields (`cancellationStartDate`, `reasonForCancellation`)
+
+### Feature 6: Modal Management
+**User Action**: Click on `closeBtn` or outside modal area
+**CMS Data Source**: No CMS operation
+**Display Result**:
+- Closes the cancellation modal
+- Returns to main admin dashboard view
+- Preserves any unsaved form data for user convenience
+
+---
+
+# 课程取消页面 - 功能描述
+
+## 概述
+课程取消页面允许管理员取消因各种原因需要停止的课程，如注册人数不足、讲师不可用或其他运营考虑。此页面提供了一个全面的界面，用于搜索、选择和配置课程取消，并显示详细的学生信息和适当的文档记录。
+
+## 功能流程描述
+
+### 功能1：课程搜索和显示
+**用户操作**：点击 `searchInput` 字段并输入搜索条件
+**CMS数据源**：从CMS-3（Import86 - 课程信息管理集合）读取数据
+**显示结果**：
+- 在 `courseRepeater` 中过滤并显示匹配的课程
+- 为每个课程显示 `courseId`、`courseName`、`courseSubject`
+- 显示 `studentCountNumber` 和 `studentCountText` 展示已注册学生数量
+- 将 `studentNames` 以逗号分隔的文本形式列出每个课程的学生
+
+### 功能2：选择课程进行取消
+**用户操作**：点击特定课程的 `cancelBtn`（"Cancel" 按钮）
+**CMS数据源**：
+- 从CMS-3（Import86）读取详细课程信息
+- 从CMS-2（Import74 - 学生课程分配集合）检索学生分配数据
+- 从CMS-7（学生集合）获取学生详细信息
+**显示结果**：
+- 隐藏包含 `extensionPlaceholderText` 和 `extensionPlaceholderIcon` 的 `extensionPlaceholder`
+- 显示 `selectedExtensionCourseInfo` 面板
+- 在 `extensionCourseHeader` 中显示 `extensionCourseTitle` 和 `extensionCourseSubject`
+- 用详细学生信息填充 `students-text-display`
+
+### 功能3：取消配置
+**用户操作**：在表单中填写取消详细信息
+**CMS数据源**：无直接CMS读取操作
+**显示结果**：
+- `cancellationStartDate`：取消生效日期的日期选择器
+- `reasonForCancellation`：详细取消理由和说明的文本区域
+
+### 功能4：提交取消申请
+**用户操作**：点击 `submitCancellationBtn`（Submit Cancellation Request）
+**CMS数据源**：
+- 在CMS-5（DataSyncLogs）中创建记录以跟踪取消操作，包含详细的用户和课程信息
+- 通过HTTP POST将取消申请数据发送到Lark Anycross：`https://open-sg.larksuite.com/anycross/trigger/callback/MGU2YzhkZjRlMDk5ZmY0ZDY2NDIyMjRmNjdmODY5NjYw`
+**显示结果**：
+- 验证所有必填字段是否已完成：
+  - `courseId`（必须选择课程）
+  - `cancellationStartDate`（必须选择生效日期）
+  - `reasonForCancellation`（必须提供详细原因）
+- 如果验证通过，显示确认lightbox包含：
+  - 标题："取消申请已提交"
+  - 消息："感谢您的提交。我们已为您生成工单，将通过邮件持续更新进展。"
+  - 单个操作按钮："确定"
+- 点击"确定"后：
+  - 关闭取消模态框
+  - 返回主课程列表视图
+
+### 功能5：清除选择
+**用户操作**：点击 `clearSelectionBtn`（如果可用）
+**CMS数据源**：无CMS操作
+**显示结果**：
+- 清除 `selectedExtensionCourseInfo`
+- 显示带有 `extensionPlaceholderText` 和 `extensionPlaceholderIcon` 的 `extensionPlaceholder`
+- 重置所有表单字段（`cancellationStartDate`、`reasonForCancellation`）
+
+### 功能6：模态框管理
+**用户操作**：点击 `closeBtn` 或模态框外部区域
+**CMS数据源**：无CMS操作
+**显示结果**：
+- 关闭取消模态框
+- 返回主管理员仪表板视图
+- 为用户便利保留任何未保存的表单数据

@@ -1,174 +1,36 @@
 # Remove AP Student Page - Element References
 
-## Form Element IDs
+## UI Screenshot-Based Element Analysis
 
-### Student Search Section
-- `studentSearch`
-- `searchBtn`
-- `studentId`
-- `studentEmail`
-- `searchResults`
+### Modal Structure
+- Modal title: "Remove AP Student"
+- Close button: "×" button in the top right corner
 
-### Student Information Display
-- `studentInfo`
-- `studentName`
-- `studentFullName`
-- `studentDateOfBirth`
-- `studentEmailDisplay`
-- `studentPhone`
-- `enrollmentDate`
-- `studentStatus`
-- `currentCourses`
-- `completedCourses`
+### Main Content Area
+- Title text: "Select a student to remove:"
+- Description text: "Click on any student below to remove them from the AP program. This action cannot be undone."
 
-### Guardian Information Display
-- `guardianInfo`
-- `guardianName`
-- `guardianEmail`
-- `guardianPhone`
-- `emergencyContact`
+### Student List Elements
+Each student entry contains:
+- Student name (e.g., Oliver Thompson, Emily Johnson, Harry Williams, Sophie Brown, Jack Davies)
+- Student information (grade and course info, e.g., Year 9 | Core Subjects)
+- Status labels:
+  - ACTIVE (green label)
+  - PAUSED (yellow label)
+- Remove button (red button with "× Remove" text)
 
-### Removal Details Section
-- `removalForm`
-- `removalReason`
-- `removalDetails`
-- `removalDate`
-- `finalGrades`
-- `certificateIssued`
-- `recordsTransfer`
+### Possible Element IDs and Class Names
 
-### Administrative Section
-- `adminNotes`
-- `approvalRequired`
-- `approverName`
-- `removalApproved`
-- `notificationSent`
+#### Modal-Related
+- `#removeStudentModal` - Entire modal
+- `.modal-header` - Modal header
+- `.modal-title` - Title text
+- `.close-btn` - Close button
 
-### Refund Section
-- `refundSection`
-- `refundEligible`
-- `refundAmount`
-- `refundMethod`
-- `refundProcessed`
-
-### Form Container
-- `removeStudentForm`
-
-## Button Functionalities
-
-### Search Actions
-- `searchStudent`
-- `clearSearch`
-- `loadStudentInfo`
-- `refreshStudentData`
-
-### Form Actions
-- `submitRemoval`
-- `resetForm`
-- `backBtn`
-- `previewRemoval`
-- `saveAsDraft`
-
-### Administrative Actions
-- `approveRemoval`
-- `rejectRemoval`
-- `sendNotification`
-- `generateReport`
-
-### Record Management
-- `exportRecords`
-- `transferRecords`
-- `archiveRecords`
-
-## CSS Class Names
-
-### Layout Classes
-- `.container`
-- `.header`
-- `.removal-container`
-- `.form-section`
-- `.form-grid`
-- `.form-group`
-- `.form-actions`
-
-### Student Information Classes
-- `.student-info`
-- `.student-details`
-- `.student-status`
-- `.student-courses`
-- `.student-records`
-- `.guardian-info`
-
-### Search Classes
-- `.search-section`
-- `.search-input`
-- `.search-results`
-- `.search-item`
-- `.no-results`
-
-### Removal Classes
-- `.removal-form`
-- `.removal-reason`
-- `.removal-details`
-- `.removal-summary`
-- `.removal-confirmation`
-
-### Administrative Classes
-- `.admin-section`
-- `.admin-notes`
-- `.approval-section`
-- `.approval-status`
-
-### Refund Classes
-- `.refund-section`
-- `.refund-calculation`
-- `.refund-details`
-- `.refund-status`
-
-### Form Element Classes
-- `.form-input`
-- `.form-select`
-- `.form-textarea`
-- `.form-label`
-- `.form-help`
-- `.readonly`
-- `.calculated`
-
-### Button Classes
-- `.btn`
-- `.btn-primary`
-- `.btn-secondary`
-- `.btn-danger`
-- `.btn-success`
-- `.btn-warning`
-- `.btn-outline`
-
-### Status Classes
-- `.status-active`
-- `.status-inactive`
-- `.status-removed`
-- `.status-pending`
-- `.status-approved`
-- `.status-rejected`
-
-### Validation Classes
-- `.error`
-- `.success`
-- `.warning`
-- `.error-message`
-- `.required`
-
-### State Classes
-- `.loading`
-- `.spinner`
-- `.disabled`
-- `.hidden`
-- `.confirmed`
-- `.pending-approval`
-
-### Record Classes
-- `.records-section`
-- `.record-item`
-- `.record-status`
-- `.transfer-info`
-- `.archive-info`
+#### Student List-Related
+- `.student-list` or `#studentList` - Student list container (Repeater container)
+- `.student-item` - Individual student entry (Repeater item)
+- `.student-name` - Student name
+- `.student-info` - Student information (grade and courses)
+- `.student-status` - Status label container
+- `.remove-btn` - Remove button

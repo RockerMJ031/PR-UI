@@ -1,4 +1,4 @@
-# Course Extension Page - Element References
+# Course Cancellation Page - Element References
 
 ## Form Element IDs
 
@@ -15,9 +15,9 @@
 - `studentCountNumber` (bold number)
 - `studentCountText` (normal text "students")
 - `studentNames` (student names text field)
-- `extendBtn`
+- `cancelBtn`
 
-### Extension Details Panel (After Course Selection)
+### Cancellation Details Panel (After Course Selection)
 - `extensionDetailsPanel`
 - `extensionPlaceholder`
 - `extensionPlaceholderText` (placeholder text: "Select a course from the left to configure extension details")
@@ -28,21 +28,8 @@
 - `extensionCourseSubject`
 - `students-text-display` (student names displayed as comma-separated text)
 
-### Extension Form Elements
-- `extensionEndDate` (date input without helper text)
-- `updatedFocusArea`
-- `extensionDescription`
+### Cancellation Form Elements
+- `cancellationStartDate` (date input without helper text)
+- `reasonForCancellation:`
 - `closeBtn`
-- `clearSelectionBtn`
-- `submitExtensionBtn`
-
-## Modal/Lightbox Elements
-- `courseExtensionLightbox`
-- `extensionCourseList`
-- `extensionSearchInput`
-
-### Confirmation Lightbox Elements
-- `confirmationLightbox`
-- `confirmationTitle`
-- `confirmationMessage`
-- `confirmationOkBtn`
+- `submitCancellationBtn`

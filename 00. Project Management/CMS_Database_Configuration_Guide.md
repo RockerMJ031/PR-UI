@@ -341,7 +341,7 @@ This document details the database collection configuration required for the tut
 {
   _id: "text",
   logId: "text", // Log number
-  syncType: "text", // student_registration, course_assignment, course_schedule, student_report
+  syncType: "text", // student_registration, course_assignment, course_schedule, student_report, course_extension, course_cancellation
   direction: "text", // wix_to_lark（仅记录Wix到Lark的数据同步）
   sourceSystem: "text", // wix（源系统始终为Wix）
   targetSystem: "text", // lark（目标系统始终为Lark）
@@ -354,6 +354,20 @@ This document details the database collection configuration required for the tut
   syncStartTime: "text", // Sync start time
   syncEndTime: "text", // Sync end time
   duration: "number", // Sync duration (milliseconds)
+  
+  // **NEW FIELDS FOR COURSE OPERATIONS TRACKING - NOT YET IMPLEMENTED IN CMS**
+  **operationType**: "text", // **extend, cancel - Type of course operation**
+  **operatorUserId**: "text", // **Admin user ID who performed the operation**
+  **operatorUserName**: "text", // **Admin user name who performed the operation**
+  **operatorEmail**: "text", // **Admin user email who performed the operation**
+  **targetCourseId**: "text", // **Course ID that was extended or cancelled**
+  **targetCourseName**: "text", // **Course name that was extended or cancelled**
+  **targetCourseSubject**: "text", // **Course subject that was extended or cancelled**
+  **operationTimestamp**: "text", // **Exact timestamp when the operation was performed**
+  **operationDetails**: "text", // **JSON string containing operation-specific details (e.g., new end date for extensions, cancellation reason)**
+  **affectedStudentCount**: "number", // **Number of students affected by this operation**
+  **affectedStudentIds**: ["text"], // **Array of student IDs affected by this operation**
+  
   _createdDate: "text",
   _updatedDate: "text"
 }
