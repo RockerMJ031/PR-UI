@@ -20,7 +20,6 @@
 
 ### Student List Classes (Repeater)
 - `studentRepeater` - Main repeater element for student list
-- `studentList` - Repeater container for student list
 - `studentCard` - Individual student card repeater item
 - `studentId` - Repeater item for student id
 - `studentName` - Student name

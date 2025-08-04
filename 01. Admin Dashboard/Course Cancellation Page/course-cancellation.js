@@ -145,6 +145,7 @@ class CourseCancellationManager {
     displayCourseInfo() {
         const cancellationCourseTitle = document.getElementById('cancellationCourseTitle');
         const cancellationCourseSubject = document.getElementById('cancellationCourseSubject');
+        const cancellationStudentCount = document.getElementById('cancellationStudentCount');
 
         if (cancellationCourseTitle) {
             cancellationCourseTitle.textContent = `${this.selectedCourse.id} - ${this.selectedCourse.name}`;
@@ -152,6 +153,10 @@ class CourseCancellationManager {
         
         if (cancellationCourseSubject) {
             cancellationCourseSubject.textContent = this.selectedCourse.subject;
+        }
+        
+        if (cancellationStudentCount) {
+            cancellationStudentCount.textContent = `${this.selectedCourse.studentCount} students`;
         }
     }
 

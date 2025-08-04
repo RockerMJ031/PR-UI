@@ -26,6 +26,7 @@
 - `extensionCourseHeader`
 - `extensionCourseTitle`
 - `extensionCourseSubject`
+- `extensionStudentCount` (student count display in parentheses, e.g., "(3 students)")
 - `studentsTextDisplay` (student names displayed as comma-separated text)
 
 ### Extension Form Elements

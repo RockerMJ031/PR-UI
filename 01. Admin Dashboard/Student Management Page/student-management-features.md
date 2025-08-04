@@ -7,7 +7,7 @@ The Student Management Page allows administrators to manage student course enrol
 
 Modal/Lightbox Elements:
 - removeStudentModal: 学生管理模态框
-- studentList: 学生列表
+- studentRepeater: 学生列表重复器
 - confirmationLightbox: 确认提交灯箱
 - successLightbox: 成功提示灯箱
 
@@ -42,7 +42,7 @@ Success Elements:
 - Queries CMS-7 for students matching the user's schoolID
 - Filters students with status "active" or "Activated"
 - Displays student management interface with:
-  - Student list in `studentList` repeater showing:
+  - Student list in `studentRepeater` repeater showing:
     - Student ID in `studentId`
 - Student name in `studentName`
 - Student email in `studentEmail`
@@ -64,7 +64,7 @@ Success Elements:
 - Shows `removeStudentModal` with student management interface
 - Displays two option buttons: `removeAllCoursesBtn` and `removeSpecificCourseBtn`
 - Shows search section with `searchInput` and `searchBtn`
-- Displays filtered student list in `studentList` (Repeater container)
+- Displays filtered student list in `studentRepeater` (Repeater container)
 - Each student entry shows:
   - Student name in `studentName`
 - Student ID in `studentId`
@@ -95,7 +95,7 @@ Success Elements:
 **CMS Data Source**: Queries CMS-7 (Students Collection) with search filters
 **Display Result**:
 - Filters the student list based on search criteria
-- Updates `studentList` to show only matching students
+- Updates `studentRepeater` to show only matching students
 - Maintains the selected removal option (all courses or specific course)
 - Shows "No results found" message if no students match the search
 
@@ -166,7 +166,7 @@ Success Elements:
 - 查询CMS-7中与用户schoolID匹配的学生
 - 过滤状态为"active"或"Activated"的学生
 - 显示学生管理界面包含：
-  - `studentList` repeater中的学生列表显示：
+  - `studentRepeater` repeater中的学生列表显示：
     - `studentId` 中的学生ID（来自CMS-7的studentId字段）
 - `studentName` 中的学生姓名（来自CMS-7的studentName字段）
 - `studentEmail` 中的学生邮箱（来自CMS-7的email字段）
@@ -188,7 +188,7 @@ Success Elements:
 - 显示包含学生管理界面的 `removeStudentModal`
 - 显示两个选项按钮：`removeAllCoursesBtn` 和 `removeSpecificCourseBtn`
 - 显示包含 `searchInput` 和 `searchBtn` 的搜索部分
-- 在 `studentList`（Repeater容器）中显示过滤后的学生列表
+- 在 `studentRepeater`（Repeater容器）中显示过滤后的学生列表
 - 每个学生条目显示：
   - `studentName` 中的学生姓名
 - `studentId` 中的学生ID
@@ -219,7 +219,7 @@ Success Elements:
 **CMS数据源**：使用搜索过滤器查询CMS-7（学生集合）
 **显示结果**：
 - 根据搜索条件过滤学生列表
-- 更新 `studentList` 以仅显示匹配的学生
+- 更新 `studentRepeater` 以仅显示匹配的学生
 - 保持所选的移除选项（所有课程或特定课程）
 - 如果没有学生匹配搜索，显示"未找到结果"消息
 

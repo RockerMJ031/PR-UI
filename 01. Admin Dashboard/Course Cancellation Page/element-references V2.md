@@ -26,6 +26,7 @@
 - `cancellationCourseTitle`
 - `cancellationCourseSubject`
 - `courseIdPopUp` - Course ID display in the right panel popup after course selection (e.g., "AS-APY-Y9-EL-BIOLOGY" with blue background)
+- `cancellationStudentCount` - Student count display in the right panel (e.g., "7 students")
 - `studentsTextDisplay` (student names displayed as comma-separated text)
 
 ### Cancellation Form Elements

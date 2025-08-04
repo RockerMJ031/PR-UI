@@ -110,6 +110,37 @@ class CourseExtensionManager {
     async initializePage() {
         await this.displayCourseRepeater();
         this.hideExtensionPlaceholder();
+        this.initializeStaticElements();
+    }
+
+    initializeStaticElements() {
+        // Initialize page title
+        const pageTitle = document.getElementById('pageTitle');
+        if (pageTitle) {
+            pageTitle.textContent = 'Course Extension';
+        }
+
+        // Initialize extension details title
+        const extensionDetailsTitle = document.getElementById('extensionDetailsTitle');
+        if (extensionDetailsTitle) {
+            extensionDetailsTitle.textContent = 'Extension Details';
+        }
+
+        // Initialize form labels
+        const extensionEndDateLabel = document.getElementById('extensionEndDateLabel');
+        if (extensionEndDateLabel) {
+            extensionEndDateLabel.textContent = 'Extend Course Until:';
+        }
+
+        const updatedFocusAreaLabel = document.getElementById('updatedFocusAreaLabel');
+        if (updatedFocusAreaLabel) {
+            updatedFocusAreaLabel.textContent = 'Updated Focus Area:';
+        }
+
+        const extensionDescriptionLabel = document.getElementById('extensionDescriptionLabel');
+        if (extensionDescriptionLabel) {
+            extensionDescriptionLabel.textContent = 'Detailed Description of Course Extension:';
+        }
     }
 
     hideExtensionPlaceholder() {
@@ -278,6 +309,8 @@ class CourseExtensionManager {
     displayCourseInfo() {
         const extensionCourseTitle = document.getElementById('extensionCourseTitle');
         const extensionCourseSubject = document.getElementById('extensionCourseSubject');
+        const extensionCourseSubjectTag = document.getElementById('extensionCourseSubjectTag');
+        const extensionStudentCount = document.getElementById('extensionStudentCount');
         const courseDetails = document.getElementById('courseDetails');
 
         if (extensionCourseTitle) {
@@ -286,6 +319,14 @@ class CourseExtensionManager {
         
         if (extensionCourseSubject) {
             extensionCourseSubject.textContent = this.selectedCourse.subject;
+        }
+        
+        if (extensionCourseSubjectTag) {
+            extensionCourseSubjectTag.textContent = this.selectedCourse.subject;
+        }
+        
+        if (extensionStudentCount) {
+            extensionStudentCount.textContent = `(${this.selectedCourse.studentCount} students)`;
         }
 
         courseDetails.innerHTML = `
@@ -793,7 +834,10 @@ window.addEventListener('beforeunload', () => {
 /*
 === 按钮和元素引用名字 ===
 
-根据 element-references.md 更新的元素 IDs:
+根据 element-references V2.md 更新的元素 IDs:
+
+Page Structure:
+- pageTitle: 页面主标题 ("Course Extension")
 
 Search Section:
 - searchInput: 搜索输入框
@@ -808,32 +852,30 @@ Course Repeater Section:
 - studentCountNumber: 学生数量数字 (加粗)
 - studentCountText: 学生数量文字 ("students")
 - studentNames: 学生姓名文本字段
-
-Student Repeater Section:
-- studentRepeater: 学生重复器
-- studentContainer: 学生容器
-- studentInfo: 合并的学生信息文本字段
 - extendBtn: 延期按钮
 
 Extension Details Panel:
 - extensionDetailsPanel: 延期详情面板
+- extensionDetailsTitle: "Extension Details" 标题
 - extensionPlaceholder: 延期占位符
+- extensionPlaceholderText: 占位符文本
+- extensionPlaceholderIcon: 占位符图标
 - selectedExtensionCourseInfo: 选中的延期课程信息
 - extensionCourseHeader: 延期课程标题
 - extensionCourseTitle: 延期课程标题
 - extensionCourseSubject: 延期课程科目
-- extensionStudentsList: 延期学生列表
-- extensionStudentInfo: 合并的学生信息文本字段
+- extensionCourseSubjectTag: 课程学科标签显示
+- extensionStudentCount: 括号内学生数量显示
+- studentsTextDisplay: 学生姓名显示
 
 Extension Form Elements:
+- extensionEndDateLabel: "Extend Course Until:" 标签
 - extensionEndDate: 延期结束日期
+- updatedFocusAreaLabel: "Updated Focus Area:" 标签
 - updatedFocusArea: 更新的重点领域
+- extensionDescriptionLabel: "Detailed Description of Course Extension:" 标签
 - extensionDescription: 延期描述
-
-Button Elements:
 - closeBtn: 关闭按钮
-- searchBtn: 搜索按钮
-- extendBtn: 延期按钮
 - clearSelectionBtn: 清除选择按钮
 - submitExtensionBtn: 提交延期按钮
 
@@ -842,22 +884,9 @@ Modal/Lightbox Elements:
 - extensionCourseList: 延期课程列表
 - extensionSearchInput: 延期搜索输入框
 
-传统表单元素 IDs (保持兼容):
-- courseInfo: 课程信息容器
-- courseTitle: 课程标题
-- courseDetails: 课程详情
-- extensionForm: 延期表单
-- extensionType: 延期类型选择框
-- currentEndDate: 当前结束日期
-- newEndDate: 新结束日期
-- additionalLessons: 额外课程数量
-- extensionReason: 延期原因选择框
-- detailedReason: 详细原因文本域
-- extensionFee: 延期费用
-- paymentMethod: 付款方式选择框
-- paymentNotes: 付款备注
-- studentsList: 学生列表
-- approvalRequired: 需要批准选择框
-- notifyStudents: 通知学生复选框
-- additionalNotes: 额外备注
+Confirmation Lightbox Elements:
+- confirmationLightbox: 确认灯箱
+- confirmationTitle: 确认标题
+- confirmationMessage: 确认消息
+- confirmationOkBtn: 确认OK按钮
 */

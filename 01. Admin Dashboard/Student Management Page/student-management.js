@@ -207,7 +207,7 @@ class StudentManagementSystem {
 
     /**
      * 显示学生列表
-     * 在studentList repeater中显示学生信息
+     * 在studentRepeater中显示学生信息
      */
     displayStudentList() {
         if (this.filteredStudents.length === 0) {
@@ -215,7 +215,7 @@ class StudentManagementSystem {
             return;
         }
 
-        $w('#studentList').data = this.filteredStudents.map(student => ({
+        $w('#studentRepeater').data = this.filteredStudents.map(student => ({
             _id: student.id,
             studentId: student.studentId,
             studentName: student.studentName,
@@ -226,7 +226,7 @@ class StudentManagementSystem {
         }));
 
         // 设置repeater项目模板
-        $w('#studentList').onItemReady(($item, itemData) => {
+        $w('#studentRepeater').onItemReady(($item, itemData) => {
             $item('#studentId').text = itemData.studentId;
             $item('#studentName').text = itemData.studentName;
             $item('#studentEmail').text = itemData.email;
@@ -505,8 +505,8 @@ class StudentManagementSystem {
         if ($w('#emptyState')) {
             $w('#emptyState').show();
         }
-        if ($w('#studentList')) {
-            $w('#studentList').hide();
+        if ($w('#studentRepeater')) {
+            $w('#studentRepeater').hide();
         }
     }
 
@@ -514,8 +514,8 @@ class StudentManagementSystem {
         if ($w('#emptyState')) {
             $w('#emptyState').hide();
         }
-        if ($w('#studentList')) {
-            $w('#studentList').show();
+        if ($w('#studentRepeater')) {
+            $w('#studentRepeater').show();
         }
     }
 
