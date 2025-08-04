@@ -9,7 +9,7 @@
 ### Course Repeater Section
 - `courseRepeater`
 - `courseContainer`
-- `courseId`
+- `courseId` - Course ID display in the left panel course list (e.g., "AS-APY-Y9-EL-BIOLOGY")
 - `courseSubject`
 - `studentCountNumber` (bold number)
 - `studentCountText` (normal text "students")
@@ -25,6 +25,7 @@
 - `cancellationCourseHeader`
 - `cancellationCourseTitle`
 - `cancellationCourseSubject`
+- `courseIdPopUp` - Course ID display in the right panel popup after course selection (e.g., "AS-APY-Y9-EL-BIOLOGY" with blue background)
 - `studentsTextDisplay` (student names displayed as comma-separated text)
 
 ### Cancellation Form Elements

@@ -168,20 +168,13 @@ class CourseExtensionManager {
 
             // Generate HTML for course repeater
             const courseHTML = coursesWithStudents.map(course => `
-                <div class="course-item" data-course-id="${course.courseId}">
-                    <div class="course-info">
-                        <div class="course-header">
-                            <span class="course-id">${course.courseId}</span>
-                            <span class="course-subject">${course.courseSubject}</span>
-                        </div>
-                        <div class="student-info">
-                            <span class="student-count">
-                                <strong>${course.studentCountNumber}</strong> ${course.studentCountText}
-                            </span>
-                            <div class="student-names">${course.studentNames}</div>
-                        </div>
-                    </div>
-                    <button class="extend-btn" data-course-id="${course.courseId}">
+                <div class="courseContainer" data-course-id="${course.courseId}">
+                    <div id="courseId">${course.courseId}</div>
+                    <div id="courseName">${course.courseId}</div>
+                    <div id="courseSubject">${course.courseSubject}</div>
+                    <div><span id="studentCountNumber">${course.studentCountNumber}</span> <span id="studentCountText">${course.studentCountText}</span></div>
+                    <div id="studentNames">${course.studentNames}</div>
+                    <button id="extendBtn" data-course-id="${course.courseId}">
                         Extend
                     </button>
                 </div>
@@ -190,7 +183,7 @@ class CourseExtensionManager {
             courseRepeater.innerHTML = courseHTML;
 
             // Add event listeners to extend buttons
-            const extendButtons = courseRepeater.querySelectorAll('.extend-btn');
+            const extendButtons = courseRepeater.querySelectorAll('[id="extendBtn"]');
             extendButtons.forEach(button => {
                 button.addEventListener('click', (e) => {
                     const courseId = e.target.getAttribute('data-course-id');
@@ -243,11 +236,12 @@ class CourseExtensionManager {
             };
 
             // Hide placeholder and show course info
-            this.showSelectedCourseInfo();
-            this.displayCourseInfo();
-            this.populateCurrentEndDate();
-            this.displayStudents();
-            this.setupDateConstraints();
+        this.showSelectedCourseInfo();
+        this.displayCourseInfo();
+        this.displayCourseIdPopUp();
+        this.populateCurrentEndDate();
+        this.displayStudents();
+        this.setupDateConstraints();
 
         } catch (error) {
             console.error('Error handling course selection:', error);
@@ -274,11 +268,25 @@ class CourseExtensionManager {
         }
     }
 
+    displayCourseIdPopUp() {
+        const extensionCourseIdPopUp = document.getElementById('extensionCourseIdPopUp');
+        if (extensionCourseIdPopUp && this.selectedCourse) {
+            extensionCourseIdPopUp.textContent = this.selectedCourse.id;
+        }
+    }
+
     displayCourseInfo() {
         const extensionCourseTitle = document.getElementById('extensionCourseTitle');
+        const extensionCourseSubject = document.getElementById('extensionCourseSubject');
         const courseDetails = document.getElementById('courseDetails');
 
-        extensionCourseTitle.textContent = `${this.selectedCourse.id} - ${this.selectedCourse.subject}`;
+        if (extensionCourseTitle) {
+            extensionCourseTitle.textContent = `${this.selectedCourse.id} - ${this.selectedCourse.subject}`;
+        }
+        
+        if (extensionCourseSubject) {
+            extensionCourseSubject.textContent = this.selectedCourse.subject;
+        }
 
         courseDetails.innerHTML = `
             <div class="detail-item">
@@ -317,9 +325,9 @@ class CourseExtensionManager {
         const studentsTextDisplay = document.getElementById('studentsTextDisplay');
         
         studentsTextDisplay.innerHTML = this.selectedCourse.students.map(student => `
-            <div class="student-item">
-                <div class="student-name">${student.name}</div>
-                <div class="student-lessons">${student.lessons} lessons completed</div>
+            <div id="studentCard">
+                <div id="studentName">${student.name}</div>
+                <div id="studentLessons">${student.lessons} lessons completed</div>
             </div>
         `).join('');
     }

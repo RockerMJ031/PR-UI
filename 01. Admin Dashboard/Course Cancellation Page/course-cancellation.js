@@ -143,15 +143,30 @@ class CourseCancellationManager {
     }
 
     displayCourseInfo() {
-        const extensionCourseTitle = document.getElementById('extensionCourseTitle');
-        const extensionCourseSubject = document.getElementById('extensionCourseSubject');
+        const cancellationCourseTitle = document.getElementById('cancellationCourseTitle');
+        const cancellationCourseSubject = document.getElementById('cancellationCourseSubject');
 
-        if (extensionCourseTitle) {
-            extensionCourseTitle.textContent = `${this.selectedCourse.id} - ${this.selectedCourse.name}`;
+        if (cancellationCourseTitle) {
+            cancellationCourseTitle.textContent = `${this.selectedCourse.id} - ${this.selectedCourse.name}`;
         }
         
-        if (extensionCourseSubject) {
-            extensionCourseSubject.textContent = this.selectedCourse.subject;
+        if (cancellationCourseSubject) {
+            cancellationCourseSubject.textContent = this.selectedCourse.subject;
+        }
+    }
+
+    displayCourseIdPopUp() {
+        const courseIdPopUp = document.getElementById('courseIdPopUp');
+        
+        if (courseIdPopUp && this.selectedCourse) {
+            courseIdPopUp.textContent = this.selectedCourse.id;
+            courseIdPopUp.style.display = 'inline-block';
+            courseIdPopUp.style.backgroundColor = '#007bff';
+            courseIdPopUp.style.color = 'white';
+            courseIdPopUp.style.padding = '4px 8px';
+            courseIdPopUp.style.borderRadius = '4px';
+            courseIdPopUp.style.fontSize = '12px';
+            courseIdPopUp.style.fontWeight = 'bold';
         }
     }
 
@@ -199,14 +214,14 @@ class CourseCancellationManager {
         const studentsList = document.getElementById('studentsList');
         
         studentsList.innerHTML = this.studentsData.map(student => `
-            <div class="student-card">
-                <div class="student-name">${student.name}</div>
-                <div class="student-details">
-                    ID: ${student.id} | Lessons: ${student.lessonsAttended}/${this.courseData.totalLessons}<br>
+            <div class="studentCard">
+                <div id="studentName">${student.name}</div>
+                <div id="studentDetails">
+                    ID: <span id="studentId">${student.id}</span> | Lessons: ${student.lessonsAttended}/${this.courseData.totalLessons}<br>
                     Enrolled: ${this.formatDate(student.enrollmentDate)}
                 </div>
-                <div class="refund-info">
-                    <div class="refund-amount">Refund: £${student.refundAmount} (${student.refundPercentage}%)</div>
+                <div id="refundInfo">
+                    <div id="refundAmount">Refund: £${student.refundAmount} (${student.refundPercentage}%)</div>
                 </div>
             </div>
         `).join('');
@@ -225,9 +240,9 @@ class CourseCancellationManager {
             searchBtn.addEventListener('click', () => this.handleSearch());
         }
 
-        // Cancel button for course selection
-        const cancelBtns = document.querySelectorAll('[id="cancelBtn"]');
-        cancelBtns.forEach(btn => {
+        // Select button for course selection
+        const selectBtns = document.querySelectorAll('[id="selectBtn"]');
+        selectBtns.forEach(btn => {
             btn.addEventListener('click', (e) => this.handleCourseSelection(e));
         });
 
@@ -410,7 +425,7 @@ class CourseCancellationManager {
                     <div id="courseSubject">${course.subject}</div>
                     <div><span id="studentCountNumber">${course.studentCount}</span> <span id="studentCountText">students</span></div>
                     <div id="studentNames">${course.students.join(', ')}</div>
-                    <button id="cancelBtn" class="btn btn-danger">Cancel</button>
+                    <button id="selectBtn" class="btn btn-primary">Select</button>
                 </div>
             `).join('');
 
@@ -432,7 +447,7 @@ class CourseCancellationManager {
                     <div id="courseSubject">${course.subject}</div>
                     <div><span id="studentCountNumber">0</span> <span id="studentCountText">students</span></div>
                     <div id="studentNames">暂无学生数据</div>
-                    <button id="cancelBtn" class="btn btn-danger">Cancel</button>
+                    <button id="selectBtn" class="btn btn-primary">Select</button>
                 </div>
             `).join('');
             
@@ -448,7 +463,7 @@ class CourseCancellationManager {
         // This would typically fetch detailed data from CMS-3, CMS-2, and CMS-7
         this.selectedCourse = {
             id: courseId,
-            name: courseContainer.querySelector('#courseName').textContent,
+            name: courseContainer.querySelector('#courseSubject').textContent,
             subject: courseContainer.querySelector('#courseSubject').textContent,
             studentCount: parseInt(courseContainer.querySelector('#studentCountNumber').textContent),
             students: courseContainer.querySelector('#studentNames').textContent.split(', ').map(name => ({ name: name.trim() }))
@@ -459,19 +474,20 @@ class CourseCancellationManager {
 
     showCancellationDetails() {
         // Hide placeholder and show selected course info
-        const extensionPlaceholder = document.getElementById('extensionPlaceholder');
-        const selectedExtensionCourseInfo = document.getElementById('selectedExtensionCourseInfo');
+        const cancellationPlaceholder = document.getElementById('cancellationPlaceholder');
+        const selectedCancellationCourseInfo = document.getElementById('selectedCancellationCourseInfo');
         
-        if (extensionPlaceholder) {
-            extensionPlaceholder.style.display = 'none';
+        if (cancellationPlaceholder) {
+            cancellationPlaceholder.style.display = 'none';
         }
         
-        if (selectedExtensionCourseInfo) {
-            selectedExtensionCourseInfo.style.display = 'block';
+        if (selectedCancellationCourseInfo) {
+            selectedCancellationCourseInfo.style.display = 'block';
         }
 
         this.displayCourseInfo();
         this.displayStudents();
+        this.displayCourseIdPopUp();
     }
 
     handleFormSubmission(e) {

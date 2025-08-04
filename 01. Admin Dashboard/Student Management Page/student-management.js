@@ -150,6 +150,11 @@ class StudentManagementSystem {
 
 
 
+        // 功能4：取消课程按钮
+        $w('#cancelCourseBtn').onClick((event) => {
+            this.handleCancelCourse(event);
+        });
+
         // 功能8：取消操作
         $w('#cancelBtn').onClick(() => {
             this.cancelConfirmation();
@@ -163,6 +168,11 @@ class StudentManagementSystem {
         // 功能7：成功确认
         $w('#successOkBtn').onClick(() => {
             this.closeSuccessLightbox();
+        });
+
+        // 页面关闭按钮
+        $w('#closeBtn').onClick(() => {
+            this.handlePageNavigation();
         });
 
         // 功能9：页面管理
@@ -217,22 +227,21 @@ class StudentManagementSystem {
 
         // 设置repeater项目模板
         $w('#studentList').onItemReady(($item, itemData) => {
-            $item('#student-id').text = itemData.studentId;
-            $item('#student-name').text = itemData.studentName;
-            $item('#student-email').text = itemData.email;
-            $item('#course-count').text = itemData.courseCount.toString();
-            $item('#course-list').text = itemData.courseList;
+            $item('#studentId').text = itemData.studentId;
+            $item('#studentName').text = itemData.studentName;
+            $item('#studentEmail').text = itemData.email;
+            $item('#courseCount').text = itemData.courseCount + ' course';
+            $item('#courseList').text = itemData.courseList;
             
-            // 设置操作按钮
-            if (this.selectedRemovalMode) {
-                $item('#actionBtn').show();
-                $item('#actionBtn').label = itemData.actionText;
-                $item('#actionBtn').onClick(() => {
-                    this.initiateRemoval(itemData);
-                });
-            } else {
-                $item('#actionBtn').hide();
-            }
+            // 设置学生卡片数据
+            $item('#studentCard').data = itemData;
+            
+            // 设置取消课程按钮
+            $item('#cancelCourseBtn').show();
+            $item('#cancelCourseBtn').label = 'Cancel Course';
+            $item('#cancelCourseBtn').onClick((event) => {
+                this.handleCancelCourse(event);
+            });
         });
 
         this.hideEmptyState();
@@ -275,6 +284,25 @@ class StudentManagementSystem {
     }
 
     /**
+     * 功能4：处理取消课程操作
+     */
+    handleCancelCourse(event) {
+        // 获取点击的学生数据
+        const $item = $w.at(event.context);
+        const studentData = $item('#studentCard').data;
+        
+        this.selectedStudent = {
+            studentId: studentData.studentId,
+            studentName: studentData.studentName,
+            email: studentData.email,
+            courseList: studentData.courseList
+        };
+        
+        this.selectedRemovalMode = 'specific';
+        this.showConfirmationDialog();
+    }
+
+    /**
      * 功能5：启动移除流程
      */
     initiateRemoval(studentData) {
@@ -286,8 +314,16 @@ class StudentManagementSystem {
      * 显示确认对话框
      */
     showConfirmationDialog() {
-        $w('#confirmationTitle').text = '确认课程移除';
-        $w('#confirmationMessage').text = `您确定要移除学生 ${this.selectedStudent.studentName} 的${this.selectedRemovalMode === 'all' ? '所有' : '特定'}课程吗？此操作无法撤销。`;
+        $w('#confirmationTitle').text = '确认课程取消';
+        
+        let message;
+        if (this.selectedRemovalMode === 'all') {
+            message = `您确定要移除学生 ${this.selectedStudent.studentName} 的所有课程吗？此操作无法撤销。`;
+        } else {
+            message = `您确定要取消学生 ${this.selectedStudent.studentName} (${this.selectedStudent.studentId}) 的课程吗？\n\n学生邮箱: ${this.selectedStudent.email}\n课程: ${this.selectedStudent.courseList}\n\n此操作无法撤销。`;
+        }
+        
+        $w('#confirmationMessage').text = message;
         $w('#confirmationLightbox').show();
     }
 
@@ -336,8 +372,22 @@ class StudentManagementSystem {
                     );
                     return Promise.all(updatePromises);
                 });
+        } else if (this.selectedRemovalMode === 'specific') {
+            // 取消特定课程
+            await wixData.query('StudentCourseAssignment')
+                .eq('studentId', this.selectedStudent.studentId)
+                .eq('status', 'Activated')
+                .find()
+                .then(results => {
+                    const updatePromises = results.items.map(item => 
+                        wixData.update('StudentCourseAssignment', {
+                            ...item,
+                            status: 'Cancelled'
+                        })
+                    );
+                    return Promise.all(updatePromises);
+                });
         }
-        // 特定课程移除逻辑可以在这里扩展
     }
 
     /**
@@ -397,8 +447,13 @@ class StudentManagementSystem {
      * 功能7：显示成功提示
      */
     showSuccessLightbox() {
-        $w('#successTitle').text = '课程移除已提交';
-        $w('#successMessage').text = '感谢您的提交。我们已为您生成工单，将通过邮件持续更新进展。';
+        if (this.selectedRemovalMode === 'specific') {
+            $w('#successTitle').text = '课程取消已提交';
+            $w('#successMessage').text = '感谢您的提交。学生课程已成功取消，我们已为您生成工单，将通过邮件持续更新进展。';
+        } else {
+            $w('#successTitle').text = '课程移除已提交';
+            $w('#successMessage').text = '感谢您的提交。我们已为您生成工单，将通过邮件持续更新进展。';
+        }
         $w('#successLightbox').show();
     }
 

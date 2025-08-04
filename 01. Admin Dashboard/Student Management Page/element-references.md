@@ -19,12 +19,15 @@
 
 
 ### Student List Classes (Repeater)
+- `studentRepeater` - Main repeater element for student list
 - `studentList` - Repeater container for student list
+- `studentCard` - Individual student card repeater item
 - `studentId` - Repeater item for student id
 - `studentName` - Student name
 - `studentEmail` - Student email
 - `courseCount` - Course count display
 - `courseList` - Course list display
+- `cancelCourseBtn` - "Cancel Course" button (red button)
 - `removeAllCoursesBtn` - "Remove all courses for student" option button
 - `removeSpecificCourseBtn` - "Remove specific course" option button (highlighted in orange)
 
