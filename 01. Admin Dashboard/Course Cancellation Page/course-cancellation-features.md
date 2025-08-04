@@ -13,7 +13,6 @@ The Course Cancellation Page allows administrators to cancel courses that need t
 - `courseRepeater`: Container for course list
 - `courseContainer`: Individual course container
 - `courseId`: Course identification display
-- `courseName`: Course name display
 - `courseSubject`: Course subject display
 - `studentCountNumber`: Student count number (bold)
 - `studentCountText`: Student count text ("students")
@@ -29,6 +28,7 @@ The Course Cancellation Page allows administrators to cancel courses that need t
 - `cancellationCourseHeader`: Course header section
 - `cancellationCourseTitle`: Selected course title
 - `cancellationCourseSubject`: Selected course subject
+- `courseIdPopUp`: Course ID display in the right panel popup after course selection
 - `studentsTextDisplay`: Student names display area
 
 ### Cancellation Form Elements
@@ -79,6 +79,7 @@ The Course Cancellation Page allows administrators to cancel courses that need t
 - Hides `cancellationPlaceholder` containing `cancellationPlaceholderText` and `cancellationPlaceholderIcon`
 - Shows `selectedCancellationCourseInfo` panel
 - Displays `cancellationCourseTitle` and `cancellationCourseSubject` in `cancellationCourseHeader`
+- Shows `courseIdPopUp` with the selected course ID
 - Populates `studentsTextDisplay` with detailed student information
 
 ### Feature 3: Cancellation Configuration
@@ -171,6 +172,7 @@ The Course Cancellation Page allows administrators to cancel courses that need t
 - 隐藏包含 `cancellationPlaceholderText` 和 `cancellationPlaceholderIcon` 的 `cancellationPlaceholder`
 - 显示 `selectedCancellationCourseInfo` 面板
 - 在 `cancellationCourseHeader` 中显示 `cancellationCourseTitle` 和 `cancellationCourseSubject`
+- 显示 `courseIdPopUp` 包含选中课程的ID
 - 用详细学生信息填充 `studentsTextDisplay`
 
 ### 功能3：取消配置

@@ -5,16 +5,50 @@ The Course Extension Page allows administrators to extend course durations for s
 
 ## Element Naming Reference
 
-Modal/Lightbox Elements:
-- courseExtensionLightbox: 课程延期灯箱
-- extensionCourseList: 延期课程列表
-- extensionSearchInput: 延期搜索输入框
+### Search Section
+- `searchInput`: Course search input field
+- `searchBtn`: Search button
 
-Confirmation Lightbox Elements:
-- confirmationLightbox: 确认提交灯箱
-- confirmationTitle: 确认标题
-- confirmationMessage: 确认消息
-- confirmationOkBtn: 确认按钮
+### Course Repeater Section
+- `courseRepeater`: Container for course list
+- `courseContainer`: Individual course container
+- `courseId`: Course identification display
+- `courseSubject`: Course subject display
+- `studentCountNumber`: Student count number (bold)
+- `studentCountText`: Student count text ("students")
+- `studentNames`: Student names text field
+- `extendBtn`: Extend course button
+
+### Extension Details Panel
+- `extensionDetailsPanel`: Main details panel container
+- `extensionPlaceholder`: Placeholder content container
+- `extensionPlaceholderText`: Placeholder instruction text
+- `extensionPlaceholderIcon`: Placeholder icon element
+- `selectedExtensionCourseInfo`: Selected course information panel
+- `extensionCourseHeader`: Course header section
+- `extensionCourseTitle`: Selected course title
+- `extensionCourseSubject`: Selected course subject
+- `courseIdPopUp`: Course ID display in the right panel popup after course selection
+- `studentsTextDisplay`: Student names display area
+
+### Extension Form Elements
+- `extensionEndDate`: Extension end date input
+- `updatedFocusArea`: Updated focus area text field
+- `extensionDescription`: Extension description text area
+- `closeBtn`: Close modal button
+- `clearSelectionBtn`: Clear selection button
+- `submitExtensionBtn`: Submit extension request button
+
+### Modal/Lightbox Elements
+- `courseExtensionLightbox`: Course extension lightbox
+- `extensionCourseList`: Extension course list
+- `extensionSearchInput`: Extension search input
+
+### Confirmation Lightbox Elements
+- `confirmationLightbox`: Confirmation lightbox
+- `confirmationTitle`: Confirmation title
+- `confirmationMessage`: Confirmation message
+- `confirmationOkBtn`: Confirmation OK button
 
 ## Feature Flow Description
 
@@ -36,12 +70,17 @@ Confirmation Lightbox Elements:
 
 ### Feature 1: Course Search and Display
 **User Action**: Click on `searchInput` field and enter search criteria
-**CMS Data Source**: Reads from CMS-3 (Import86 - Course Information Management Collection)
+**CMS Data Source**: 
+- **Course Information**: Reads from CMS-3 (Import86 - Course Information Management Collection)
+- **Student Count**: Queries CMS-2 (Import74 - Student Course Assignment Collection) to count students with matching `class_id` and `status: 'Activated'`
+- **Student Names**: Retrieves `student_name` from CMS-2 records with matching `class_id` and `status: 'Activated'`
 **Display Result**: 
 - Filters and displays matching courses in `courseRepeater`
-- Shows `courseId`, `courseName`, `courseSubject` for each course
-- Displays `studentCountNumber` and `studentCountText` showing enrolled student count
-- Lists `studentNames` as comma-separated text for each course
+- `courseId`: Shows CMS-3 `class_id` field
+- `courseSubject`: Shows CMS-3 `subject` field
+- `studentCountNumber`: Displays count of CMS-2 records with matching `class_id` and `status: 'Activated'`
+- `studentCountText`: Fixed text "students"
+- `studentNames`: Lists `student_name` from CMS-2 records with matching `class_id` and `status: 'Activated'`
 
 ### Feature 2: Course Selection for Extension
 **User Action**: Click on `extendBtn` ("Extend" button) for a specific course
@@ -53,6 +92,7 @@ Confirmation Lightbox Elements:
 - Hides `extensionPlaceholder` containing `extensionPlaceholderText` and `extensionPlaceholderIcon`
 - Shows `selectedExtensionCourseInfo` panel
 - Displays `extensionCourseTitle` and `extensionCourseSubject` in `extensionCourseHeader`
+- Shows `courseIdPopUp` with the selected course ID
 - Populates `studentsTextDisplay` with detailed student information
 
 ### Feature 3: Extension Configuration
@@ -125,12 +165,17 @@ Confirmation Lightbox Elements:
 - 基于学校ID匹配过滤课程，确保用户只能看到其所在学校的课程
 ### 功能1：课程搜索和显示
 **用户操作**：点击 `searchInput` 字段并输入搜索条件
-**CMS数据源**：从CMS-3（Import86 - 课程信息管理集合）读取数据
+**CMS数据源**：
+- **课程信息**：从CMS-3（Import86 - 课程信息管理集合）读取数据
+- **学生数量**：查询CMS-2（Import74 - 学生课程分配集合）统计与 `class_id` 匹配且 `status: 'Activated'` 的学生数量
+- **学生姓名**：从CMS-2中与 `class_id` 匹配且 `status: 'Activated'` 的记录中获取 `student_name`
 **显示结果**：
 - 在 `courseRepeater` 中过滤并显示匹配的课程
-- 为每个课程显示 `courseId`、`courseName`、`courseSubject`
-- 显示 `studentCountNumber` 和 `studentCountText` 展示已注册学生数量
-- 将 `studentNames` 以逗号分隔的文本形式列出每个课程的学生
+- `courseId`：显示CMS-3中的 `class_id` 字段
+- `courseSubject`：显示CMS-3中的 `subject` 字段
+- `studentCountNumber`：显示CMS-2中与 `class_id` 匹配且 `status: 'Activated'` 的记录数量
+- `studentCountText`：固定文本 "students"
+- `studentNames`：列出CMS-2中与 `class_id` 匹配且 `status: 'Activated'` 的记录中的 `student_name`
 
 ### 功能2：选择课程进行延期
 **用户操作**：点击特定课程的 `extendBtn`（"Extend" 按钮）
@@ -142,6 +187,7 @@ Confirmation Lightbox Elements:
 - 隐藏包含 `extensionPlaceholderText` 和 `extensionPlaceholderIcon` 的 `extensionPlaceholder`
 - 显示 `selectedExtensionCourseInfo` 面板
 - 在 `extensionCourseHeader` 中显示 `extensionCourseTitle` 和 `extensionCourseSubject`
+- 显示 `courseIdPopUp` 包含选中课程的ID
 - 用详细学生信息填充 `studentsTextDisplay`
 
 ### 功能3：延期配置
