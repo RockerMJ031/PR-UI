@@ -49,18 +49,18 @@ Ticket Elements:
 **Display Result**:
 - Shows ticket management interface with loading state management
 - Displays ticket summary statistics in `summary-cards`:
-  - Total tickets count in `.card-number`
+  - Total tickets count in `cardNumber`
   - Open tickets count with status styling
   - In Progress tickets count with progress indicator
   - Resolved tickets count with completion styling
 - Populates `ticket-list` repeater with ticket information:
-  - Ticket ID mapped to CMS-8 `ticketId` in `.ticket-id`
-  - Ticket title mapped to CMS-8 `title` in `.ticket-title`
-  - Ticket description mapped to CMS-8 `description` in `.ticket-description`
-  - Submitter information mapped to CMS-8 `submitterName` and `submitterEmail` in `.ticket-submitter`
-  - Submission date mapped to CMS-8 `submissionDate` in `.ticket-date`
-  - Status badge mapped to CMS-8 `status` in `.ticket-status`
-  - Priority badge mapped to CMS-8 `priority` in `.ticket-priority`
+  - Ticket ID mapped to CMS-8 `ticketId` in `ticketId`
+- Ticket title mapped to CMS-8 `title` in `ticketTitle`
+- Ticket description mapped to CMS-8 `description` in `ticketDescription`
+- Submitter information mapped to CMS-8 `submitterName` and `submitterEmail` in `ticketSubmitter`
+- Submission date mapped to CMS-8 `submissionDate` in `ticketDate`
+- Status badge mapped to CMS-8 `status` in `ticketStatus`
+- Priority badge mapped to CMS-8 `priority` in `ticketPriority`
 - Includes error handling for failed data loads
 - Provides fallback data display for network issues
 - Shows empty state message when no tickets are found
@@ -78,13 +78,13 @@ Ticket Elements:
 - Shows ticket summary section with status counts in `summary-cards`
 - Displays filtered ticket list in `ticket-list` (Repeater container)
 - Each ticket entry shows:
-  - Ticket ID in `.ticket-id`
-  - Ticket title in `.ticket-title`
-  - Ticket description in `.ticket-description`
-  - Submitter information in `.ticket-submitter`
-  - Submission date in `.ticket-date`
-  - Status badge in `.ticket-status`
-  - Priority badge in `.ticket-priority`
+  - Ticket ID in `ticketId`
+- Ticket title in `ticketTitle`
+- Ticket description in `ticketDescription`
+- Submitter information in `ticketSubmitter`
+- Submission date in `ticketDate`
+- Status badge in `ticketStatus`
+- Priority badge in `ticketPriority`
 
 ### Feature 2: Ticket Summary Display
 **User Action**: View ticket summary statistics
@@ -180,18 +180,18 @@ Ticket Elements:
 **显示结果**：
 - 显示带有加载状态管理的票据管理界面
 - 在 `summary-cards` 中显示票据摘要统计：
-  - `.card-number` 中的总票据数
+  - `cardNumber` 中的总票据数
   - 带有状态样式的开放票据数
   - 带有进度指示器的进行中票据数
   - 带有完成样式的已解决票据数
 - 在 `ticket-list` repeater中填充票据信息：
-  - `.ticket-id` 中映射到CMS-8 `ticketId` 的票据ID
-  - `.ticket-title` 中映射到CMS-8 `title` 的票据标题
-  - `.ticket-description` 中映射到CMS-8 `description` 的票据描述
-  - `.ticket-submitter` 中映射到CMS-8 `submitterName` 和 `submitterEmail` 的提交者信息
-  - `.ticket-date` 中映射到CMS-8 `submissionDate` 的提交日期
-  - `.ticket-status` 中映射到CMS-8 `status` 的状态徽章
-  - `.ticket-priority` 中映射到CMS-8 `priority` 的优先级徽章
+  - `ticketId` 中映射到CMS-8 `ticketId` 的票据ID
+- `ticketTitle` 中映射到CMS-8 `title` 的票据标题
+- `ticketDescription` 中映射到CMS-8 `description` 的票据描述
+- `ticketSubmitter` 中映射到CMS-8 `submitterName` 和 `submitterEmail` 的提交者信息
+- `ticketDate` 中映射到CMS-8 `submissionDate` 的提交日期
+- `ticketStatus` 中映射到CMS-8 `status` 的状态徽章
+- `ticketPriority` 中映射到CMS-8 `priority` 的优先级徽章
 - 包含数据加载失败的错误处理
 - 为网络问题提供备用数据显示
 - 当未找到票据时显示空状态消息
@@ -209,13 +209,13 @@ Ticket Elements:
 - 在 `summary-cards` 中显示状态计数的票据摘要部分
 - 在 `ticket-list`（Repeater容器）中显示过滤后的票据列表
 - 每个票据条目显示：
-  - `.ticket-id` 中的票据ID
-  - `.ticket-title` 中的票据标题
-  - `.ticket-description` 中的票据描述
-  - `.ticket-submitter` 中的提交者信息
-  - `.ticket-date` 中的提交日期
-  - `.ticket-status` 中的状态徽章
-  - `.ticket-priority` 中的优先级徽章
+  - `ticketId` 中的票据ID
+- `ticketTitle` 中的票据标题
+- `ticketDescription` 中的票据描述
+- `ticketSubmitter` 中的提交者信息
+- `ticketDate` 中的提交日期
+- `ticketStatus` 中的状态徽章
+- `ticketPriority` 中的优先级徽章
 
 ### 功能2：票据摘要显示
 **用户操作**：查看票据摘要统计

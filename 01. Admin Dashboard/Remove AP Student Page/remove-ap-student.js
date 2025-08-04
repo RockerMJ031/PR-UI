@@ -95,7 +95,7 @@ class RemoveAPStudentManager {
     }
 
     displayStudentList() {
-        const studentList = $w('#studentList');
+        const studentList = $w('studentList');
         
         if (!studentList) {
             console.error('Student list repeater not found');
@@ -280,7 +280,6 @@ class RemoveAPStudentManager {
 
     handleSuccessOk() {
         this.hideSuccessLightbox();
-        this.hideRemoveStudentModal();
         this.refreshStudentList();
     }
 
@@ -305,12 +304,7 @@ class RemoveAPStudentManager {
         }
     }
 
-    hideRemoveStudentModal() {
-        const removeStudentModal = $w('#removeStudentModal');
-        if (removeStudentModal) {
-            removeStudentModal.hide();
-        }
-    }
+
 
     async refreshStudentList() {
         try {
@@ -325,7 +319,7 @@ class RemoveAPStudentManager {
     showLoadingState(show) {
         this.isLoading = show;
         const loadingIndicator = $w('#loadingIndicator');
-        const studentList = $w('#studentList');
+        const studentList = $w('studentList');
         
         if (loadingIndicator) {
             if (show) {
@@ -342,7 +336,7 @@ class RemoveAPStudentManager {
 
     showEmptyState() {
         const emptyState = $w('#emptyState');
-        const studentList = $w('#studentList');
+        const studentList = $w('studentList');
         
         if (emptyState) {
             emptyState.show();
@@ -394,11 +388,7 @@ class RemoveAPStudentManager {
             successOkBtn.onClick(() => this.handleSuccessOk());
         }
         
-        // Modal close handlers
-        const removeStudentModal = $w('#removeStudentModal');
-        if (removeStudentModal) {
-            // Handle modal close events if needed
-        }
+        // Page close handlers can be added here if needed
     }
 }
 

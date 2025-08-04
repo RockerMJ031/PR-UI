@@ -156,7 +156,7 @@ class CourseCancellationManager {
     }
 
     displayStudents() {
-        const studentsDisplay = document.getElementById('students-text-display');
+        const studentsDisplay = document.getElementById('studentsTextDisplay');
         
         if (studentsDisplay) {
             const studentNames = this.selectedCourse.students.map(student => student.name).join(', ');

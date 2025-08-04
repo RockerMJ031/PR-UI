@@ -34,10 +34,10 @@ Success Elements:
 - Loads all students associated with the user's schoolID from CMS-7
 - Displays students in `studentList` (Repeater container) with:
   - Student ID in data attributes
-  - Student name in `.student-name`
-  - Student AP plan information in `.ap-plan`
-  - Status label (ACTIVE/PAUSED) in `.student-status`
-  - Remove button in `.remove-btn`
+  - Student name in `studentName`
+- Student AP plan information in `apPlan`
+- Status label (ACTIVE/PAUSED) in `studentStatus`
+- Remove button in `removeBtn`
 - Shows loading state during data retrieval
 - Handles error states if data loading fails
 - Provides fallback data if no students are found
@@ -49,10 +49,10 @@ Success Elements:
 - Shows `removeStudentModal` with student selection interface
 - Displays student list in `studentList` (Repeater container)
 - Each student entry shows:
-  - Student name in `.student-name`
-  - Student information (grade and courses) in `.student-info`
-  - Status label (ACTIVE/PAUSED) in `.student-status`
-  - Remove button in `.remove-btn`
+  - Student name in `studentName`
+- Student information (grade and courses) in `studentInfo`
+- Status label (ACTIVE/PAUSED) in `studentStatus`
+- Remove button in `removeBtn`
 
 ### Feature 2: Remove Button Click
 **User Action**: Click on `remove-btn` ("× Remove" button) for a specific student
@@ -121,10 +121,10 @@ Success Elements:
 - 从CMS-7加载与用户schoolID关联的所有学生
 - 在 `studentList`（Repeater容器）中显示学生，包含：
   - 数据属性中的学生ID
-  - `.student-name` 中的学生姓名
-  - `.ap-plan` 中的学生AP计划信息
-  - `.student-status` 中的状态标签（ACTIVE/PAUSED）
-  - `.remove-btn` 中的移除按钮
+  - `studentName` 中的学生姓名
+- `apPlan` 中的学生AP计划信息
+- `studentStatus` 中的状态标签（ACTIVE/PAUSED）
+- `removeBtn` 中的移除按钮
 - 数据检索期间显示加载状态
 - 如果数据加载失败则处理错误状态
 - 如果未找到学生则提供备用数据
@@ -136,10 +136,10 @@ Success Elements:
 - 显示带有学生选择界面的 `removeStudentModal`
 - 在 `studentList`（Repeater容器）中显示学生列表
 - 每个学生条目显示：
-  - `.student-name` 中的学生姓名
-  - `.student-info` 中的学生信息（年级和课程）
-  - `.student-status` 中的状态标签（ACTIVE/PAUSED）
-  - `.remove-btn` 中的移除按钮
+  - `studentName` 中的学生姓名
+- `studentInfo` 中的学生信息（年级和课程）
+- `studentStatus` 中的状态标签（ACTIVE/PAUSED）
+- `removeBtn` 中的移除按钮
 
 ### 功能2：点击移除按钮
 **用户操作**：点击特定学生的 `remove-btn`（"× Remove" 按钮）

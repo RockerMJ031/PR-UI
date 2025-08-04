@@ -25,10 +25,10 @@
 - `cancellationCourseHeader`
 - `cancellationCourseTitle`
 - `cancellationCourseSubject`
-- `students-text-display` (student names displayed as comma-separated text)
+- `studentsTextDisplay` (student names displayed as comma-separated text)
 
 ### Cancellation Form Elements
 - `cancellationStartDate` (date input without helper text)
-- `reasonForCancellation:`
+- `reasonForCancellation`
 - `closeBtn`
 - `submitCancellationBtn`

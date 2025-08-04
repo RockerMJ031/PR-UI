@@ -275,10 +275,10 @@ class CourseExtensionManager {
     }
 
     displayCourseInfo() {
-        const courseTitle = document.getElementById('courseTitle');
+        const extensionCourseTitle = document.getElementById('extensionCourseTitle');
         const courseDetails = document.getElementById('courseDetails');
 
-        courseTitle.textContent = `${this.selectedCourse.id} - ${this.selectedCourse.subject}`;
+        extensionCourseTitle.textContent = `${this.selectedCourse.id} - ${this.selectedCourse.subject}`;
 
         courseDetails.innerHTML = `
             <div class="detail-item">
@@ -309,14 +309,14 @@ class CourseExtensionManager {
     }
 
     populateCurrentEndDate() {
-        const currentEndDateInput = document.getElementById('currentEndDate');
-        currentEndDateInput.value = this.selectedCourse.endDate;
+        const extensionEndDate = document.getElementById('extensionEndDate');
+        extensionEndDate.value = this.selectedCourse.endDate;
     }
 
     displayStudents() {
-        const studentsList = document.getElementById('studentsList');
+        const studentsTextDisplay = document.getElementById('studentsTextDisplay');
         
-        studentsList.innerHTML = this.selectedCourse.students.map(student => `
+        studentsTextDisplay.innerHTML = this.selectedCourse.students.map(student => `
             <div class="student-item">
                 <div class="student-name">${student.name}</div>
                 <div class="student-lessons">${student.lessons} lessons completed</div>
@@ -596,7 +596,7 @@ class CourseExtensionManager {
             courseId: this.selectedCourse.id,
             courseName: `${this.selectedCourse.id} - ${this.selectedCourse.subject}`,
             extensionType: document.getElementById('extensionType').value,
-            currentEndDate: document.getElementById('currentEndDate').value,
+            currentEndDate: document.getElementById('extensionEndDate').value,
             newEndDate: document.getElementById('newEndDate').value,
             additionalLessons: parseInt(document.getElementById('additionalLessons').value) || 0,
             extensionReason: document.getElementById('extensionReason').value,

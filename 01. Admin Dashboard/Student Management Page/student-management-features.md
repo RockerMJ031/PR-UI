@@ -43,11 +43,11 @@ Success Elements:
 - Filters students with status "active" or "Activated"
 - Displays student management interface with:
   - Student list in `studentList` repeater showing:
-    - Student ID in `.student-id`
-    - Student name in `.student-name`
-    - Student email in `.student-email`
-    - Course count in `.course-count`
-    - Course list in `.course-list`
+    - Student ID in `studentId`
+- Student name in `studentName`
+- Student email in `studentEmail`
+- Course count in `courseCount`
+- Course list in `courseList`
     - Management action buttons
   - Two option buttons: `removeAllCoursesBtn` and `removeSpecificCourseBtn`
   - Search functionality with `searchInput` and `searchBtn`
@@ -66,11 +66,11 @@ Success Elements:
 - Shows search section with `searchInput` and `searchBtn`
 - Displays filtered student list in `studentList` (Repeater container)
 - Each student entry shows:
-  - Student name in `.student-name`
-  - Student ID in `.student-id`
-  - Student email in `.student-email`
-  - Course count in `.course-count`
-  - Course list in `.course-list`
+  - Student name in `studentName`
+- Student ID in `studentId`
+- Student email in `studentEmail`
+- Course count in `courseCount`
+- Course list in `courseList`
 
 ### Feature 2: Remove All Courses Option Selection
 **User Action**: Click on `removeAllCoursesBtn` ("Remove all courses for student" button)
@@ -167,11 +167,11 @@ Success Elements:
 - 过滤状态为"active"或"Activated"的学生
 - 显示学生管理界面包含：
   - `studentList` repeater中的学生列表显示：
-    - `.student-id` 中的学生ID（来自CMS-7的studentId字段）
-    - `.student-name` 中的学生姓名（来自CMS-7的studentName字段）
-    - `.student-email` 中的学生邮箱（来自CMS-7的email字段）
-    - `.course-count` 中的课程数量（从CMS-2中搜索该学生studentId且status为"Activated"的class_id数量）
-    - `.course-list` 中的课程列表（根据点击removeAllCoursesBtn显示"courses"或点击removeSpecificCourseBtn显示"course"，内容为CMS-2中的class_id）
+    - `studentId` 中的学生ID（来自CMS-7的studentId字段）
+- `studentName` 中的学生姓名（来自CMS-7的studentName字段）
+- `studentEmail` 中的学生邮箱（来自CMS-7的email字段）
+- `courseCount` 中的课程数量（从CMS-2中搜索该学生studentId且status为"Activated"的class_id数量）
+- `courseList` 中的课程列表（根据点击removeAllCoursesBtn显示"courses"或点击removeSpecificCourseBtn显示"course"，内容为CMS-2中的class_id）
     - 管理操作按钮
   - 两个选项按钮：`removeAllCoursesBtn` 和 `removeSpecificCourseBtn`
   - 搜索功能包含 `searchInput` 和 `searchBtn`
@@ -190,11 +190,11 @@ Success Elements:
 - 显示包含 `searchInput` 和 `searchBtn` 的搜索部分
 - 在 `studentList`（Repeater容器）中显示过滤后的学生列表
 - 每个学生条目显示：
-  - `.student-name` 中的学生姓名
-  - `.student-id` 中的学生ID
-  - `.student-email` 中的学生邮箱
-  - `.course-count` 中的课程数量
-  - `.course-list` 中的课程列表
+  - `studentName` 中的学生姓名
+- `studentId` 中的学生ID
+- `studentEmail` 中的学生邮箱
+- `courseCount` 中的课程数量
+- `courseList` 中的课程列表
 
 ### 功能2：移除所有课程选项选择
 **用户操作**：点击 `removeAllCoursesBtn`（"移除学生所有课程" 按钮）

@@ -15,7 +15,6 @@ class StudentManagementSystem {
         this.students = [];
         this.filteredStudents = [];
         this.selectedRemovalMode = null; // 'all' or 'specific'
-        this.searchTerm = '';
         this.isLoading = false;
         this.selectedStudent = null;
         
@@ -149,15 +148,7 @@ class StudentManagementSystem {
             this.selectRemovalMode('specific');
         });
 
-        // 功能4：搜索功能
-        $w('#searchBtn').onClick(() => {
-            this.performSearch();
-        });
 
-        $w('#searchInput').onInput(() => {
-            this.searchTerm = $w('#searchInput').value;
-            this.performSearch();
-        });
 
         // 功能8：取消操作
         $w('#cancelBtn').onClick(() => {
@@ -174,10 +165,8 @@ class StudentManagementSystem {
             this.closeSuccessLightbox();
         });
 
-        // 功能9：模态框管理
-        $w('#removeStudentModal').onClose(() => {
-            this.closeModal();
-        });
+        // 功能9：页面管理
+        // 页面关闭处理逻辑可以在这里添加
     }
 
     /**
@@ -204,24 +193,7 @@ class StudentManagementSystem {
         this.updateStudentListDisplay();
     }
 
-    /**
-     * 功能4：执行搜索
-     */
-    performSearch() {
-        const searchTerm = this.searchTerm.toLowerCase();
-        
-        if (!searchTerm) {
-            this.filteredStudents = [...this.students];
-        } else {
-            this.filteredStudents = this.students.filter(student => 
-                student.studentName.toLowerCase().includes(searchTerm) ||
-                student.studentId.toLowerCase().includes(searchTerm) ||
-                student.email.toLowerCase().includes(searchTerm)
-            );
-        }
-        
-        this.displayStudentList();
-    }
+
 
     /**
      * 显示学生列表
@@ -450,11 +422,11 @@ class StudentManagementSystem {
     }
 
     /**
-     * 功能9：关闭模态框
+     * 功能9：页面导航处理
      */
-    closeModal() {
-        $w('#removeStudentModal').hide();
+    handlePageNavigation() {
         // 返回主仪表板或执行其他导航逻辑
+        // 可以使用 wixLocation.to() 进行页面跳转
     }
 
     /**

@@ -29,7 +29,7 @@ The Course Cancellation Page allows administrators to cancel courses that need t
 - `cancellationCourseHeader`: Course header section
 - `cancellationCourseTitle`: Selected course title
 - `cancellationCourseSubject`: Selected course subject
-- `students-text-display`: Student names display area
+- `studentsTextDisplay`: Student names display area
 
 ### Cancellation Form Elements
 - `cancellationStartDate`: Cancellation effective date input
@@ -79,7 +79,7 @@ The Course Cancellation Page allows administrators to cancel courses that need t
 - Hides `cancellationPlaceholder` containing `cancellationPlaceholderText` and `cancellationPlaceholderIcon`
 - Shows `selectedCancellationCourseInfo` panel
 - Displays `cancellationCourseTitle` and `cancellationCourseSubject` in `cancellationCourseHeader`
-- Populates `students-text-display` with detailed student information
+- Populates `studentsTextDisplay` with detailed student information
 
 ### Feature 3: Cancellation Configuration
 **User Action**: Fill in cancellation details in the form
@@ -171,7 +171,7 @@ The Course Cancellation Page allows administrators to cancel courses that need t
 - 隐藏包含 `cancellationPlaceholderText` 和 `cancellationPlaceholderIcon` 的 `cancellationPlaceholder`
 - 显示 `selectedCancellationCourseInfo` 面板
 - 在 `cancellationCourseHeader` 中显示 `cancellationCourseTitle` 和 `cancellationCourseSubject`
-- 用详细学生信息填充 `students-text-display`
+- 用详细学生信息填充 `studentsTextDisplay`
 
 ### 功能3：取消配置
 **用户操作**：在表单中填写取消详细信息

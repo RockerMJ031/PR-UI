@@ -21,16 +21,15 @@ Each student entry contains:
 
 ### Possible Element IDs and Class Names
 
-#### Modal-Related
-- `#removeStudentModal` - Entire modal
-- `.modal-header` - Modal header
-- `.modal-title` - Title text
-- `.close-btn` - Close button
+#### Page-Related
+- `modalHeader` - Page header
+- `modalTitle` - Title text
+- `closeBtn` - Close button
 
 #### Student List-Related
-- `.student-list` or `#studentList` - Student list container (Repeater container)
-- `.student-item` - Individual student entry (Repeater item)
-- `.student-name` - Student name
-- `.student-info` - Student information (grade and courses)
-- `.student-status` - Status label container
-- `.remove-btn` - Remove button
+- `studentList` - Student list container (Repeater container)
+- `studentItem` - Individual student entry (Repeater item)
+- `studentName` - Student name
+- `studentInfo` - Student information (grade and courses)
+- `studentStatus` - Status label container
+- `removeBtn` - Remove button

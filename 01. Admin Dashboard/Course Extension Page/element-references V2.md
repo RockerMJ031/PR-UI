@@ -26,7 +26,7 @@
 - `extensionCourseHeader`
 - `extensionCourseTitle`
 - `extensionCourseSubject`
-- `students-text-display` (student names displayed as comma-separated text)
+- `studentsTextDisplay` (student names displayed as comma-separated text)
 
 ### Extension Form Elements
 - `extensionEndDate` (date input without helper text)

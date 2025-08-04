@@ -2580,7 +2580,7 @@
                     <div class="extension-course-subject">${course.subject}</div>
                     <div class="student-count">(${course.students.length} students)</div>
                 </div>
-                <div class="students-text-display">
+                <div class="studentsTextDisplay">
                     ${studentNames}
                 </div>
             `;
@@ -2859,7 +2859,7 @@
             const studentsText = course.students.map(student => student.name).join(', ');
             
             document.getElementById('selectedCancellationStudentsList').innerHTML = `
-                <div class="students-text-display">${studentsText}</div>
+                <div class="studentsTextDisplay">${studentsText}</div>
             `;
             
             // Show details panel
@@ -3917,7 +3917,7 @@
             font-weight: 500;
         }
 
-        .students-text-display {
+        .studentsTextDisplay {
             margin-top: 0.75rem;
             padding: 0.75rem 1rem;
             background: #f8f9ff;

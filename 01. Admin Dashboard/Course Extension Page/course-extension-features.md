@@ -53,7 +53,7 @@ Confirmation Lightbox Elements:
 - Hides `extensionPlaceholder` containing `extensionPlaceholderText` and `extensionPlaceholderIcon`
 - Shows `selectedExtensionCourseInfo` panel
 - Displays `extensionCourseTitle` and `extensionCourseSubject` in `extensionCourseHeader`
-- Populates `students-text-display` with detailed student information
+- Populates `studentsTextDisplay` with detailed student information
 
 ### Feature 3: Extension Configuration
 **User Action**: Fill in extension details in the form
@@ -142,7 +142,7 @@ Confirmation Lightbox Elements:
 - 隐藏包含 `extensionPlaceholderText` 和 `extensionPlaceholderIcon` 的 `extensionPlaceholder`
 - 显示 `selectedExtensionCourseInfo` 面板
 - 在 `extensionCourseHeader` 中显示 `extensionCourseTitle` 和 `extensionCourseSubject`
-- 用详细学生信息填充 `students-text-display`
+- 用详细学生信息填充 `studentsTextDisplay`
 
 ### 功能3：延期配置
 **用户操作**：在表单中填写延期详细信息
