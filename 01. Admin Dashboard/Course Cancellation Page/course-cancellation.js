@@ -605,15 +605,15 @@ class CourseCancellationManager {
         this.selectedCourse = null;
         
         // Hide course details and show placeholder
-        const extensionPlaceholder = document.getElementById('extensionPlaceholder');
-        const selectedExtensionCourseInfo = document.getElementById('selectedExtensionCourseInfo');
+        const cancellationPlaceholder = document.getElementById('cancellationPlaceholder');
+        const selectedCancellationCourseInfo = document.getElementById('selectedCancellationCourseInfo');
         
-        if (extensionPlaceholder) {
-            extensionPlaceholder.style.display = 'block';
+        if (cancellationPlaceholder) {
+            cancellationPlaceholder.style.display = 'block';
         }
         
-        if (selectedExtensionCourseInfo) {
-            selectedExtensionCourseInfo.style.display = 'none';
+        if (selectedCancellationCourseInfo) {
+            selectedCancellationCourseInfo.style.display = 'none';
         }
         
         // Clear form fields
@@ -660,15 +660,15 @@ class CourseCancellationManager {
         await this.displayCourseRepeater();
         
         // Show placeholder initially
-        const extensionPlaceholder = document.getElementById('extensionPlaceholder');
-        const selectedExtensionCourseInfo = document.getElementById('selectedExtensionCourseInfo');
+        const cancellationPlaceholder = document.getElementById('cancellationPlaceholder');
+        const selectedCancellationCourseInfo = document.getElementById('selectedCancellationCourseInfo');
         
-        if (extensionPlaceholder) {
-            extensionPlaceholder.style.display = 'block';
+        if (cancellationPlaceholder) {
+            cancellationPlaceholder.style.display = 'block';
         }
         
-        if (selectedExtensionCourseInfo) {
-            selectedExtensionCourseInfo.style.display = 'none';
+        if (selectedCancellationCourseInfo) {
+            selectedCancellationCourseInfo.style.display = 'none';
         }
     }
 

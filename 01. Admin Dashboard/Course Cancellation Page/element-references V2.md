@@ -14,7 +14,7 @@
 - `studentCountNumber` (bold number)
 - `studentCountText` (normal text "students")
 - `studentNames` (student names text field)
-- `cancelBtn`
+- `selectBtn`
 
 ### Cancellation Details Panel (After Course Selection)
 - `cancellationDetailsPanel`
@@ -30,6 +30,19 @@
 
 ### Cancellation Form Elements
 - `cancellationStartDate` (date input without helper text)
+- `cancellationDate` (cancellation date used in validation)
+- `lastClassDate` (last class date used in validation)
 - `reasonForCancellation`
-- `closeBtn`
+- `closeBtn` - Close modal button (handles general modal close functionality)
+- `clearSelectionBtn` - Clear course selection button (returns to main view and clears selected course)
 - `submitCancellationBtn`
+
+### Impact Statistics and Student List
+- `impactStats` - Impact statistics display (students affected, total refunds, etc.)
+- `studentsList` - Student list display with refund information
+
+### Confirmation Dialog Elements
+- `confirmationLightbox` - Confirmation dialog overlay
+- `confirmationTitle` - Confirmation dialog title
+- `confirmationMessage` - Confirmation dialog message
+- `confirmationOkBtn` - Confirmation dialog OK button
