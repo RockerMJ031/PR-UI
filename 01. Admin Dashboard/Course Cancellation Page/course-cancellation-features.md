@@ -42,8 +42,8 @@ The Course Cancellation Page allows administrators to cancel courses that need t
 ### Feature 0: Page Load and Initial Course Display
 **User Action**: Page loads automatically
 **CMS Data Source**: 
-- **User Authentication**: Get current user's `wix_id` and query CMS-6 (Admins Collection) using `wixData.query('Admins').eq('userId', wix_id)` to get user's `schoolID`
-- **Course Data**: Query CMS-3 (Import86 - Course Information Management Collection) using `wixData.query('Import86').eq('schoolID', userSchoolID)` to get school-specific courses
+- **User Authentication**: Get current user's `wix_id` and query CMS-6 (Admins Collection) using `wixData.query('Admins').eq('userId', wix_id)` to get user's `school`
+- **Course Data**: Query CMS-3 (Import86 - Course Information Management Collection) using `wixData.query('Import86').eq('schoolName', userSchool)` to get school-specific courses
 - **Student Count**: Queries CMS-2 (Import74 - Student Course Assignment Collection) to count students with matching `class_id` and `status: 'Activated'`
 - **Student Names**: Retrieves `student_name` from CMS-2 records with matching `class_id` and `status: 'Activated'`
 **Display Result**: 
@@ -135,8 +135,8 @@ The Course Cancellation Page allows administrators to cancel courses that need t
 ### 功能0：页面加载和初始课程显示
 **用户操作**：页面自动加载
 **CMS数据源**：
-- **用户身份验证**：获取当前用户的 `wix_id`，使用 `wixData.query('Admins').eq('userId', wix_id)` 查询CMS-6（管理员集合）以获取用户的 `schoolID`
-- **课程数据**：使用 `wixData.query('Import86').eq('schoolID', userSchoolID)` 查询CMS-3（Import86 - 课程信息管理集合），获取学校特定的课程
+- **用户身份验证**：获取当前用户的 `wix_id`，使用 `wixData.query('Admins').eq('userId', wix_id)` 查询CMS-6（管理员集合）以获取用户的 `school`
+- **课程数据**：使用 `wixData.query('Import86').eq('schoolName', userSchool)` 查询CMS-3（Import86 - 课程信息管理集合），获取学校特定的课程
 - **学生数量**：查询CMS-2（Import74 - 学生课程分配集合）统计与 `class_id` 匹配且 `status: 'Activated'` 的学生数量
 - **学生姓名**：从CMS-2中与 `class_id` 匹配且 `status: 'Activated'` 的记录中获取 `student_name`
 **显示结果**：

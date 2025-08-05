@@ -2,12 +2,12 @@
 // Handles course cancellation form functionality and data management
 // 
 // 主要功能：
-// 功能0：页面加载和初始课程显示 - 通过wix_id从CMS-6获取schoolID，然后从CMS-3获取课程数据
+// 功能0：页面加载和初始课程显示 - 通过wix_id从CMS-6获取school，然后从CMS-3获取课程数据
 // 功能1：课程搜索和显示 - 从CMS-3获取课程信息，从CMS-2获取学生数据，支持搜索过滤
 // 
 // CMS数据源：
-// - CMS-6 (Admins Collection): 用户身份验证，通过userId(wix_id)获取schoolID
-// - CMS-3 (Classes Collection): 课程信息，包含class_id、subject、schoolID
+// - CMS-6 (Admins Collection): 用户身份验证，通过userId(wix_id)获取school
+// - CMS-3 (Classes Collection): 课程信息，包含class_id、subject、schoolName
 // - CMS-2 (Students Collection): 学生信息，包含name、class_id、status
 
 // 导入Wix API
@@ -19,7 +19,7 @@ class CourseCancellationManager {
         this.selectedCourse = null;
         this.studentsData = [];
         this.courseData = null;
-        this.userSchoolID = null;
+        this.userSchool = null;
         this.init();
     }
 
@@ -31,7 +31,7 @@ class CourseCancellationManager {
         this.setupDateConstraints();
     }
 
-    // 功能0：用户身份验证 - 通过wix_id获取schoolID
+    // 功能0：用户身份验证 - 通过wix_id获取school
     async authenticateUser() {
         try {
             // 获取当前用户的wix_id
@@ -43,7 +43,7 @@ class CourseCancellationManager {
             
             const wixId = currentUser.id;
             
-            // 查询CMS-6 (Admins Collection) 获取schoolID
+            // 查询CMS-6 (Admins Collection) 获取school
             const adminQuery = wixData.query('Admins')
                 .eq('userId', wixId)
                 .limit(1);
@@ -51,31 +51,31 @@ class CourseCancellationManager {
             const adminResults = await adminQuery.find();
             
             if (adminResults.items.length > 0) {
-                this.userSchoolID = adminResults.items[0].schoolID;
-                console.log('用户schoolID:', this.userSchoolID);
+                this.userSchool = adminResults.items[0].school;
+                console.log('用户school:', this.userSchool);
             } else {
                 console.error('未找到用户的学校信息');
-                // 使用默认schoolID进行测试
-                this.userSchoolID = 'DEFAULT_SCHOOL';
+                // 使用默认school进行测试
+                this.userSchool = 'DEFAULT_SCHOOL';
             }
         } catch (error) {
             console.error('用户身份验证失败:', error);
-            // 使用默认schoolID进行测试
-            this.userSchoolID = 'DEFAULT_SCHOOL';
+            // 使用默认school进行测试
+            this.userSchool = 'DEFAULT_SCHOOL';
         }
     }
 
     // 功能0：页面加载和初始课程显示 - 从CMS获取课程数据
     async loadCourseData() {
         try {
-            if (!this.userSchoolID) {
-                console.error('用户schoolID未获取');
+            if (!this.userSchool) {
+                console.error('用户school未获取');
                 return;
             }
 
-            // 从CMS-3 (Classes Collection) 查询课程数据，根据schoolID过滤
+            // 从CMS-3 (Classes Collection) 查询课程数据，根据schoolName过滤
             const classesQuery = wixData.query('Classes')
-                .eq('schoolID', this.userSchoolID)
+                .eq('schoolName', this.userSchool)
                 .limit(50); // 限制返回数量
             
             const classesResults = await classesQuery.find();
@@ -90,7 +90,7 @@ class CourseCancellationManager {
                     return {
                         id: classItem.class_id,
                         subject: classItem.subject,
-                        schoolID: classItem.schoolID
+                        schoolName: classItem.schoolName
                     };
                 });
                 
@@ -110,12 +110,12 @@ class CourseCancellationManager {
                 {
                     id: 'AS-APY-Y9-EL-BIOLOGY',
                     subject: 'Biology',
-                    schoolID: this.userSchoolID
+                    schoolName: this.userSchool
                 },
                 {
                     id: 'AS-APY-Y10-EL-CHEMISTRY', 
                     subject: 'Chemistry',
-                    schoolID: this.userSchoolID
+                    schoolName: this.userSchool
                 }
             ];
             this.displayCourseRepeater();

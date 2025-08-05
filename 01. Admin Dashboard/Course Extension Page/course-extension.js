@@ -10,7 +10,7 @@ import wixData from 'wix-data';
 class CourseExtensionManager {
     constructor() {
         this.selectedCourse = null;
-        this.userSchoolID = null;
+        this.userSchool = null;
         this.courses = [];
         this.extensionFees = {
             standard: 50,
@@ -39,32 +39,32 @@ class CourseExtensionManager {
                     .find();
                 
                 if (adminQuery.items.length > 0) {
-                    this.userSchoolID = adminQuery.items[0].schoolID;
+                    this.userSchool = adminQuery.items[0].school;
                 } else {
-                    console.warn('User not found in Admins collection, using default schoolID');
-                    this.userSchoolID = 'DEFAULT_SCHOOL';
+                    console.warn('User not found in Admins collection, using default school');
+                    this.userSchool = 'DEFAULT_SCHOOL';
                 }
             } else {
-                console.warn('No current user found, using default schoolID');
-                this.userSchoolID = 'DEFAULT_SCHOOL';
+                console.warn('No current user found, using default school');
+                this.userSchool = 'DEFAULT_SCHOOL';
             }
         } catch (error) {
             console.error('Error authenticating user:', error);
-            this.userSchoolID = 'DEFAULT_SCHOOL';
+            this.userSchool = 'DEFAULT_SCHOOL';
         }
     }
 
     async loadCourseData() {
         try {
-            if (!this.userSchoolID) {
-                console.warn('No userSchoolID available, using fallback data');
+            if (!this.userSchool) {
+                console.warn('No userSchool available, using fallback data');
                 this.courses = this.getFallbackCourses();
                 return;
             }
 
-            // Query CMS-3 for courses matching user's schoolID
+            // Query CMS-3 for courses matching user's school
             const courseQuery = await wixData.query('Import86')
-                .eq('schoolID', this.userSchoolID)
+                .eq('schoolName', this.userSchool)
                 .find();
 
             if (courseQuery.items.length > 0) {
@@ -81,7 +81,7 @@ class CourseExtensionManager {
                     };
                 });
             } else {
-                console.warn('No courses found for schoolID:', this.userSchoolID);
+                console.warn('No courses found for school:', this.userSchool);
                 this.courses = this.getFallbackCourses();
             }
         } catch (error) {
@@ -96,13 +96,13 @@ class CourseExtensionManager {
                 courseId: 'AS-APY-Y9-EL-BIOLOGY',
                 courseName: 'AS-APY-Y9-EL-BIOLOGY',
                 courseSubject: 'Biology',
-                schoolID: this.userSchoolID || 'DEFAULT_SCHOOL'
+                schoolID: this.userSchool || 'DEFAULT_SCHOOL'
             },
             {
                 courseId: 'AS-APY-Y9-EL-CHEMISTRY',
                 courseName: 'AS-APY-Y9-EL-CHEMISTRY', 
                 courseSubject: 'Chemistry',
-                schoolID: this.userSchoolID || 'DEFAULT_SCHOOL'
+                schoolID: this.userSchool || 'DEFAULT_SCHOOL'
             }
         ];
     }

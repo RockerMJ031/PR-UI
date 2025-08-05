@@ -55,8 +55,8 @@ The Course Extension Page allows administrators to extend course durations for s
 ### Feature 0: Page Load and Initial Course Display
 **User Action**: Page automatically loads
 **CMS Data Source**:
-- **User Authentication**: Get current user's `wix_id`, use `wixData.query('Admins').eq('userId', wix_id)` to query CMS-6 (Admins Collection) to obtain user's `schoolID`
-- **Course Data**: Use `wixData.query('Import86').eq('schoolID', userSchoolID)` to query CMS-3 (Import86 - Course Information Management Collection) to get school-specific courses
+- **User Authentication**: Get current user's `wix_id`, use `wixData.query('Admins').eq('userId', wix_id)` to query CMS-6 (Admins Collection) to obtain user's `school`
+- **Course Data**: Use `wixData.query('Import86').eq('schoolName', userSchool)` to query CMS-3 (Import86 - Course Information Management Collection) to get school-specific courses
 - **Student Count**: Query CMS-2 (Import74 - Student Course Assignment Collection) to count students matching `class_id` with `status: 'Activated'`
 - **Student Names**: Retrieve `student_name` from CMS-2 records matching `class_id` with `status: 'Activated'`
 **Display Result**:
@@ -151,8 +151,8 @@ The Course Extension Page allows administrators to extend course durations for s
 ### 功能0：页面加载和初始课程显示
 **用户操作**：页面自动加载
 **CMS数据源**：
-- **用户身份验证**：获取当前用户的 `wix_id`，使用 `wixData.query('Admins').eq('userId', wix_id)` 查询CMS-6（管理员集合）以获取用户的 `schoolID`
-- **课程数据**：使用 `wixData.query('Import86').eq('schoolID', userSchoolID)` 查询CMS-3（Import86 - 课程信息管理集合），获取学校特定的课程
+- **用户身份验证**：获取当前用户的 `wix_id`，使用 `wixData.query('Admins').eq('userId', wix_id)` 查询CMS-6（管理员集合）以获取用户的 `school`
+- **课程数据**：使用 `wixData.query('Import86').eq('schoolName', userSchool)` 查询CMS-3（Import86 - 课程信息管理集合），获取学校特定的课程
 - **学生数量**：查询CMS-2（Import74 - 学生课程分配集合）统计与 `class_id` 匹配且 `status: 'Activated'` 的学生数量
 - **学生姓名**：从CMS-2中与 `class_id` 匹配且 `status: 'Activated'` 的记录中获取 `student_name`
 **显示结果**：
