@@ -12,12 +12,20 @@
 - `headerTitle` - "All Ticket Status" title text
 
 ### Ticket Summary Section
-- `ticketSummary` - Summary container
 - `summaryTitle` - "Ticket Summary" heading
 - `summaryCards` - Cards container
-- `summaryCard` - Individual summary card
-- `cardLabel` - Card label (Total Tickets, Open, In Progress, Resolved)
-- `cardNumber` - Card number display
+- `summaryCardTotal` - Total tickets summary card
+- `summaryCardOpen` - Open tickets summary card
+- `summaryCardInProgress` - In progress tickets summary card
+- `summaryCardResolved` - Resolved tickets summary card
+- `cardLabelTotalTicket` - Total tickets label
+- `cardNumberTotal` - Total tickets number display
+- `cardLabelOpen` - Open tickets label
+- `textOpenTickets` - Open tickets number display
+- `cardLabelInProgress` - In progress tickets label
+- `textInProgressTickets` - In progress tickets number display
+- `cardLabelResolved` - Resolved tickets label
+- `textResolvedTickets` - Resolved tickets number display
 
 ### Ticket List Section (Repeater)
 - `ticketList` - Repeater container

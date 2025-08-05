@@ -17,12 +17,20 @@ Header Elements:
 - modal-close: 关闭按钮
 
 Summary Elements:
-- ticket-summary: 票据摘要容器
 - summary-title: 摘要标题
 - summary-cards: 摘要卡片容器
-- summary-card: 单个摘要卡片
-- card-label: 卡片标签
-- card-number: 卡片数字
+- summary-card-total: 总票据摘要卡片
+- summary-card-open: 开放票据摘要卡片
+- summary-card-in-progress: 进行中票据摘要卡片
+- summary-card-resolved: 已解决票据摘要卡片
+- card-label-total-ticket: 总票据标签
+- card-label-open: 开放票据标签
+- card-label-in-progress: 进行中票据标签
+- card-label-resolved: 已解决票据标签
+- card-number-total: 总票据数字
+- text-open-tickets: 开放票据数字
+- text-in-progress-tickets: 进行中票据数字
+- text-resolved-tickets: 已解决票据数字
 
 Ticket Elements:
 - ticket-item: 票据项目
@@ -49,10 +57,10 @@ Ticket Elements:
 **Display Result**:
 - Shows ticket management interface with loading state management
 - Displays ticket summary statistics in `summary-cards`:
-  - Total tickets count in `cardNumber`
-  - Open tickets count with status styling
-  - In Progress tickets count with progress indicator
-  - Resolved tickets count with completion styling
+  - Total tickets count in `cardNumberTotal`
+  - Open tickets count in `textOpenTickets` with status styling
+  - In Progress tickets count in `textInProgressTickets` with progress indicator
+  - Resolved tickets count in `textResolvedTickets` with completion styling
 - Populates `ticket-list` repeater with ticket information:
   - Ticket ID mapped to CMS-8 `ticketId` in `ticketId`
 - Ticket title mapped to CMS-8 `title` in `ticketTitle`
@@ -180,10 +188,10 @@ Ticket Elements:
 **显示结果**：
 - 显示带有加载状态管理的票据管理界面
 - 在 `summary-cards` 中显示票据摘要统计：
-  - `cardNumber` 中的总票据数
-  - 带有状态样式的开放票据数
-  - 带有进度指示器的进行中票据数
-  - 带有完成样式的已解决票据数
+  - `cardNumberTotal` 中的总票据数
+  - `textOpenTickets` 中带有状态样式的开放票据数
+  - `textInProgressTickets` 中带有进度指示器的进行中票据数
+  - `textResolvedTickets` 中带有完成样式的已解决票据数
 - 在 `ticket-list` repeater中填充票据信息：
   - `ticketId` 中映射到CMS-8 `ticketId` 的票据ID
 - `ticketTitle` 中映射到CMS-8 `title` 的票据标题

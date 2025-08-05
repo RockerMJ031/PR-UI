@@ -19,7 +19,7 @@ class TicketManager {
         await this.loadTickets();
         this.setupEventListeners();
         this.renderTicketList();
-        this.updateStatistics();
+        this.updateSummaryCards(this.tickets);
     }
 
     async loadCurrentUser() {
@@ -40,29 +40,28 @@ class TicketManager {
             this.tickets = results.items;
         } catch (error) {
             console.error('Error loading tickets:', error);
-            this.showNotification('Failed to load tickets', 'error');
         }
     }
 
     setupEventListeners() {
         // Modal close button
-        $w('#btnCloseModal').onClick(() => this.hideModal());
+        $w('#modalClose').onClick(() => this.hideModal());
         
         // Ticket list item clicks - setup repeater
-        $w('#repeaterTickets').onItemReady(($item, itemData) => {
+        $w('#ticketList').onItemReady(($item, itemData) => {
             // Populate ticket data in repeater items
-            $item('#textTicketId').text = itemData._id || itemData.ticketId;
-            $item('#textTicketTitle').text = itemData.title;
-            $item('#textTicketDescription').text = itemData.description;
-            $item('#textSubmittedBy').text = itemData.submittedBy || itemData.submitterEmail;
-            $item('#textTicketDate').text = itemData.createdDateFormatted || new Date(itemData._createdDate).toLocaleDateString();
-            $item('#textTicketStatus').text = itemData.status;
-            $item('#textTicketPriority').text = itemData.priority;
+            $item('#ticketId').text = itemData._id || itemData.ticketId;
+            $item('#ticketTitle').text = itemData.title;
+            $item('#ticketDescription').text = itemData.description;
+            $item('#ticketSubmitter').text = itemData.submittedBy || itemData.submitterEmail;
+            $item('#ticketDate').text = itemData.createdDateFormatted || new Date(itemData._createdDate).toLocaleDateString();
+            $item('#ticketStatus').text = itemData.status;
+            $item('#ticketPriority').text = itemData.priority;
         });
     }
 
     hideModal() {
-        $w('#containerTicketManagement').hide();
+        $w('#modalContainer').hide();
     }
 
     // Removed createTicket method as it's not needed for this view-only modal
@@ -82,7 +81,7 @@ class TicketManager {
             statusClass: this.getStatusClass(ticket.status)
         }));
         
-        $w('#repeaterTickets').data = ticketData;
+        $w('#ticketList').data = ticketData;
     }
 
     getPriorityClass(priority) {
@@ -105,24 +104,23 @@ class TicketManager {
         return classes[status] || 'status-open';
     }
 
-    updateStatistics() {
-        const stats = {
-            total: this.tickets.length,
-            open: this.tickets.filter(t => t.status === 'Open').length,
-            inProgress: this.tickets.filter(t => t.status === 'In Progress').length,
-            resolved: this.tickets.filter(t => t.status === 'Resolved').length
-        };
+    updateSummaryCards(tickets) {
+        const totalTickets = tickets.length;
+        const openTickets = tickets.filter(ticket => ticket.status === 'Open').length;
+        const inProgressTickets = tickets.filter(ticket => ticket.status === 'In Progress').length;
+        const resolvedTickets = tickets.filter(ticket => ticket.status === 'Resolved').length;
         
-        $w('#textTotalTickets').text = stats.total.toString();
-        $w('#textOpenTickets').text = stats.open.toString();
-        $w('#textInProgressTickets').text = stats.inProgress.toString();
-        $w('#textResolvedTickets').text = stats.resolved.toString();
+        // Update summary cards
+        $w('#cardNumberTotal').text = totalTickets.toString();
+        $w('#textOpenTickets').text = openTickets.toString();
+        $w('#textInProgressTickets').text = inProgressTickets.toString();
+        $w('#textResolvedTickets').text = resolvedTickets.toString();
     }
 
     async refreshTickets() {
         await this.loadTickets();
         this.renderTicketList();
-        this.updateStatistics();
+        this.updateSummaryCards(this.tickets);
     }
 
     // Removed notification methods as no notification elements exist
