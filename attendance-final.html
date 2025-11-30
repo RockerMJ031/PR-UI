@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Purple Ruler - Strategic Attendance Dashboard</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ['Inter', 'sans-serif'] },
+            colors: {
+              brand: {
+                50: '#f5f3ff', 100: '#ede9fe', 200: '#ddd6fe', 300: '#c4b5fd',
+                400: '#a78bfa', 500: '#8b5cf6', 600: '#7c3aed', 700: '#6d28d9',
+                800: '#5b21b6', 900: '#4c1d95',
+              },
+              code: {
+                present: '#dcfce7', // Green 100
+                presentText: '#15803d', // Green 700
+                late: '#fef9c3', // Yellow 100
+                lateText: '#a16207', // Yellow 700
+                auth: '#dbeafe', // Blue 100
+                authText: '#1d4ed8', // Blue 700
+                unauth: '#fee2e2', // Red 100
+                unauthText: '#b91c1c', // Red 700
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      .hide-scrollbar::-webkit-scrollbar { display: none; }
+      .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+      .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+      .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 font-sans antialiased h-screen overflow-hidden">
+    <div id="root" class="h-full"></div>
+
+    <script type="text/babel" data-presets="typescript,react">
+        const { useState, useEffect, useCallback, useMemo } = React;
+
+        // --- ICONS ---
+        const Icon = ({ path, className = "w-5 h-5" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>{path}</svg>
+        );
+        const Icons = {
+            LayoutDashboard: (p) => <Icon {...p} path={<><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></>} />,
+            Users: (p) => <Icon {...p} path={<><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></>} />,
+            PieChart: (p) => <Icon {...p} path={<><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></>} />,
+            GraduationCap: (p) => <Icon {...p} path={<><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></>} />,
+            Bell: (p) => <Icon {...p} path={<><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></>} />,
+            Menu: (p) => <Icon {...p} path={<><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></>} />,
+            Search: (p) => <Icon {...p} path={<><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></>} />,
+            ChevronLeft: (p) => <Icon {...p} path={<path d="m15 18-6-6 6-6"/>} />,
+            ChevronRight: (p) => <Icon {...p} path={<path d="m9 18 6-6-6-6"/>} />,
+            Shield: (p) => <Icon {...p} path={<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>} />,
+            AlertTriangle: (p) => <Icon {...p} path={<><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></>} />,
+            FileText: (p) => <Icon {...p} path={<><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></>} />,
+            TrendingDown: (p) => <Icon {...p} path={<><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></>} />,
+        };
+
+        // --- DATA & UTILS ---
+        
+        // DfE Codes Configuration
+        const ATTENDANCE_CODES = {
+            '/': { label: 'Present (AM)', type: 'present', color: 'bg-emerald-100 text-emerald-800' },
+            '\\': { label: 'Present (PM)', type: 'present', color: 'bg-emerald-100 text-emerald-800' },
+            'L': { label: 'Late', type: 'late', color: 'bg-amber-100 text-amber-800' },
+            'I': { label: 'Illness', type: 'auth', color: 'bg-blue-50 text-blue-700' },
+            'M': { label: 'Medical', type: 'auth', color: 'bg-blue-50 text-blue-700' },
+            'U': { label: 'Unauthorised', type: 'unauth', color: 'bg-red-100 text-red-800 font-bold' },
+            'O': { label: 'Unauth Abs', type: 'unauth', color: 'bg-red-100 text-red-800 font-bold' },
+            'B': { label: 'Off-site', type: 'present', color: 'bg-purple-100 text-purple-800' },
+            'N': { label: 'No Reason', type: 'unauth', color: 'bg-red-50 text-red-600' },
+        };
+
+        const getCodeStyle = (code) => ATTENDANCE_CODES[code]?.color || 'bg-slate-50 text-slate-400';
+
+        // Date Helpers
+        const getMonday = (d) => {
+            const date = new Date(d);
+            const day = date.getDay();
+            const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+            date.setDate(diff); date.setHours(0,0,0,0); return date;
+        };
+        const formatDateKey = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        const getWeekDays = (base) => Array.from({length:5}, (_,i) => {
+            const d = new Date(getMonday(base)); d.setDate(d.getDate()+i); return formatDateKey(d);
+        });
+        const getIsoWeek = (d) => {
+            const date = new Date(d.getTime()); date.setHours(0,0,0,0);
+            date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
+            const week1 = new Date(date.getFullYear(), 0, 4);
+            return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+        };
+        const getIsoString = (d) => `${d.getFullYear()}-W${String(getIsoWeek(d)).padStart(2,'0')}`;
+        const getDateFromIso = (str) => {
+            const [y, w] = str.split('-W');
+            const d = new Date(y, 0, 1 + (w - 1) * 7);
+            const dayOfWeek = d.getDay();
+            const isoWeekStart = d;
+            if (dayOfWeek <= 4) isoWeekStart.setDate(d.getDate() - d.getDay() + 1);
+            else isoWeekStart.setDate(d.getDate() + 8 - d.getDay());
+            return isoWeekStart;
+        };
+
+        // --- MOCK DATA GENERATION ---
+        const generateData = (weekStart) => {
+            const students = [
+                { id: 'S1', name: 'Alice Johnson', flags: [], attendanceYtd: 98.5 },
+                { id: 'S2', name: 'Ben Harris', flags: ['pp'], attendanceYtd: 94.2 }, // PP = Pupil Premium
+                { id: 'S3', name: 'Charlie Davis', flags: ['sen', 'pp'], attendanceYtd: 88.4 }, // PA Student
+                { id: 'S4', name: 'Diana Evans', flags: ['safeguarding'], attendanceYtd: 91.0 },
+                { id: 'S5', name: 'Ethan Foster', flags: [], attendanceYtd: 100 },
+                { id: 'S6', name: 'Fiona Green', flags: [], attendanceYtd: 82.1 }, // Severe PA
+                { id: 'S7', name: 'George Hill', flags: ['sen'], attendanceYtd: 95.5 },
+                { id: 'S8', name: 'Hannah Ivers', flags: [], attendanceYtd: 97.0 },
+            ];
+
+            const days = getWeekDays(weekStart);
+            const data = {};
+
+            students.forEach(st => {
+                data[st.id] = {};
+                days.forEach((day, idx) => {
+                    // Simulation Logic
+                    let am = '/', pm = '\\';
+                    
+                    // Simulate persistent absentee (Charlie & Fiona)
+                    if ((st.id === 'S3' || st.id === 'S6') && Math.random() < 0.4) {
+                        const r = Math.random();
+                        if (r < 0.5) { am = 'U'; pm = 'U'; } // Unauthorised
+                        else if (r < 0.8) { am = 'I'; pm = 'I'; } // Illness
+                        else { am = 'L'; pm = '\\'; } // Late
+                    }
+                    
+                    // Simulate occasional medical (Diana)
+                    if (st.id === 'S4' && idx === 2) { am = 'M'; pm = 'M'; }
+
+                    data[st.id][day] = { am, pm };
+                });
+            });
+            return { students, days, data };
+        };
+
+        // --- COMPONENTS ---
+
+        const Badge = ({ type }) => {
+            const styles = {
+                safeguarding: 'bg-red-100 text-red-700 border-red-200',
+                sen: 'bg-indigo-100 text-indigo-700 border-indigo-200',
+                pp: 'bg-amber-100 text-amber-700 border-amber-200',
+                pa: 'bg-rose-600 text-white shadow-sm font-bold animate-pulse',
+            };
+            const labels = {
+                safeguarding: 'SG', sen: 'SEN', pp: 'PP', pa: 'PA <90%'
+            };
+            return (
+                <span className={`text-[10px] px-1.5 py-0.5 rounded border ${styles[type]} ml-1 cursor-help`} title={type.toUpperCase()}>
+                    {labels[type]}
+                </span>
+            );
+        };
+
+        const StatCard = ({ title, value, subtext, trend, type = 'neutral' }) => {
+            const colors = {
+                neutral: 'border-l-brand-500',
+                danger: 'border-l-red-500',
+                warning: 'border-l-amber-500',
+                success: 'border-l-emerald-500',
+            };
+            
+            return (
+                <div className={`bg-white p-5 rounded-xl border border-slate-200 shadow-sm border-l-4 ${colors[type]}`}>
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <p className="text-slate-500 text-xs font-semibold uppercase tracking-wide">{title}</p>
+                            <h3 className="text-2xl font-bold text-slate-800 mt-1">{value}</h3>
+                        </div>
+                        {type === 'danger' && <div className="p-2 bg-red-50 rounded-lg"><Icons.AlertTriangle className="text-red-600" /></div>}
+                        {type === 'success' && <div className="p-2 bg-emerald-50 rounded-lg"><Icons.PieChart className="text-emerald-600" /></div>}
+                        {type === 'warning' && <div className="p-2 bg-amber-50 rounded-lg"><Icons.TrendingDown className="text-amber-600" /></div>}
+                    </div>
+                    <div className="mt-3 flex items-center text-xs">
+                        {trend && <span className={`font-medium ${trend.includes('+') ? 'text-red-600' : 'text-emerald-600'}`}>{trend}</span>}
+                        <span className="text-slate-400 ml-2">{subtext}</span>
+                    </div>
+                </div>
+            );
+        };
+
+        const GridCell = ({ sessionData, viewMode }) => {
+            if (!sessionData) return <td className="p-3 bg-slate-50"></td>;
+            
+            const { am, pm } = sessionData;
+            
+            if (viewMode === 'stats') {
+                // Calculation: Present (/, \, B, L) count as present
+                const presentCodes = ['/', '\\', 'B', 'L'];
+                let score = 0;
+                if (presentCodes.includes(am)) score++;
+                if (presentCodes.includes(pm)) score++;
+                
+                let bg = 'bg-white';
+                let text = 'text-slate-300';
+                let border = 'border-slate-100';
+
+                if (score === 2) { bg = 'bg-emerald-50'; text = 'text-emerald-700'; border = 'border-emerald-200'; }
+                else if (score === 1) { bg = 'bg-amber-50'; text = 'text-amber-700'; border = 'border-amber-200'; }
+                else { bg = 'bg-red-50'; text = 'text-red-700'; border = 'border-red-200'; }
+
+                return (
+                    <td className="p-2 text-center border-r border-slate-100 last:border-0">
+                        <div className={`w-10 h-8 mx-auto flex items-center justify-center rounded border ${bg} ${text} ${border} text-xs font-bold`}>
+                            {score}/2
+                        </div>
+                    </td>
+                );
+            }
+
+            // DfE Codes View (Split Cell)
+            return (
+                <td className="p-0 border-r border-slate-200 last:border-0 h-14">
+                    <div className="flex h-full w-full">
+                        <div className={`flex-1 flex items-center justify-center border-r border-slate-100 text-xs font-medium ${getCodeStyle(am)}`} title={`AM: ${ATTENDANCE_CODES[am]?.label}`}>
+                            {am}
+                        </div>
+                        <div className={`flex-1 flex items-center justify-center text-xs font-medium ${getCodeStyle(pm)}`} title={`PM: ${ATTENDANCE_CODES[pm]?.label}`}>
+                            {pm}
+                        </div>
+                    </div>
+                </td>
+            );
+        };
+
+        const AttendancePage = () => {
+            const [date, setDate] = useState(getMonday(new Date()));
+            const [viewMode, setViewMode] = useState('codes'); // 'codes' | 'stats'
+            const [mockData, setMockData] = useState({ students: [], days: [], data: {} });
+            const [loading, setLoading] = useState(true);
+
+            // Fetch/Gen Data
+            useEffect(() => {
+                setLoading(true);
+                // Simulate API delay
+                const timer = setTimeout(() => {
+                    setMockData(generateData(date));
+                    setLoading(false);
+                }, 400);
+                return () => clearTimeout(timer);
+            }, [date]);
+
+            // Calculate Aggregates
+            const stats = useMemo(() => {
+                if (!mockData.students.length) return { att: 0, pa: 0, unauth: 0 };
+                
+                let totalSessions = 0;
+                let presentSessions = 0;
+                let unauthSessions = 0;
+                let paCount = 0;
+
+                mockData.students.forEach(st => {
+                    // Check if student is PA (< 90% YTD)
+                    if (st.attendanceYtd < 90) paCount++;
+
+                    mockData.days.forEach(day => {
+                        const sess = mockData.data[st.id]?.[day];
+                        if (sess) {
+                            ['am', 'pm'].forEach(slot => {
+                                const code = sess[slot];
+                                totalSessions++;
+                                if (['/', '\\', 'L', 'B'].includes(code)) presentSessions++;
+                                if (['U', 'O', 'G', 'N'].includes(code)) unauthSessions++;
+                            });
+                        }
+                    });
+                });
+
+                return {
+                    att: totalSessions ? Math.round((presentSessions / totalSessions) * 100) : 0,
+                    pa: mockData.students.length ? Math.round((paCount / mockData.students.length) * 100) : 0,
+                    unauth: totalSessions ? ((unauthSessions / totalSessions) * 100).toFixed(1) : 0
+                };
+            }, [mockData]);
+
+            // Handlers
+            const handleWeekChange = (e) => setDate(getDateFromIso(e.target.value));
+            const toggleMode = () => setViewMode(prev => prev === 'codes' ? 'stats' : 'codes');
+
+            return (
+                <div className="flex h-screen bg-slate-50">
+                    {/* Sidebar (Gemini style) */}
+                    <aside className="w-64 bg-gradient-to-b from-brand-800 to-brand-900 text-white flex-shrink-0 hidden md:flex flex-col shadow-xl">
+                        <div className="h-20 flex items-center justify-center border-b border-brand-700/50 bg-brand-900/30">
+                            <div className="flex items-center space-x-2">
+                                <Icons.GraduationCap className="h-8 w-8 text-brand-300" />
+                                <h1 className="text-xl font-bold tracking-tight">Purple Ruler</h1>
+                            </div>
+                        </div>
+                        <nav className="p-4 space-y-2 flex-1">
+                            <a href="#" className="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors bg-brand-800 text-white shadow-lg shadow-brand-900/20">
+                                <Icons.LayoutDashboard className="mr-3 h-5 w-5 text-white" /> Dashboard
+                            </a>
+                            <a href="#" className="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors text-brand-100 hover:bg-brand-800 hover:text-white">
+                                <Icons.Users className="mr-3 h-5 w-5 text-brand-300" /> Students
+                            </a>
+                            <a href="#" className="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors text-brand-100 hover:bg-brand-800 hover:text-white">
+                                <Icons.FileText className="mr-3 h-5 w-5 text-brand-300" /> Reports
+                            </a>
+                        </nav>
+                        <div className="p-4">
+                            <div className="bg-brand-800/50 rounded-lg p-4 text-xs text-brand-200 border border-brand-700/50">
+                                <p className="font-semibold text-white mb-1">Academic Year 23/24</p>
+                                <p>Term 2 • Week 8</p>
+                            </div>
+                        </div>
+                    </aside>
+
+                    {/* Main Content */}
+                    <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+                        {/* Header */}
+                        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-6">
+                            <div className="flex items-center">
+                                <h1 className="text-xl font-bold text-slate-800">Attendance Register</h1>
+                                <span className="ml-4 px-3 py-1 bg-brand-50 text-brand-700 text-xs font-medium rounded-full border border-brand-100 hidden sm:inline-block">Year 7 - Class 7A</span>
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <div className="relative hidden sm:block">
+                                    <Icons.Search className="absolute left-3 top-2.5 text-slate-400 w-4 h-4" />
+                                    <input type="text" placeholder="Search student..." className="pl-9 pr-4 py-2 bg-slate-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 w-64" />
+                                </div>
+                                <button className="p-2 text-slate-500 hover:bg-slate-100 rounded-full relative">
+                                    <Icons.Bell className="w-6 h-6" />
+                                    <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+                                </button>
+                            </div>
+                        </header>
+
+                        {/* Scrollable Area */}
+                        <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar">
+                            
+                            {/* Toolbar */}
+                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                                <div className="flex items-center bg-white border border-slate-200 rounded-lg p-1 shadow-sm">
+                                    <button onClick={() => {const d=new Date(date); d.setDate(d.getDate()-7); setDate(d)}} className="p-1.5 hover:bg-slate-50 rounded"><Icons.ChevronLeft /></button>
+                                    <input 
+                                        type="week" 
+                                        value={getIsoString(date)} 
+                                        onChange={handleWeekChange}
+                                        className="border-0 py-1 px-2 text-sm font-medium focus:ring-0 text-slate-700" 
+                                    />
+                                    <button onClick={() => {const d=new Date(date); d.setDate(d.getDate()+7); setDate(d)}} className="p-1.5 hover:bg-slate-50 rounded"><Icons.ChevronRight /></button>
+                                </div>
+
+                                {/* View Switcher */}
+                                <div className="flex bg-slate-100 p-1 rounded-lg">
+                                    <button 
+                                        onClick={() => setViewMode('codes')}
+                                        className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${viewMode === 'codes' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                    >
+                                        DfE Codes
+                                    </button>
+                                    <button 
+                                        onClick={() => setViewMode('stats')}
+                                        className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${viewMode === 'stats' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                    >
+                                        Statistics
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Strategic Stats */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                                <StatCard 
+                                    title="Weekly Attendance" 
+                                    value={`${stats.att}%`} 
+                                    type={stats.att < 90 ? 'danger' : (stats.att < 95 ? 'warning' : 'success')}
+                                    trend={stats.att < 95 ? "-1.2% vs last week" : null}
+                                    subtext="Target: 96%"
+                                />
+                                <StatCard 
+                                    title="PA Rate (Persistent Absence)" 
+                                    value={`${stats.pa}%`} 
+                                    type={stats.pa > 10 ? 'danger' : 'neutral'}
+                                    subtext={`${Math.round((stats.pa / 100) * mockData.students.length)} students < 90%`}
+                                />
+                                <StatCard 
+                                    title="Unauthorised Absence" 
+                                    value={`${stats.unauth}%`} 
+                                    type={parseFloat(stats.unauth) > 2 ? 'warning' : 'neutral'}
+                                    subtext="Of total sessions this week"
+                                />
+                            </div>
+
+                            {/* Main Grid */}
+                            <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col">
+                                {loading && <div className="p-12 text-center text-slate-400">Loading register data...</div>}
+                                
+                                {!loading && (
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-left border-collapse">
+                                            <thead>
+                                                <tr>
+                                                    <th className="sticky top-0 left-0 z-20 bg-slate-50 border-b border-slate-200 border-r p-4 text-xs font-bold text-slate-500 uppercase tracking-wide w-64 shadow-[4px_0_8px_-4px_rgba(0,0,0,0.1)]">Student</th>
+                                                    {mockData.days.map(d => {
+                                                        const dateObj = new Date(d);
+                                                        return (
+                                                            <th key={d} className="sticky top-0 z-10 bg-slate-50 border-b border-slate-200 p-2 text-center min-w-[90px]">
+                                                                <div className="text-xs font-bold text-slate-700 uppercase">{dateObj.toLocaleDateString('en-GB', {weekday:'short'})}</div>
+                                                                <div className="text-[10px] text-slate-400 font-medium">{dateObj.getDate()}</div>
+                                                            </th>
+                                                        )
+                                                    })}
+                                                    <th className="sticky top-0 right-0 z-10 bg-slate-50 border-b border-slate-200 p-4 text-xs font-bold text-slate-500 uppercase tracking-wide text-right">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-slate-100">
+                                                {mockData.students.map(student => (
+                                                    <tr key={student.id} className="group hover:bg-slate-50 transition-colors">
+                                                        <td className="sticky left-0 z-10 bg-white group-hover:bg-slate-50 border-r border-slate-200 p-4 shadow-[4px_0_8px_-4px_rgba(0,0,0,0.05)]">
+                                                            <div className="flex items-center justify-between">
+                                                                <div>
+                                                                    <div className="font-semibold text-sm text-slate-800 flex items-center">
+                                                                        {student.name}
+                                                                        {student.attendanceYtd < 90 && <Badge type="pa" />}
+                                                                    </div>
+                                                                    <div className="flex mt-1">
+                                                                        {student.flags.map(f => <Badge key={f} type={f} />)}
+                                                                        <span className={`text-[10px] ml-auto font-mono ${student.attendanceYtd < 90 ? 'text-red-600 font-bold' : 'text-slate-400'}`}>
+                                                                            YTD: {student.attendanceYtd}%
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        {mockData.days.map(day => (
+                                                            <GridCell 
+                                                                key={day} 
+                                                                sessionData={mockData.data[student.id]?.[day]} 
+                                                                viewMode={viewMode} 
+                                                            />
+                                                        ))}
+                                                        <td className="p-4 text-right">
+                                                            <button className="text-brand-600 hover:text-brand-800 text-xs font-semibold">Details</button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+                                
+                                <div className="bg-slate-50 border-t border-slate-200 p-3 flex flex-wrap gap-4 text-xs text-slate-500 items-center justify-center sm:justify-start">
+                                    <span className="font-semibold text-slate-700">Key:</span>
+                                    <span className="flex items-center"><span className="w-2 h-2 rounded-full bg-emerald-500 mr-1.5"></span>Present (/, \)</span>
+                                    <span className="flex items-center"><span className="w-2 h-2 rounded-full bg-amber-400 mr-1.5"></span>Late (L)</span>
+                                    <span className="flex items-center"><span className="w-2 h-2 rounded-full bg-blue-500 mr-1.5"></span>Authorised (I, M, C)</span>
+                                    <span className="flex items-center"><span className="w-2 h-2 rounded-full bg-red-500 mr-1.5"></span>Unauthorised (U, O)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<React.StrictMode><AttendancePage /></React.StrictMode>);
+    </script>
+</body>
+</html>
